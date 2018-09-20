@@ -1,0 +1,43 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "t5o9417otI91DFEWLtR0cem1Tqs=",
+			"path": "github.com/DATA-DOG/godog",
+			"revision": "d0006ef3064289b4a45189bb92e22e0b6f103494",
+			"revisionTime": "2018-09-19T08:34:52Z"
+		},
+		{
+			"checksumSHA1": "wbBy+PwuadGhTgX7IP05lwIR+Qs=",
+			"path": "github.com/DATA-DOG/godog/colors",
+			"revision": "d0006ef3064289b4a45189bb92e22e0b6f103494",
+			"revisionTime": "2018-09-19T08:34:52Z"
+		},
+		{
+			"checksumSHA1": "eT37F5UgVxJ7cygCfyI4f5rJemQ=",
+			"path": "github.com/DATA-DOG/godog/gherkin",
+			"revision": "d0006ef3064289b4a45189bb92e22e0b6f103494",
+			"revisionTime": "2018-09-19T08:34:52Z"
+		},
+		{
+			"checksumSHA1": "8UEWPwWrTawgXaARJI11+N13Id8=",
+			"path": "github.com/magefile/mage/mg",
+			"revision": "1426fb6b9761fe9c59c34feb498022f57bbee8c8",
+			"revisionTime": "2018-09-20T15:14:03Z"
+		},
+		{
+			"checksumSHA1": "En+iNLzNPUlnqzETlbSJmiQxA8E=",
+			"path": "github.com/magefile/mage/sh",
+			"revision": "1426fb6b9761fe9c59c34feb498022f57bbee8c8",
+			"revisionTime": "2018-09-20T15:14:03Z"
+		},
+		{
+			"checksumSHA1": "ZSWoOPUNRr5+3dhkLK3C4cZAQPk=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "5420a8b6744d3b0345ab293f6fcba19c978f1183",
+			"revisionTime": "2018-03-28T19:50:20Z"
+		}
+	],
+	"rootPath": "github.com/bilus/oya"
+}
