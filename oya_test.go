@@ -11,6 +11,7 @@ import (
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
 	"github.com/bilus/oya/build"
+	"github.com/pkg/errors"
 )
 
 func TestMain(m *testing.M) {
@@ -30,14 +31,12 @@ func TestMain(m *testing.M) {
 
 type SuiteContext struct {
 	projectDir string
+
+	lastBuildErr error
 }
 
 func (s *SuiteContext) MustSetUp() {
 	projectDir, err := ioutil.TempDir("", "oya")
-	if err != nil {
-		panic(err)
-	}
-	err = os.Chdir(projectDir)
 	if err != nil {
 		panic(err)
 	}
@@ -70,6 +69,10 @@ func (c *SuiteContext) MustTearDown() {
 	}
 }
 
+func (c *SuiteContext) iAmInProjectDir() error {
+	return os.Chdir(c.projectDir)
+}
+
 func (c *SuiteContext) fileProjectToopfileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
 }
@@ -85,15 +88,25 @@ func (c *SuiteContext) fileProjectToopfileContains(path string, contents *gherki
 	return nil
 }
 
-func (c *SuiteContext) oyaBuildIsRun(job string) error {
-	return build.Build(c.projectDir, job)
+func (c *SuiteContext) iRunOyaBuild(job string) error {
+	c.lastBuildErr = build.Build(c.projectDir, job)
+	return nil
+}
+
+func (c *SuiteContext) theBuildSucceeds() error {
+	if c.lastBuildErr != nil {
+		return errors.Wrap(c.lastBuildErr, "build failed")
+	}
+	return nil
 }
 
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
+	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^file (.+) containing$`, c.fileProjectToopfileContaining)
+	s.Step(`^I run "oya build (.+)"$`, c.iRunOyaBuild)
 	s.Step(`^file (.+) contains$`, c.fileProjectToopfileContains)
-	s.Step(`^"oya build (.+)" is run$`, c.oyaBuildIsRun)
+	s.Step(`^the build succeeds$`, c.theBuildSucceeds)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })

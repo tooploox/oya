@@ -1,10 +1,13 @@
 Feature: Building
 
+Background:
+   Given I'm in project dir
+
 # Scenario: No Oyafile
 # Scenario: Missing job
 
 Scenario: Single job
-  Given file Oyafile containing
+  Given file ./Oyafile containing
     """
     jobs:
       all: |
@@ -14,17 +17,17 @@ Scenario: Single job
         fi
         echo "Done"
     """
-  When "oya build all" is run
-  # Then the command suceeds
+  When I run "oya build all"
+  Then the build succeeds
   # And prints
   # """
   # Done
   # """
-  Then file OK contains
+  And file ./OK contains
     """
     """
 
 
 # Scenario: Nested Oyafiles
-
+# Changeset excluding certain dirs
 # Scenario: Shell specification
