@@ -32,7 +32,7 @@ type SuiteContext struct {
 	projectDir string
 }
 
-func MustSetup() SuiteContext {
+func (s *SuiteContext) MustSetUp() {
 	projectDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
 		panic(err)
@@ -41,12 +41,10 @@ func MustSetup() SuiteContext {
 	if err != nil {
 		panic(err)
 	}
-	return SuiteContext{
-		projectDir: projectDir,
-	}
+	s.projectDir = projectDir
 }
 
-func (c SuiteContext) writeFile(relPath, contents string) error {
+func (c *SuiteContext) writeFile(relPath, contents string) error {
 	fullPath := path.Join(c.projectDir, relPath)
 	dir := path.Dir(fullPath)
 	err := os.MkdirAll(dir, 0700)
@@ -56,7 +54,7 @@ func (c SuiteContext) writeFile(relPath, contents string) error {
 	return ioutil.WriteFile(fullPath, []byte(contents), 0600)
 }
 
-func (c SuiteContext) readFile(relPath string) (string, error) {
+func (c *SuiteContext) readFile(relPath string) (string, error) {
 	fullPath := path.Join(c.projectDir, relPath)
 	contents, err := ioutil.ReadFile(fullPath)
 	if err != nil {
@@ -65,18 +63,18 @@ func (c SuiteContext) readFile(relPath string) (string, error) {
 	return string(contents), err
 }
 
-func (c SuiteContext) MustTearDown() {
+func (c *SuiteContext) MustTearDown() {
 	err := os.RemoveAll(c.projectDir)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (c SuiteContext) fileProjectToopfileContaining(path string, contents *gherkin.DocString) error {
+func (c *SuiteContext) fileProjectToopfileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
 }
 
-func (c SuiteContext) fileProjectToopfileContains(path string, contents *gherkin.DocString) error {
+func (c *SuiteContext) fileProjectToopfileContains(path string, contents *gherkin.DocString) error {
 	actual, err := c.readFile(path)
 	if err != nil {
 		return err
@@ -87,15 +85,16 @@ func (c SuiteContext) fileProjectToopfileContains(path string, contents *gherkin
 	return nil
 }
 
-func (c SuiteContext) runOyaBuildAll(job string) error {
+func (c *SuiteContext) oyaBuildIsRun(job string) error {
 	return build.Build(c.projectDir, job)
 }
 
 func FeatureContext(s *godog.Suite) {
-	c := MustSetup()
+	c := SuiteContext{}
 	s.Step(`^file (.+) containing$`, c.fileProjectToopfileContaining)
 	s.Step(`^file (.+) contains$`, c.fileProjectToopfileContains)
-	s.Step(`^run oya build (.+)$`, c.runOyaBuildAll)
+	s.Step(`^"oya build (.+)" is run$`, c.oyaBuildIsRun)
 
+	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
 }

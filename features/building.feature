@@ -1,16 +1,30 @@
 Feature: Building
 
+# Scenario: No Oyafile
+# Scenario: Missing job
 
-Scenario: Single directory
+Scenario: Single job
   Given file Oyafile containing
     """
-    all: |
-      echo "OK" > OK
+    jobs:
+      all: |
+        foo=4
+        if [ $foo -ge 3 ]; then
+          touch OK
+        fi
+        echo "Done"
     """
-  And run oya build all
+  When "oya build all" is run
   # Then the command suceeds
+  # And prints
+  # """
+  # Done
+  # """
   Then file OK contains
     """
-    OK
-
     """
+
+
+# Scenario: Nested Oyafiles
+
+# Scenario: Shell specification
