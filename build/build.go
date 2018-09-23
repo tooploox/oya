@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Build(projectDir, jobName string, stdout, stderr io.Writer) error {
+func Build(projectDir, hookName string, stdout, stderr io.Writer) error {
 	tempDir, err := ioutil.TempDir("", "oya")
 	defer os.RemoveAll(tempDir)
 	if err != nil {
@@ -31,12 +31,12 @@ func Build(projectDir, jobName string, stdout, stderr io.Writer) error {
 			return nil
 		}
 
-		job, ok := oyafile.Jobs[jobName]
+		hook, ok := oyafile.Hooks[hookName]
 		if !ok {
-			return fmt.Errorf("no such job: %v", jobName)
+			return fmt.Errorf("no such hook: %v", hookName)
 		}
 
-		script := job.Script
+		script := hook.Script
 
 		scriptFile, err := ioutil.TempFile(tempDir, "")
 		if err != nil {

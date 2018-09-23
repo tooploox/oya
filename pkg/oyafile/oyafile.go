@@ -9,12 +9,10 @@ import (
 
 const DefaultName = "Oyafile"
 
-type OyafileFormat struct {
-	Jobs map[string]Script `yaml:"jobs"`
-}
+type OyafileFormat = map[string]Script
 
 type Oyafile struct {
-	Jobs map[string]Job
+	Hooks map[string]Hook
 }
 
 func Load(oyafilePath string) (*Oyafile, bool, error) {
@@ -33,10 +31,10 @@ func Load(oyafilePath string) (*Oyafile, bool, error) {
 		return nil, false, err
 	}
 	oyafile := Oyafile{
-		Jobs: make(map[string]Job),
+		Hooks: make(map[string]Hook),
 	}
-	for name, script := range of.Jobs {
-		oyafile.Jobs[name] = Job{
+	for name, script := range of {
+		oyafile.Hooks[name] = Hook{
 			Name:   name,
 			Script: script,
 		}

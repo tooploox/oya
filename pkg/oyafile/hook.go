@@ -1,6 +1,6 @@
 package oyafile
 
-type Job struct {
+type Hook struct {
 	Name string
 	Script
 }

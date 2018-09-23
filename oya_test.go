@@ -98,8 +98,8 @@ func (c *SuiteContext) fileExists(path string) error {
 	return err
 }
 
-func (c *SuiteContext) iRunOyaBuild(job string) error {
-	c.lastCommandErr = build.Build(c.projectDir, job, c.stdout, c.stderr)
+func (c *SuiteContext) iRunOyaBuild(hook string) error {
+	c.lastCommandErr = build.Build(c.projectDir, hook, c.stdout, c.stderr)
 	return nil
 }
 

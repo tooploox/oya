@@ -51,8 +51,8 @@ test: pytest
    * `changeset` -- (optional) modifies the current changeset (see Changesets).
 
 Oya first walks all directories to build the changeset: a list of buildable directories.
-It then walks the list, running the requested job in each.
-   CI/CD tool-specific script outputting list of modified files in buildable directories given the current job name.
+It then walks the list, running the matching hook in each.
+   CI/CD tool-specific script outputting list of modified files in buildable directories given the current hook name.
      - each path must be normalized and prefixed with `+`
      - cannot be overriden, only valid for top-level Oyafile
      - in the future, you'll be able to override for a buildable directory and use `-` to exclude directories, `+` to include additional ones,
