@@ -2,55 +2,48 @@ package build
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
-	"path"
 
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
-type Script = string
-
-type Oyafile struct {
-	Jobs map[string]Script `yaml:"jobs"`
-}
-
-func Build(projectDir, job string) error {
+func Build(projectDir, jobName string, stdout, stderr io.Writer) error {
 	tempDir, err := ioutil.TempDir("", "oya")
 	defer os.RemoveAll(tempDir)
 	if err != nil {
 		return err
 	}
-	oyafilePath := path.Join(projectDir, "Oyafile")
-	file, err := os.Open(oyafilePath)
+	oyafilePath := oyafile.FullPath(projectDir, "")
+	oyafile, err := oyafile.Load(oyafilePath)
 	if err != nil {
 		return err
 	}
-	defer func() { _ = file.Close() }()
-	decoder := yaml.NewDecoder(file)
-	var oyafile Oyafile
-	err = decoder.Decode(&oyafile)
-	if err != nil {
-		return err
-	}
-	script, ok := oyafile.Jobs[job]
+
+	job, ok := oyafile.Jobs[jobName]
 	if !ok {
-		return fmt.Errorf("no such job: %v", job)
+		return fmt.Errorf("no such job: %v", jobName)
 	}
+
+	script := job.Script
 
 	scriptFile, err := ioutil.TempFile(tempDir, "")
 	if err != nil {
 		return err
 	}
-	defer scriptFile.Close()
 	_, err = scriptFile.WriteString(string(script))
+	if err != nil {
+		_ = scriptFile.Close()
+		return err
+	}
+	err = scriptFile.Close()
 	if err != nil {
 		return err
 	}
-
-	err = sh.RunV("sh", scriptFile.Name())
+	_, err = sh.Exec(nil, stdout, stderr, "sh", scriptFile.Name())
 	if err != nil {
 		return errors.Wrapf(err, "error in %v", oyafilePath)
 	}

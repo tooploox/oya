@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,7 +33,9 @@ func TestMain(m *testing.M) {
 type SuiteContext struct {
 	projectDir string
 
-	lastBuildErr error
+	lastCommandErr error
+	stdout         *bytes.Buffer
+	stderr         *bytes.Buffer
 }
 
 func (s *SuiteContext) MustSetUp() {
@@ -41,6 +44,8 @@ func (s *SuiteContext) MustSetUp() {
 		panic(err)
 	}
 	s.projectDir = projectDir
+	s.stdout = bytes.NewBuffer(nil)
+	s.stderr = bytes.NewBuffer(nil)
 }
 
 func (c *SuiteContext) writeFile(relPath, contents string) error {
@@ -83,19 +88,35 @@ func (c *SuiteContext) fileProjectToopfileContains(path string, contents *gherki
 		return err
 	}
 	if actual != contents.Content {
-		return fmt.Errorf("unexpected file %v contents: %v expected: %v", path, actual, contents.Content)
+		return fmt.Errorf("unexpected file %v contents: %q expected: %q", path, actual, contents.Content)
 	}
 	return nil
 }
 
 func (c *SuiteContext) iRunOyaBuild(job string) error {
-	c.lastBuildErr = build.Build(c.projectDir, job)
+	c.lastCommandErr = build.Build(c.projectDir, job, c.stdout, c.stderr)
 	return nil
 }
 
-func (c *SuiteContext) theBuildSucceeds() error {
-	if c.lastBuildErr != nil {
-		return errors.Wrap(c.lastBuildErr, "build failed")
+func (c *SuiteContext) theCommandSucceeds() error {
+	if c.lastCommandErr != nil {
+		return errors.Wrap(c.lastCommandErr, "build failed")
+	}
+	return nil
+}
+
+func (c *SuiteContext) theCommandOutputs(target string, expected *gherkin.DocString) error {
+	var actual string
+	switch target {
+	case "stdout":
+		actual = c.stdout.String()
+	case "stderr":
+		actual = c.stderr.String()
+	default:
+		return fmt.Errorf("Unexpected command output target: %v", target)
+	}
+	if actual != expected.Content {
+		return fmt.Errorf("unexpected %v output: %q expected: %q", target, actual, expected.Content)
 	}
 	return nil
 }
@@ -106,7 +127,8 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^file (.+) containing$`, c.fileProjectToopfileContaining)
 	s.Step(`^I run "oya build (.+)"$`, c.iRunOyaBuild)
 	s.Step(`^file (.+) contains$`, c.fileProjectToopfileContains)
-	s.Step(`^the build succeeds$`, c.theBuildSucceeds)
+	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
+	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })

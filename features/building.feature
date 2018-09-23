@@ -6,7 +6,7 @@ Background:
 # Scenario: No Oyafile
 # Scenario: Missing job
 
-Scenario: Single job
+Scenario: Successful build
   Given file ./Oyafile containing
     """
     jobs:
@@ -18,11 +18,12 @@ Scenario: Single job
         echo "Done"
     """
   When I run "oya build all"
-  Then the build succeeds
-  # And prints
-  # """
-  # Done
-  # """
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Done
+
+  """
   And file ./OK contains
     """
     """
