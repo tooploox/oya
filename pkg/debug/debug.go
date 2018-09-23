@@ -9,7 +9,7 @@ func LogOyafiles(msg string, oyafiles []*oyafile.Oyafile) {
 	if log.GetLevel() == log.DebugLevel {
 		log.Debug(msg)
 		for _, o := range oyafiles {
-			log.Debug(o.Dir)
+			log.Debugf("  %v", o.Dir)
 		}
 	}
 }

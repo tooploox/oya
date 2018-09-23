@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bilus/oya/pkg/debug"
 	"github.com/bilus/oya/pkg/oyafile"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,24 +21,24 @@ func Calculate(oyafiles []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	}
 	included := unique(dirs)
 
+	log.Debug("Resulting changeset:")
 	changeset := make([]*oyafile.Oyafile, 0, len(oyafiles))
 	for _, oyafile := range oyafiles {
 		cleanDir := filepath.Clean(oyafile.Dir)
 		_, ok := included[cleanDir]
 		if ok {
-			log.Debug("Included: %v", cleanDir)
+			log.Debugf("  + %v", cleanDir)
 			changeset = append(changeset, oyafile)
 		} else {
-			log.Debug("Excluded: %v", cleanDir)
+			log.Debugf("  - %v", cleanDir)
 		}
 	}
 
-	debug.LogOyafiles("Resulting changeset", changeset)
 	return changeset, nil
 }
 
 func calculateChangeset(oyafile *oyafile.Oyafile) ([]string, error) {
-	log.Debugf("Calculating changeset at %v", oyafile.Dir)
+	log.Debugf("Generating changeset at %v:", oyafile.Dir)
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
@@ -56,15 +55,14 @@ func calculateChangeset(oyafile *oyafile.Oyafile) ([]string, error) {
 	dirs := make([]string, 0)
 	for _, change := range changes {
 		if len(change) == 0 {
-			log.Debug("Rejected: <empty line>")
 			continue
 		}
 		if change[0] != '+' || len(change) < 2 {
-			log.Debug("Error: %v", change)
+			log.Debugf("  Error: %v", change)
 			return nil, fmt.Errorf("Unexpected changeset entry %q expected \"+path\"", change)
 		}
 		path := normalizePath(oyafile.Dir, change[1:])
-		log.Debugf("Accepted: %v", path)
+		log.Debugf("  Addition: %v", path)
 		// TODO: Check if path is valid.
 		dirs = append(dirs, path)
 	}

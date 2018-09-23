@@ -3,9 +3,6 @@ Feature: Building
 Background:
    Given I'm in project dir
 
-# Scenario: No Oyafile
-# Scenario: Missing hook
-
 Scenario: Successful build
   Given file ./Oyafile containing
     """
@@ -121,6 +118,10 @@ Scenario: Parent forces child rebuild
 
   """
 
-# Scenario: Minimal rebuild
+# NEXT: Exclusion.
+
+# Scenario: No Oyafile
+# Scenario: Missing hook
+# Scenario: .oyaignore
 # Scenario: Shell specification
-# Early termination flag.
+# Scenario: Disable early termination
