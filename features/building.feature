@@ -24,11 +24,44 @@ Scenario: Successful build
   Done
 
   """
-  And file ./OK contains
-    """
-    """
+  And file ./OK exists
 
 
-# Scenario: Nested Oyafiles
-# Changeset excluding certain dirs
+Scenario: Nested Oyafiles
+  Given file ./Oyafile containing
+    """
+    jobs:
+      all: |
+        touch Root
+        echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    jobs:
+      all: |
+        touch Project1
+        echo "Project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    jobs:
+      all: |
+        touch Project2
+        echo "Project2"
+    """
+  When I run "oya build all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Root
+  Project1
+  Project2
+
+  """
+  And file ./Root exists
+  And file ./Project1 exists
+  And file ./Project2 exists
+
+# Scenario: No rebuild
+# Scenario: Minimal rebuild
 # Scenario: Shell specification

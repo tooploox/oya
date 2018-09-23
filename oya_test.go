@@ -78,11 +78,11 @@ func (c *SuiteContext) iAmInProjectDir() error {
 	return os.Chdir(c.projectDir)
 }
 
-func (c *SuiteContext) fileProjectToopfileContaining(path string, contents *gherkin.DocString) error {
+func (c *SuiteContext) fileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
 }
 
-func (c *SuiteContext) fileProjectToopfileContains(path string, contents *gherkin.DocString) error {
+func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) error {
 	actual, err := c.readFile(path)
 	if err != nil {
 		return err
@@ -91,6 +91,11 @@ func (c *SuiteContext) fileProjectToopfileContains(path string, contents *gherki
 		return fmt.Errorf("unexpected file %v contents: %q expected: %q", path, actual, contents.Content)
 	}
 	return nil
+}
+
+func (c *SuiteContext) fileExists(path string) error {
+	_, err := os.Stat(path)
+	return err
 }
 
 func (c *SuiteContext) iRunOyaBuild(job string) error {
@@ -124,9 +129,10 @@ func (c *SuiteContext) theCommandOutputs(target string, expected *gherkin.DocStr
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
-	s.Step(`^file (.+) containing$`, c.fileProjectToopfileContaining)
+	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya build (.+)"$`, c.iRunOyaBuild)
-	s.Step(`^file (.+) contains$`, c.fileProjectToopfileContains)
+	s.Step(`^file (.+) contains$`, c.fileContains)
+	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 
