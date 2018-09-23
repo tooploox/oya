@@ -13,6 +13,7 @@ import (
 	"github.com/DATA-DOG/godog/gherkin"
 	"github.com/bilus/oya/build"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestMain(m *testing.M) {
@@ -43,6 +44,7 @@ func (s *SuiteContext) MustSetUp() {
 	if err != nil {
 		panic(err)
 	}
+	log.SetLevel(log.DebugLevel)
 	s.projectDir = projectDir
 	s.stdout = bytes.NewBuffer(nil)
 	s.stderr = bytes.NewBuffer(nil)

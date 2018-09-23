@@ -77,6 +77,49 @@ Scenario: No rebuild
   """
   """
 
+@current
+Scenario: Child forces parent rebuild
+  Given file ./Oyafile containing
+    """
+    Changeset: echo ""
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    Changeset: echo "+../"
+    all: |
+      echo "Root"
+    """
+  When I run "oya build all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Root
+
+  """
+
+@current
+Scenario: Parent forces child rebuild
+  Given file ./Oyafile containing
+    """
+    Changeset: echo "+project1/"
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    Changeset: echo ""
+    all: |
+      echo "Project1"
+    """
+  When I run "oya build all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Project1
+
+  """
 
 # Scenario: Minimal rebuild
 # Scenario: Shell specification

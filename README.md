@@ -1,3 +1,5 @@
+NEXT: Absolute paths.
+
 # Oya
 
 ## Usage

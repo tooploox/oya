@@ -6,7 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bilus/oya/pkg/debug"
 	"github.com/bilus/oya/pkg/oyafile"
+	log "github.com/sirupsen/logrus"
 )
 
 func Calculate(oyafiles []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
@@ -18,19 +20,26 @@ func Calculate(oyafiles []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 		}
 		dirs = append(dirs, changes...)
 	}
-	included := uniqueDirs(dirs)
+	included := unique(dirs)
 
 	changeset := make([]*oyafile.Oyafile, 0, len(oyafiles))
 	for _, oyafile := range oyafiles {
-		_, ok := included[filepath.Clean(oyafile.Dir)]
+		cleanDir := filepath.Clean(oyafile.Dir)
+		_, ok := included[cleanDir]
 		if ok {
+			log.Debug("Included: %v", cleanDir)
 			changeset = append(changeset, oyafile)
+		} else {
+			log.Debug("Excluded: %v", cleanDir)
 		}
 	}
+
+	debug.LogOyafiles("Resulting changeset", changeset)
 	return changeset, nil
 }
 
 func calculateChangeset(oyafile *oyafile.Oyafile) ([]string, error) {
+	log.Debugf("Calculating changeset at %v", oyafile.Dir)
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
@@ -47,23 +56,33 @@ func calculateChangeset(oyafile *oyafile.Oyafile) ([]string, error) {
 	dirs := make([]string, 0)
 	for _, change := range changes {
 		if len(change) == 0 {
+			log.Debug("Rejected: <empty line>")
 			continue
 		}
 		if change[0] != '+' || len(change) < 2 {
+			log.Debug("Error: %v", change)
 			return nil, fmt.Errorf("Unexpected changeset entry %q expected \"+path\"", change)
 		}
+		path := normalizePath(oyafile.Dir, change[1:])
+		log.Debugf("Accepted: %v", path)
 		// TODO: Check if path is valid.
-		dirs = append(dirs, change[1:])
+		dirs = append(dirs, path)
 	}
 
 	return dirs, nil
 }
 
-func uniqueDirs(dirs []string) map[string]struct{} {
+func normalizePath(oyafileDir, path string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Clean(filepath.Join(oyafileDir, path))
+}
+
+func unique(strings []string) map[string]struct{} {
 	unique := make(map[string]struct{})
-	for _, dir := range dirs {
-		cleanDir := filepath.Clean(dir)
-		unique[cleanDir] = struct{}{}
+	for _, s := range strings {
+		unique[s] = struct{}{}
 	}
 	return unique
 }
