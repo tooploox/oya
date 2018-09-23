@@ -1,61 +1,27 @@
 package build
 
 import (
-	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
+	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 )
 
-func Build(projectDir, hookName string, stdout, stderr io.Writer) error {
-	tempDir, err := ioutil.TempDir("", "oya")
-	defer os.RemoveAll(tempDir)
+func Build(rootDir, hookName string, stdout, stderr io.Writer) error {
+	oyafiles, err := oyafile.List(rootDir)
 	if err != nil {
 		return err
 	}
-	return filepath.Walk(projectDir, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			return nil
-		}
-		oyafilePath := oyafile.FullPath(path, "")
-		oyafile, buildable, err := oyafile.Load(oyafilePath)
+	changes, err := changeset.Calculate(oyafiles)
+	if err != nil {
+		return err
+	}
+	for _, o := range changes {
+		_, err = o.ExecHook(hookName, nil, stdout, stderr)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error in %v", o.Path)
 		}
-		if !buildable {
-			return nil
-		}
-
-		hook, ok := oyafile.Hooks[hookName]
-		if !ok {
-			return fmt.Errorf("no such hook: %v", hookName)
-		}
-
-		script := hook.Script
-
-		scriptFile, err := ioutil.TempFile(tempDir, "")
-		if err != nil {
-			return err
-		}
-		_, err = scriptFile.WriteString(string(script))
-		if err != nil {
-			_ = scriptFile.Close()
-			return err
-		}
-		err = scriptFile.Close()
-		if err != nil {
-			return err
-		}
-		_, err = sh.Exec(nil, stdout, stderr, "sh", scriptFile.Name())
-		if err != nil {
-			return errors.Wrapf(err, "error in %v", oyafilePath)
-		}
-
-		return nil
-	})
+	}
+	return nil
 }

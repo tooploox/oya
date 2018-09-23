@@ -58,6 +58,26 @@ Scenario: Nested Oyafiles
   And file ./Project1 exists
   And file ./Project2 exists
 
-# Scenario: No rebuild
+Scenario: No rebuild
+  Given file ./Oyafile containing
+    """
+    Changeset: echo ""
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    Changeset: echo ""
+    all: |
+      echo "Project1"
+    """
+  When I run "oya build all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  """
+
+
 # Scenario: Minimal rebuild
 # Scenario: Shell specification
+# Early termination flag.

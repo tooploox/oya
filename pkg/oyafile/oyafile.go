@@ -1,18 +1,30 @@
 package oyafile
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"path"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
-const DefaultName = "Oyafile"
-
 type OyafileFormat = map[string]Script
 
 type Oyafile struct {
+	Dir   string
+	Path  string
+	Shell string
 	Hooks map[string]Hook
+}
+
+func New(oyafilePath string) *Oyafile {
+	return &Oyafile{
+		Dir:   path.Dir(oyafilePath),
+		Path:  oyafilePath,
+		Shell: "/bin/sh",
+		Hooks: make(map[string]Hook),
+	}
 }
 
 func Load(oyafilePath string) (*Oyafile, bool, error) {
@@ -30,21 +42,20 @@ func Load(oyafilePath string) (*Oyafile, bool, error) {
 	if err != nil {
 		return nil, false, err
 	}
-	oyafile := Oyafile{
-		Hooks: make(map[string]Hook),
-	}
+	oyafile := New(oyafilePath)
 	for name, script := range of {
 		oyafile.Hooks[name] = Hook{
 			Name:   name,
 			Script: script,
 		}
 	}
-	return &oyafile, true, err
+	return oyafile, true, err
 }
 
-func FullPath(projectDir, name string) string {
-	if len(name) == 0 {
-		name = DefaultName
+func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, stderr io.Writer) (found bool, err error) {
+	hook, ok := oyafile.Hooks[hookName]
+	if !ok {
+		return false, fmt.Errorf("no such hook: %v", hookName)
 	}
-	return path.Join(projectDir, name)
+	return true, hook.Script.Exec(nil, stdout, stderr, oyafile.Shell)
 }
