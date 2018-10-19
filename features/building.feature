@@ -125,3 +125,6 @@ Scenario: Parent forces child rebuild
 # Scenario: .oyaignore
 # Scenario: Shell specification
 # Scenario: Disable early termination
+# Scenario: Absolute changeset paths trigger error
+# Scenorio/test: Changeset path that doesn't exist
+# Scenorio/test: Changeset path that has no Oyafile

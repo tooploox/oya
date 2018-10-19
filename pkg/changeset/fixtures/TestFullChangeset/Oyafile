@@ -1,0 +1,4 @@
+Changeset:
+  echo '+.'
+  echo './project1'
+  echo './project2'
