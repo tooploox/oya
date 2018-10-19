@@ -74,7 +74,27 @@ Scenario: No rebuild
   """
   """
 
-@current
+Scenario: Child forces its rebuild
+  Given file ./Oyafile containing
+    """
+    Changeset: echo ""
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    Changeset: echo "+."
+    all: |
+      echo "Root"
+    """
+  When I run "oya build all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Root
+
+  """
+
 Scenario: Child forces parent rebuild
   Given file ./Oyafile containing
     """
@@ -96,7 +116,6 @@ Scenario: Child forces parent rebuild
 
   """
 
-@current
 Scenario: Parent forces child rebuild
   Given file ./Oyafile containing
     """
@@ -125,3 +144,6 @@ Scenario: Parent forces child rebuild
 # Scenario: .oyaignore
 # Scenario: Shell specification
 # Scenario: Disable early termination
+# Scenario: Absolute changeset paths trigger error
+# Scenorio/test: Changeset path that doesn't exist
+# Scenorio/test: Changeset path that has no Oyafile

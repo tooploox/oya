@@ -2,8 +2,9 @@ package oyafile
 
 import (
 	"os"
-	"path"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 const DefaultName = "Oyafile"
@@ -14,10 +15,9 @@ func List(rootDir string) ([]*Oyafile, error) {
 		if !info.IsDir() {
 			return nil
 		}
-		oyafilePath := fullPath(path, "")
-		oyafile, buildable, err := Load(oyafilePath)
+		oyafile, buildable, err := LoadFromDir(path)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error listing Oyafiles in %s", rootDir)
 		}
 		if !buildable {
 			return nil
@@ -25,11 +25,4 @@ func List(rootDir string) ([]*Oyafile, error) {
 		oyafiles = append(oyafiles, oyafile)
 		return nil
 	})
-}
-
-func fullPath(projectDir, name string) string {
-	if len(name) == 0 {
-		name = DefaultName
-	}
-	return path.Join(projectDir, name)
 }
