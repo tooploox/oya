@@ -35,7 +35,7 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
 	defaultHook := oyafile.BuiltinHook{
 		Name: "Changeset",
-		OnExec: func(env map[string]string, stdout, stderr io.Writer, shell string) error {
+		OnExec: func(env map[string]string, stdout, stderr io.Writer) error {
 			oyafiles, err := oyafile.List(rootOyafile.Dir)
 			if err != nil {
 				return err
@@ -66,7 +66,7 @@ func execChangesetHook(changesetHook oyafile.Hook) ([]string, error) {
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
-	err := changesetHook.Exec(nil, stdout, stderr, "sh") // TODO: Make it ScriptedHook.Shell instead of passing as arg.
+	err := changesetHook.Exec(nil, stdout, stderr)
 	if err != nil {
 		return nil, err
 	}

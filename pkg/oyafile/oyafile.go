@@ -58,6 +58,7 @@ func Load(oyafilePath string) (*Oyafile, bool, error) {
 		oyafile.Hooks[name] = ScriptedHook{
 			Name:   name,
 			Script: script,
+			Shell:  oyafile.Shell,
 		}
 	}
 	return oyafile, true, nil
@@ -73,7 +74,7 @@ func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, 
 	if !ok {
 		return false, fmt.Errorf("no such hook: %v", hookName)
 	}
-	return true, hook.Exec(nil, stdout, stderr, oyafile.Shell)
+	return true, hook.Exec(nil, stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {
