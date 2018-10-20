@@ -1,6 +1,7 @@
 package build
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/bilus/oya/pkg/changeset"
@@ -9,18 +10,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var ErrNoOyafiles = fmt.Errorf("No Oyafiles found")
+
 func Build(rootDir, hookName string, stdout, stderr io.Writer) error {
 	log.Debugf("Hook %q at %v", hookName, rootDir)
-	oyafile, ok, err := oyafile.LoadFromDir(rootDir)
+
+	oyafiles, err := oyafile.List(rootDir)
 	if err != nil {
 		return err
 	}
-	if !ok {
-		// TODO: Need warn.
-		return nil
+	if len(oyafiles) == 0 {
+		return ErrNoOyafiles
 	}
 
-	changes, err := changeset.Calculate(oyafile)
+	if oyafiles[0].Dir != rootDir {
+		panic("oyafile.List post-condition failed: expected first oyafile to be root Oyafile")
+	}
+
+	changes, err := changeset.Calculate(oyafiles)
 	if err != nil {
 		return err
 	}

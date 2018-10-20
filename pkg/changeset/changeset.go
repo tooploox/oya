@@ -11,31 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type VisitedOyafiles struct {
-	os []*oyafile.Oyafile
-}
-
-func (vo *VisitedOyafiles) MarkVisited(o *oyafile.Oyafile) {
-	if vo.IsVisited(o) {
-		panic(fmt.Sprintf("Internal error: already visited %v", o.Path))
-	}
-	vo.os = append(vo.os, o)
-}
-
-func (vo *VisitedOyafiles) IsVisited(o *oyafile.Oyafile) bool {
-	for _, x := range vo.os {
-		if x.Equals(*o) {
-			return true
-		}
-	}
-	return false
-}
-
-func Calculate(o *oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
-	candidates, err := oyafile.List(o.Dir)
-	if err != nil {
-		return nil, err
-	}
+func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	if len(candidates) == 0 {
 		return candidates, nil
 	}
