@@ -19,7 +19,17 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	rootOyafile := candidates[0]
 	// Set to default if not present.
 	rootOyafile.Hooks["Changeset"] = rootChangesetHook(rootOyafile)
-	return calculateChangeset(rootOyafile.Dir, candidates)
+
+	var changeset []*oyafile.Oyafile
+	for _, candidate := range candidates {
+		oyafiles, err := calculateChangeset(candidate)
+		if err != nil {
+			return nil, err
+		}
+		changeset = append(changeset, oyafiles...)
+	}
+
+	return changeset, nil
 }
 
 func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
@@ -52,19 +62,6 @@ func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
 	return defaultHook
 }
 
-func calculateChangeset(rootDir string, candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
-	var changeset []*oyafile.Oyafile
-	for _, candidate := range candidates {
-		oyafiles, err := doCalculateChangeset(rootDir, candidate)
-		if err != nil {
-			return nil, err
-		}
-		changeset = append(changeset, oyafiles...)
-	}
-
-	return changeset, nil
-}
-
 func execChangesetHook(changesetHook oyafile.Hook) ([]string, error) {
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
@@ -77,7 +74,7 @@ func execChangesetHook(changesetHook oyafile.Hook) ([]string, error) {
 	return parseChangeset(stdout.String())
 }
 
-func doCalculateChangeset(rootDir string, currOyafile *oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
+func calculateChangeset(currOyafile *oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	changesetHook, ok := currOyafile.Hooks["Changeset"]
 	if !ok {
 		return nil, nil
