@@ -1,0 +1,12 @@
+* Customizable Shell via .Values.Shell
+* Support for templating
+* Values inheritance
+* Exclusions (-../)
+* .oyaignore
+   Exclude sub-directiories -- have to be built by cd'ing and running oya.
+* .Values.EarlyTerminate (default: true)
+   Set to false to avoid terminating on first error
+* Fail for incorrect changeset paths
+** Absolute path
+** Non-existent path
+** Path without Oyafile
