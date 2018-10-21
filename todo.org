@@ -1,4 +1,16 @@
+* Fetching packages.
+* CLI
 * Customizable Shell via .Values.Shell
+Values:
+  Shell: /bin/bash
+  custom: uuu
+
+
+Changeset: echo ""
+
+build: |
+  go build main.go --foor {{ .Values.uuu }
+
 * Support for templating
 * Values inheritance
 * Exclusions (-../)

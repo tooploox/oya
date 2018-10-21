@@ -10,13 +10,16 @@
 
         oya init jenkins-monorepo
 
-   It boostraps configuration for Jenkins pipelines supporting the 1.a workflow (see Workflows below), an Oyafile and supporting scripts and compatible generators.
+   It boostraps configuration for Jenkins pipelines supporting the 1.a workflow
+   (see Workflows below), an Oyafile and supporting scripts and compatible
+   generators.
 
 1. Run a hook:
 
         oya run build
 
-   Right now it won't do anything as there are no buildable directories yet. Let's create one.
+   Right now it won't do anything as there are no buildable directories yet.
+   Let's create one.
 
 1. Create a buildable directory:
 
@@ -32,15 +35,47 @@
 
 ## How it works
 
-A directory is included in the build process if it has an Oyafile. Let's call that such directory a
-"buildable directory".
+A directory is included in the build process if it has an Oyafile. Let's call
+that such directory a **buildable directory**. You can think of a buildable
+directory as its own sub-project. For example, in a mono-repository containing
+several microservices, you'd put each microservice in its own buildable
+directory.
 
-Oya first walks all directories to build the changeset: a list of buildable directories.
-It then walks the list of directories, running the requested hook for each directory
+Imagine you have the following file structure:
 
-Hooks and their corresponding scripts are defined in `Oyafile`s. Names of hooks can be arbitrary camel-case yaml identifiers, starting with a lower-case letter. Built-in hooks start with capital letters.
+```yaml
+# ./Oyafile
 
-Example `Oyafile`:
+build: |
+  echo "Top-level directory"
+```
+
+```yaml
+# ./subdir/Oyafile
+
+build: |
+  echo "Sub-directory"
+```
+
+When you run `oya run build`, Oya first walks the directory tree, starting from
+the current directory, to build the **changeset**: the list of directories that
+require re-building. In the above example it would be, as you probably guessed,
+`.` (the top-level directory) and `subdir` (the sub-directory).
+
+Finally, Oya executes the hook you specified for every Oyafile that contains it,
+starting from the top directory. Going back to our example, it would generate
+the following output:
+
+```
+Top-level directory
+Sub-directory
+```
+
+As you say, hooks and their corresponding scripts are defined in `Oyafile`s.
+Their names must be camel-case yaml identifiers, starting with a lower-case
+letter. Built-in hooks start with capital letters.
+
+More realistic example of an `Oyafile`:
 
 ```
 build: docker build .
@@ -49,30 +84,37 @@ test: pytest
 
 ## Changesets
 
-   * `changeset` -- (optional) modifies the current changeset (see Changesets).
+TODO
 
-Oya first walks all directories to build the changeset: a list of buildable directories.
-It then walks the list, running the matching hook in each.
-   CI/CD tool-specific script outputting list of modified files in buildable directories given the current hook name.
+   * `Changeset` -- (optional) modifies the current changeset (see Changesets).
+
+Oya first walks all directories to build the changeset: a list of buildable
+directories. It then walks the list, running the matching hook in each. CI/CD
+tool-specific script outputting list of modified files in buildable directories
+given the current hook name.
      - each path must be normalized and prefixed with `+`
      - cannot be overriden, only valid for top-level Oyafile
-     - in the future, you'll be able to override for a buildable directory and use `-` to exclude directories, `+` to include additional ones,
-       and use wildcards, this will allow e.g. forcing running tests for all apps when you change a shared directory
+     - in the future, you'll be able to override for a buildable directory and
+       use `-` to exclude directories, `+` to include additional ones, and use
+       wildcards, this will allow e.g. forcing running tests for all apps when
+       you change a shared directory
      - git diff --name-only origin/master...$branch
      - https://dzone.com/articles/build-test-and-deploy-apps-independently-from-a-mo
      - https://stackoverflow.com/questions/6260383/how-to-get-list-of-changed-files-since-last-build-in-jenkins-hudson/9473207#9473207
 
-Generation of the changeset is controlled by the optional changeset key in Oyafiles,
-which can point to a script executed to generate the changeset:
+Generation of the changeset is controlled by the optional changeset key in
+Oyafiles, which can point to a script executed to generate the changeset:
 
 1. No directive -- includes all directories containing on Oyafile.
 2. Directive pointing to a script.
 
-.oyaignore lists files whose changes do not trigger build for the containing buildable directory
+.oyaignore lists files whose changes do not trigger build for the containing
+buildable directory
 
 ## Features/ideas
 
-1. Generators based on packs. https://github.com/Flaque/thaum + draft pack plugin
+1. Generators based on packs. https://github.com/Flaque/thaum + draft pack
+   plugin
 
 ## Workflows
 
@@ -115,7 +157,11 @@ b. Each environment has its own branch
 | 3.b      | P           | Simple deployment automation               | Same as 3.a                                             |
 
 * [1] Code gets merged from branch to branch; works for small team.
-* [2] Need to detect what changed between commits. Many CI/CD tools allow only one configuration per repo and require coding around the limitations, example: https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/13
-* [3] No way to just share code, need to package into libraries. Great for microservices and must have for large teams.
+* [2] Need to detect what changed between commits. Many CI/CD tools allow only
+  one configuration per repo and require coding around the limitations, example:
+  https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/13
+* [3] No way to just share code, need to package into libraries. Great for
+  microservices and must have for large teams.
 * [4] Just put a CI/CD config into the root.
-* [5] No way to just share code, need to package into libraries. Bad for small teams wanting to quickly prototype.
+* [5] No way to just share code, need to package into libraries. Bad for small
+  teams wanting to quickly prototype.
