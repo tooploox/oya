@@ -107,7 +107,18 @@ func (c *SuiteContext) iRunOyaBuild(hook string) error {
 
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
-		return errors.Wrap(c.lastCommandErr, "build failed")
+		return errors.Wrap(c.lastCommandErr, "build unexpectedly failed")
+	}
+	return nil
+}
+
+func (c *SuiteContext) theCommandFailsWithError(errMsg *gherkin.DocString) error {
+	if c.lastCommandErr == nil {
+		return errors.Wrap(c.lastCommandErr, "build unexpectedly succeeded")
+	}
+	if c.lastCommandErr.Error() != errMsg.Content {
+		return errors.Wrap(c.lastCommandErr,
+			fmt.Sprintf("unexpected error %q; expected %q", c.lastCommandErr, errMsg.Content))
 	}
 	return nil
 }
@@ -136,6 +147,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
+	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })

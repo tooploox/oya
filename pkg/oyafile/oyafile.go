@@ -2,7 +2,6 @@ package oyafile
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"path"
@@ -72,7 +71,7 @@ func LoadFromDir(dirPath string) (*Oyafile, bool, error) {
 func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, stderr io.Writer) (found bool, err error) {
 	hook, ok := oyafile.Hooks[hookName]
 	if !ok {
-		return false, fmt.Errorf("no such hook: %v", hookName)
+		return false, nil
 	}
 	return true, hook.Exec(nil, stdout, stderr)
 }

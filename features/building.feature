@@ -137,13 +137,22 @@ Scenario: Parent forces child rebuild
 
   """
 
-# NEXT: Exclusion.
+Scenario: No Oyafile
+  Given file ./NotOyafile containing
+    """
+    """
+  When I run "oya build all"
+  Then the command fails with error
+    """
+    missing Oyafile
+    """
 
-# Scenario: No Oyafile
-# Scenario: Missing hook
-# Scenario: .oyaignore
-# Scenario: Shell specification
-# Scenario: Disable early termination
-# Scenario: Absolute changeset paths trigger error
-# Scenorio/test: Changeset path that doesn't exist
-# Scenorio/test: Changeset path that has no Oyafile
+Scenario: Missing hook
+  Given file ./Oyafile containing
+    """
+    """
+  When I run "oya build all"
+  Then the command fails with error
+    """
+    missing hook "all"
+    """

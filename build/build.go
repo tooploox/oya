@@ -10,7 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var ErrNoOyafiles = fmt.Errorf("No Oyafiles found")
+var ErrNoOyafiles = fmt.Errorf("missing Oyafile")
+
+type ErrNoHook struct {
+	Hook string
+}
+
+func (e ErrNoHook) Error() string {
+	return fmt.Sprintf("missing hook %q", e.Hook)
+}
 
 func Build(rootDir, hookName string, stdout, stderr io.Writer) error {
 	log.Debugf("Hook %q at %v", hookName, rootDir)
@@ -31,10 +39,25 @@ func Build(rootDir, hookName string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
+
+	if len(changes) == 0 {
+		return nil
+	}
+
+	foundAtLeastOnHook := false
 	for _, o := range changes {
-		_, err = o.ExecHook(hookName, nil, stdout, stderr)
+		found, err := o.ExecHook(hookName, nil, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
+		}
+		if found {
+			foundAtLeastOnHook = found
+		}
+	}
+
+	if !foundAtLeastOnHook {
+		return ErrNoHook{
+			Hook: hookName,
 		}
 	}
 	return nil
