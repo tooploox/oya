@@ -1,4 +1,4 @@
-package build
+package run
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func (e ErrNoHook) Error() string {
 	return fmt.Sprintf("missing hook %q", e.Hook)
 }
 
-func Build(rootDir, hookName string, stdout, stderr io.Writer) error {
+func Run(rootDir, hookName string, stdout, stderr io.Writer) error {
 	log.Debugf("Hook %q at %v", hookName, rootDir)
 
 	oyafiles, err := oyafile.List(rootDir)

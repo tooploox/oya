@@ -14,32 +14,27 @@
    (see Workflows below), an Oyafile and supporting scripts and compatible
    generators.
 
-1. Run a hook:
-
-        oya run build
-
-   Right now it won't do anything as there are no buildable directories yet.
-   Let's create one.
-
-1. Create a buildable directory:
+1. Define a hook you can run:
 
         mkdir app1
         cat > Oyafile
         build: echo "Hello, world"
 
-1. Run the build hook again:
+1. Run the hook:
 
         oya run build
         Hello, world
 
+The hook in the above example is called "build" but there's nothing special about the name. In fact, a hook name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different hooks as you like.
 
 ## How it works
 
-A directory is included in the build process if it has an Oyafile. Let's call
-that such directory a **buildable directory**. You can think of a buildable
-directory as its own sub-project. For example, in a mono-repository containing
-several microservices, you'd put each microservice in its own buildable
-directory.
+A directory is included in the build process if contains an Oyafile regardless of how deeply nested it is. You can use Oyafiles in these directories to define their own hooks.
+
+For example, to set up a CI/CD pipeline in a mono-repository containing several
+microservices, you'd put each microservice in its directory, each with its own
+Oyafile containing the hooks necessary to support the CI/CD workflow.
+
 
 Imagine you have the following file structure:
 
@@ -59,12 +54,12 @@ build: |
 
 When you run `oya run build`, Oya first walks the directory tree, starting from
 the current directory, to build the **changeset**: the list of directories that
-require re-building. In the above example it would be, as you probably guessed,
-`.` (the top-level directory) and `subdir` (the sub-directory).
+are marked as changed. In the above example it would be, as you probably
+guessed, `.` (the top-level directory) and `subdir` (the sub-directory).
 
-Finally, Oya executes the hook you specified for every Oyafile that contains it,
-starting from the top directory. Going back to our example, it would generate
-the following output:
+Finally, Oya executes the hook you specified for every directory marked as
+changed, starting from the top directory. Going back to our example, it would
+generate the following output:
 
 ```
 Top-level directory
@@ -88,10 +83,12 @@ TODO
 
    * `Changeset` -- (optional) modifies the current changeset (see Changesets).
 
-Oya first walks all directories to build the changeset: a list of buildable
-directories. It then walks the list, running the matching hook in each. CI/CD
-tool-specific script outputting list of modified files in buildable directories
-given the current hook name.
+Oya first walks all directories to build the changeset: a list of directories
+containing an Oyafile that are marked as "changed".
+
+It then walks the list,
+running the matching hook in each. CI/CD tool-specific script outputting list of
+modified files in buildable directories given the current hook name.
      - each path must be normalized and prefixed with `+`
      - cannot be overriden, only valid for top-level Oyafile
      - in the future, you'll be able to override for a buildable directory and

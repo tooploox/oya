@@ -11,7 +11,7 @@ import (
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
-	"github.com/bilus/oya/build"
+	"github.com/bilus/oya/run"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -100,21 +100,21 @@ func (c *SuiteContext) fileExists(path string) error {
 	return err
 }
 
-func (c *SuiteContext) iRunOyaBuild(hook string) error {
-	c.lastCommandErr = build.Build(c.projectDir, hook, c.stdout, c.stderr)
+func (c *SuiteContext) iRunOyaRun(hook string) error {
+	c.lastCommandErr = run.Run(c.projectDir, hook, c.stdout, c.stderr)
 	return nil
 }
 
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
-		return errors.Wrap(c.lastCommandErr, "build unexpectedly failed")
+		return errors.Wrap(c.lastCommandErr, "command unexpectedly failed")
 	}
 	return nil
 }
 
 func (c *SuiteContext) theCommandFailsWithError(errMsg *gherkin.DocString) error {
 	if c.lastCommandErr == nil {
-		return errors.Wrap(c.lastCommandErr, "build unexpectedly succeeded")
+		return errors.Wrap(c.lastCommandErr, "command unexpectedly succeeded")
 	}
 	if c.lastCommandErr.Error() != errMsg.Content {
 		return errors.Wrap(c.lastCommandErr,
@@ -143,7 +143,7 @@ func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
-	s.Step(`^I run "oya build (.+)"$`, c.iRunOyaBuild)
+	s.Step(`^I run "oya run (.+)"$`, c.iRunOyaRun)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)

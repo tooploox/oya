@@ -22,3 +22,29 @@ build: |
 ** Absolute path
 ** Non-existent path
 ** Path without Oyafile
+
+
+* Whiteboard
+
+** Installing packs
+
+oya install github.com/oya/packs/helm-circle-ci-monorepo
+
+- environment
+
+Adds ./oya/bin/build_docker etc.
+
+oya init
+
+Updates Oyafile
+
+build: |
+  build_docker
+
+Install CircleCI scripts etc.
+
+** Updating
+
+oya update github.com/oya/packs/docker-go
+
+** All you

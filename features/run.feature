@@ -1,9 +1,9 @@
-Feature: Building
+Feature: Running hooks
 
 Background:
    Given I'm in project dir
 
-Scenario: Successful build
+Scenario: Successful run hook
   Given file ./Oyafile containing
     """
     all: |
@@ -13,7 +13,7 @@ Scenario: Successful build
       fi
       echo "Done"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -42,7 +42,7 @@ Scenario: Nested Oyafiles
       touch Project2
       echo "Project2"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -55,7 +55,7 @@ Scenario: Nested Oyafiles
   And file ./Project1 exists
   And file ./Project2 exists
 
-Scenario: No rebuild
+Scenario: No changes
   Given file ./Oyafile containing
     """
     Changeset: echo ""
@@ -68,13 +68,13 @@ Scenario: No rebuild
     all: |
       echo "Project1"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
   """
 
-Scenario: Child forces its rebuild
+Scenario: Child marks itself as changed
   Given file ./Oyafile containing
     """
     Changeset: echo ""
@@ -87,7 +87,7 @@ Scenario: Child forces its rebuild
     all: |
       echo "Root"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -95,7 +95,7 @@ Scenario: Child forces its rebuild
 
   """
 
-Scenario: Child forces parent rebuild
+Scenario: Child marks parent as changed
   Given file ./Oyafile containing
     """
     Changeset: echo ""
@@ -108,7 +108,7 @@ Scenario: Child forces parent rebuild
     all: |
       echo "Root"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -116,7 +116,7 @@ Scenario: Child forces parent rebuild
 
   """
 
-Scenario: Parent forces child rebuild
+Scenario: Parent marks child as changed
   Given file ./Oyafile containing
     """
     Changeset: echo "+project1/"
@@ -129,7 +129,7 @@ Scenario: Parent forces child rebuild
     all: |
       echo "Project1"
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -141,7 +141,7 @@ Scenario: No Oyafile
   Given file ./NotOyafile containing
     """
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command fails with error
     """
     missing Oyafile
@@ -151,7 +151,7 @@ Scenario: Missing hook
   Given file ./Oyafile containing
     """
     """
-  When I run "oya build all"
+  When I run "oya run all"
   Then the command fails with error
     """
     missing hook "all"
