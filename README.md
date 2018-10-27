@@ -27,6 +27,34 @@
 
 The hook in the above example is called "build" but there's nothing special about the name. In fact, a hook name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different hooks as you like.
 
+## Plugins
+
+oya vendor p github.com/bilus/oya/packages/circleci-helm-platform
+
+installs into vendor/
+symlinks vendor/p to it
+symlinks all in vendor/p/bin/ to oya/bin/p
+
+cd delivery/broadcasts/Oyafile
+oya p/generate/docker
+
+delivery/broadcasts/Oyafile
+
+Import:
+  - github.com/bilus/oya/packages/jenkins-monorepo
+
+--
+
+Path:
+  jm: github.com/bilus/oya/packages/jenkins-monorepo/bin
+
+buildDocker:
+  jm/buildDocker
+
+buildChart:
+  jm/buildChart
+
+
 ## How it works
 
 A directory is included in the build process if contains an Oyafile regardless of how deeply nested it is. You can use Oyafiles in these directories to define their own hooks.

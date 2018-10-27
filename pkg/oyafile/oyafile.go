@@ -2,34 +2,43 @@ package oyafile
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
-type OyafileFormat = map[string]Script
+type OyafileFormat = map[string]interface{}
+
+type Alias string
+type ImportPath string
 
 type Oyafile struct {
-	Dir   string
-	Path  string
-	Shell string
-	Hooks map[string]Hook
+	Dir       string
+	Path      string
+	VendorDir string
+	Shell     string
+	Imports   map[Alias]ImportPath
+	Hooks     map[string]Hook
 }
 
-func New(oyafilePath string) *Oyafile {
+func New(oyafilePath string, vendorDir string) *Oyafile {
 	return &Oyafile{
-		Dir:   path.Dir(oyafilePath),
-		Path:  oyafilePath,
-		Shell: "/bin/sh",
-		Hooks: make(map[string]Hook),
+		Dir:       path.Dir(oyafilePath),
+		Path:      oyafilePath,
+		VendorDir: vendorDir,
+		Shell:     "/bin/sh",
+		Imports:   make(map[Alias]ImportPath),
+		Hooks:     make(map[string]Hook),
 	}
 }
 
-func Load(oyafilePath string) (*Oyafile, bool, error) {
+func Load(oyafilePath string, vendorDir string) (*Oyafile, bool, error) {
 	if _, err := os.Stat(oyafilePath); os.IsNotExist(err) {
 		return nil, false, nil
 	}
@@ -39,7 +48,7 @@ func Load(oyafilePath string) (*Oyafile, bool, error) {
 		return nil, false, errors.Wrapf(err, "error loading Oyafile %s", oyafilePath)
 	}
 	if empty {
-		return New(oyafilePath), true, nil
+		return New(oyafilePath, vendorDir), true, nil
 	}
 	file, err := os.Open(oyafilePath)
 	if err != nil {
@@ -52,20 +61,17 @@ func Load(oyafilePath string) (*Oyafile, bool, error) {
 	if err != nil {
 		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
 	}
-	oyafile := New(oyafilePath)
-	for name, script := range of {
-		oyafile.Hooks[name] = ScriptedHook{
-			Name:   name,
-			Script: script,
-			Shell:  oyafile.Shell,
-		}
+	oyafile, err := parseOyafile(oyafilePath, vendorDir, of)
+	if err != nil {
+		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
 	}
+
 	return oyafile, true, nil
 }
 
-func LoadFromDir(dirPath string) (*Oyafile, bool, error) {
+func LoadFromDir(dirPath, vendorDir string) (*Oyafile, bool, error) {
 	oyafilePath := fullPath(dirPath, "")
-	return Load(oyafilePath)
+	return Load(oyafilePath, vendorDir)
 }
 
 func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, stderr io.Writer) (found bool, err error) {
@@ -119,4 +125,62 @@ func isNode(line string) bool {
 		}
 	}
 	return false
+}
+
+func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
+	oyafile := New(path, vendorDir)
+	for name, value := range of {
+		switch name {
+		case "Import":
+			imports, ok := value.(map[interface{}]interface{})
+			if !ok {
+				return nil, fmt.Errorf("Map of aliases to paths expected for key %q", name)
+			}
+			for alias, path := range imports {
+				alias, ok := alias.(string)
+				if !ok {
+					return nil, fmt.Errorf("Expected string alias for key %q", name)
+				}
+				path, ok := path.(string)
+				if !ok {
+					return nil, fmt.Errorf("Expected path for key %q", name)
+				}
+				oyafile.Imports[Alias(alias)] = ImportPath(path)
+			}
+		default:
+			script, ok := value.(string)
+			if !ok {
+				return nil, fmt.Errorf("Script expected for key %q", name)
+			}
+			oyafile.Hooks[name] = ScriptedHook{
+				Name:   name,
+				Script: Script(script),
+				Shell:  oyafile.Shell,
+			}
+		}
+	}
+
+	return oyafile, oyafile.resolveImports()
+}
+
+func (oyafile *Oyafile) resolveImports() error {
+	for alias, path := range oyafile.Imports {
+		fullPath := filepath.Join(oyafile.VendorDir, string(path))
+		log.Debugf("Importing Oyafile in %v as %v", fullPath, alias)
+		imported, found, err := LoadFromDir(fullPath, oyafile.VendorDir)
+		if err != nil {
+			return errors.Wrap(err, "error resolving imports")
+		}
+		if !found {
+			log.Debugf("Import %v has no Oyafile", path)
+			// TODO: Warn?
+			return nil
+		}
+		for key, hook := range imported.Hooks {
+			// TODO: Detect if hook already set.
+			log.Printf("Importing hook %v/%v", alias, key)
+			oyafile.Hooks[fmt.Sprintf("%v/%v", alias, key)] = hook
+		}
+	}
+	return nil
 }

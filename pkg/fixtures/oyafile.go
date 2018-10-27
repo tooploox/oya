@@ -7,7 +7,7 @@ import (
 )
 
 func Oyafile(dirPath string, kvs ...string) *oyafile.Oyafile {
-	o := oyafile.New(filepath.Join(dirPath, oyafile.DefaultName))
+	o := oyafile.New(filepath.Join(dirPath, oyafile.DefaultName), filepath.Join(dirPath, "oya/vendor"))
 	for i := 0; i < len(kvs); i = i + 2 {
 		hook := kvs[i]
 		script := kvs[i+1]

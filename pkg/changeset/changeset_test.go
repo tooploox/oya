@@ -1,6 +1,7 @@
 package changeset_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/bilus/oya/pkg/changeset"
@@ -37,7 +38,7 @@ func TestEmptyChangeset(t *testing.T) {
 
 func TestMinimalChangeset(t *testing.T) {
 	rootDir := "./fixtures/TestMinimalChangeset"
-	expected := []*oyafile.Oyafile{mustLoadOyafile(t, rootDir)}
+	expected := []*oyafile.Oyafile{mustLoadOyafile(t, rootDir, rootDir)}
 	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
@@ -55,7 +56,7 @@ func TestFullChangeset(t *testing.T) {
 
 func TestLocalOverride(t *testing.T) {
 	rootDir := "./fixtures/TestLocalOverride"
-	expected := []*oyafile.Oyafile{mustLoadOyafile(t, "./fixtures/TestLocalOverride/project1")}
+	expected := []*oyafile.Oyafile{mustLoadOyafile(t, "./fixtures/TestLocalOverride/project1", rootDir)}
 	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
@@ -68,8 +69,9 @@ func mustListOyafiles(t *testing.T, dir string) []*oyafile.Oyafile {
 	return oyafiles
 }
 
-func mustLoadOyafile(t *testing.T, dir string) *oyafile.Oyafile {
-	o, found, err := oyafile.LoadFromDir(dir)
+func mustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
+	vendorDir := filepath.Join(rootDir, "oya/vendor")
+	o, found, err := oyafile.LoadFromDir(dir, vendorDir)
 	tu.AssertNoErr(t, err, "Error loading root Oyafile")
 	tu.AssertTrue(t, found, "Root Oyafile not found")
 	return o

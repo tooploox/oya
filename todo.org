@@ -48,3 +48,8 @@ Install CircleCI scripts etc.
 oya update github.com/oya/packs/docker-go
 
 ** All you
+
+* Import -- imports all hooks
+
+* oya vendor (based on Import)
+* oya hooks
