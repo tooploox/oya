@@ -11,6 +11,7 @@ import (
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
+	oyainit "github.com/bilus/oya/init"
 	"github.com/bilus/oya/run"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -105,6 +106,11 @@ func (c *SuiteContext) iRunOyaRun(hook string) error {
 	return nil
 }
 
+func (c *SuiteContext) iRunOyaInit() error {
+	c.lastCommandErr = oyainit.Init(c.projectDir, c.stdout, c.stderr)
+	return nil
+}
+
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
 		return errors.Wrap(c.lastCommandErr, "command unexpectedly failed")
@@ -144,6 +150,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya run (.+)"$`, c.iRunOyaRun)
+	s.Step(`^I run "oya init"$`, c.iRunOyaInit)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)

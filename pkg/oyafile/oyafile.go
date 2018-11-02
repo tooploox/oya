@@ -74,6 +74,14 @@ func LoadFromDir(dirPath, vendorDir string) (*Oyafile, bool, error) {
 	return Load(oyafilePath, vendorDir)
 }
 
+func InitDir(dirPath string) error {
+	f, err := os.Create(fullPath(dirPath, ""))
+	if err != nil {
+		return err
+	}
+	return f.Close()
+}
+
 func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, stderr io.Writer) (found bool, err error) {
 	hook, ok := oyafile.Hooks[hookName]
 	if !ok {

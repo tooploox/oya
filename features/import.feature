@@ -3,7 +3,6 @@ Feature: Running hooks
 Background:
    Given I'm in project dir
 
-@current
 Scenario: Import hooks from vendored idr
   Given file ./Oyafile containing
     """
