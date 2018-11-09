@@ -1,0 +1,5 @@
+release:
+	rm -f *.tgz
+  helm package . --version $(cat VERSION)
+  helm gcs push {{.Values.chartName}}-$(cat VERSION).tgz \
+    {{.Values.repoAlias}} $(PUSH_OPTS)

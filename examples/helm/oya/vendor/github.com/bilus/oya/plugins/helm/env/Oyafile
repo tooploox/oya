@@ -1,0 +1,20 @@
+upgrade:
+  Before:
+    - updateDeps
+    - clean
+  Script:
+    helm upgrade {{.Values.releaseName}} . -f values.yaml -f secrets.yaml --namespace {{.Values.namespace}} {{.Argv | join " "}}
+
+diff:
+  Before:
+    - updateDeps
+    - clean
+  Script:
+    helm diff upgrade {{.Values.releaseName}} . -f values.yaml -f secrets.yaml --namespace {{.Values.namespace}} --allow-unreleased -C 3 {{.Argv | join " "}}
+
+clean:
+  rm -rf tempcharts
+  rm -f charts/*.tgz
+
+updateDeps:
+  helm dependency update

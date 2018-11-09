@@ -4,7 +4,7 @@ Background:
    Given I'm in project dir
 
 @current
-Scenario: Import hooks from vendored idr
+Scenario: Init a project
   When I run "oya init"
   Then the command succeeds
   And file ./Oyafile exists

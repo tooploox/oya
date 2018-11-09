@@ -1,0 +1,9 @@
+Values:
+  chart:
+    chartName: example
+    repoAlias: example
+
+Import:
+  chart: github.com/bilus/oya/plugins/helm/chart
+
+# chart/release

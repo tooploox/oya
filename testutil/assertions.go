@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"os"
 	"reflect"
 	"sort"
 	"testing"
@@ -46,4 +47,11 @@ func AssertObjectsEqual(t *testing.T, expected, actual interface{}) {
 		t.Errorf("Objects are not equal. Diff:\n %v", diff.ObjectGoPrintSideBySide(expected, actual))
 	}
 
+}
+
+func AssertPathExists(t *testing.T, path string) {
+	_, err := os.Stat(path)
+	if err != nil {
+		t.Errorf("path %v does not exist", path)
+	}
 }
