@@ -157,7 +157,6 @@ Scenario: Missing hook
     missing hook "all"
     """
 
-@current
 Scenario: Script template
   Given file ./Oyafile containing
     """

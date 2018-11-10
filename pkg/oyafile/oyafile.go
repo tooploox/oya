@@ -25,7 +25,7 @@ type Oyafile struct {
 	Shell     string
 	Imports   map[Alias]ImportPath
 	Hooks     map[string]Hook
-	Values    map[string]interface{}
+	Values    Scope
 }
 
 type Scope map[string]interface{}
@@ -180,6 +180,7 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 				Name:   name,
 				Script: Script(script),
 				Shell:  oyafile.Shell,
+				Scope:  &oyafile.Values,
 			}
 		}
 	}

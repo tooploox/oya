@@ -10,10 +10,11 @@ type ScriptedHook struct {
 	Name string
 	Script
 	Shell string
+	Scope *Scope
 }
 
 func (h ScriptedHook) Exec(values Scope, stdout, stderr io.Writer) error {
-	return h.Script.Exec(values, stdout, stderr, h.Shell)
+	return h.Script.Exec(*h.Scope, stdout, stderr, h.Shell)
 }
 
 type BuiltinHook struct {
