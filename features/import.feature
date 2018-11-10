@@ -18,7 +18,7 @@ Scenario: Import hooks from vendored idr
       fi
       echo "Done"
     """
-  When I run "oya run foo/all"
+  When I run "oya run foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -41,7 +41,7 @@ Scenario: Import hook using pack values
       bar=$foo
       echo $$bar
     """
-  When I run "oya run foo/all"
+  When I run "oya run foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -49,7 +49,6 @@ Scenario: Import hook using pack values
 
   """
 
-@current
 Scenario: Import hook using BasePath
   Given file ./Oyafile containing
     """
@@ -64,7 +63,7 @@ Scenario: Import hook using BasePath
       bar=$$(basename $BasePath)
       echo $$bar
     """
-  When I run "oya run foo/all"
+  When I run "oya run foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """

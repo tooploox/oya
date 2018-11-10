@@ -214,8 +214,8 @@ func (oyafile *Oyafile) resolveImports() error {
 		}
 		for key, hook := range imported.Hooks {
 			// TODO: Detect if hook already set.
-			log.Printf("Importing hook %v/%v", alias, key)
-			oyafile.Hooks[fmt.Sprintf("%v/%v", alias, key)] = hook
+			log.Printf("Importing hook %v.%v", alias, key)
+			oyafile.Hooks[fmt.Sprintf("%v.%v", alias, key)] = hook
 		}
 	}
 	return nil
