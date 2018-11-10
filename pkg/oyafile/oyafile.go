@@ -31,14 +31,15 @@ type Oyafile struct {
 type Scope map[string]interface{}
 
 func New(oyafilePath string, vendorDir string) *Oyafile {
+	dir := path.Dir(oyafilePath)
 	return &Oyafile{
-		Dir:       path.Dir(oyafilePath),
+		Dir:       dir,
 		Path:      oyafilePath,
 		VendorDir: vendorDir,
 		Shell:     "/bin/sh",
 		Imports:   make(map[Alias]ImportPath),
 		Hooks:     make(map[string]Hook),
-		Values:    make(Scope),
+		Values:    defaultValues(dir),
 	}
 }
 
@@ -66,6 +67,10 @@ func Load(oyafilePath string, vendorDir string) (*Oyafile, bool, error) {
 		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
 	}
 	oyafile, err := parseOyafile(oyafilePath, vendorDir, of)
+	if err != nil {
+		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
+	}
+	err = oyafile.resolveImports()
 	if err != nil {
 		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
 	}
@@ -105,6 +110,12 @@ func fullPath(projectDir, name string) string {
 		name = DefaultName
 	}
 	return path.Join(projectDir, name)
+}
+
+func defaultValues(dirPath string) Scope {
+	return Scope{
+		"BasePath": dirPath,
+	}
 }
 
 // isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
@@ -185,7 +196,7 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 		}
 	}
 
-	return oyafile, oyafile.resolveImports()
+	return oyafile, nil
 }
 
 func (oyafile *Oyafile) resolveImports() error {

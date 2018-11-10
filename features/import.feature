@@ -27,8 +27,7 @@ Scenario: Import hooks from vendored idr
   """
   And file ./OK exists
 
-@current
-Scenario: Import hooks using pack values
+Scenario: Import hook using pack values
   Given file ./Oyafile containing
     """
     Import:
@@ -47,5 +46,28 @@ Scenario: Import hooks using pack values
   And the command outputs to stdout
   """
   xxx
+
+  """
+
+@current
+Scenario: Import hook using BasePath
+  Given file ./Oyafile containing
+    """
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      foo: xxx
+    all: |
+      bar=$$(basename $BasePath)
+      echo $$bar
+    """
+  When I run "oya run foo/all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  foo
 
   """
