@@ -13,7 +13,7 @@ Scenario: Import hooks from vendored idr
     """
     all: |
       foo=4
-      if [ $foo -ge 3 ]; then
+      if [ $$foo -ge 3 ]; then
         touch OK
       fi
       echo "Done"

@@ -46,7 +46,7 @@ func Run(rootDir, hookName string, stdout, stderr io.Writer) error {
 
 	foundAtLeastOnHook := false
 	for _, o := range changes {
-		found, err := o.ExecHook(hookName, nil, stdout, stderr)
+		found, err := o.ExecHook(hookName, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}

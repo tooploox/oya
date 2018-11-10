@@ -1,23 +1,27 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"os"
 
-	getter "github.com/hashicorp/go-getter"
+	kasia "github.com/ziutek/kasia.go"
 )
 
+type Ctx struct {
+	H, W string
+}
+
 func main() {
+	ctx := map[string]string{"H": "Hello", "W": "world"}
 
-	// repo, err := vcs.NewRepo("https://github.com/bilus/akasha", "/tmp/akasha")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// err = repo.Get()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	tpl, err := kasia.Parse("$H $W $$O!\n")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	err := getter.GetAny("/tmp/baz", "github.com/bilus/akasha//bin?ref=v0.4.0")
-	log.Printf("Result: %v", err)
-
+	err = tpl.Run(os.Stdout, ctx)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

@@ -3,7 +3,6 @@ Feature: Getting packages
 Background:
    Given I'm in project dir
 
-@current
 Scenario: Get a package
   When I run "oya get github.com/bilus/oya@fixtures"
   Then the command succeeds

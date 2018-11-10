@@ -8,7 +8,7 @@ Scenario: Successful run hook
     """
     all: |
       foo=4
-      if [ $foo -ge 3 ]; then
+      if [ $$foo -ge 3 ]; then
         touch OK
       fi
       echo "Done"
@@ -156,3 +156,21 @@ Scenario: Missing hook
     """
     missing hook "all"
     """
+
+@current
+Scenario: Script template
+  Given file ./Oyafile containing
+    """
+    Values:
+      value: some value
+    all: |
+      foo="$value"
+      echo $$foo
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  some value
+
+  """

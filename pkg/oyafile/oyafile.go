@@ -25,6 +25,7 @@ type Oyafile struct {
 	Shell     string
 	Imports   map[Alias]ImportPath
 	Hooks     map[string]Hook
+	Values    map[string]interface{}
 }
 
 func New(oyafilePath string, vendorDir string) *Oyafile {
@@ -35,6 +36,7 @@ func New(oyafilePath string, vendorDir string) *Oyafile {
 		Shell:     "/bin/sh",
 		Imports:   make(map[Alias]ImportPath),
 		Hooks:     make(map[string]Hook),
+		Values:    make(map[string]interface{}),
 	}
 }
 
@@ -82,12 +84,12 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (oyafile Oyafile) ExecHook(hookName string, env map[string]string, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) ExecHook(hookName string, stdout, stderr io.Writer) (found bool, err error) {
 	hook, ok := oyafile.Hooks[hookName]
 	if !ok {
 		return false, nil
 	}
-	return true, hook.Exec(nil, stdout, stderr)
+	return true, hook.Exec(oyafile.Values, stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {
@@ -154,6 +156,18 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 					return nil, fmt.Errorf("Expected path for key %q", name)
 				}
 				oyafile.Imports[Alias(alias)] = ImportPath(path)
+			}
+		case "Values":
+			values, ok := value.(map[interface{}]interface{})
+			if !ok {
+				return nil, fmt.Errorf("Map of keys to values expected for key %q", name)
+			}
+			for k, v := range values {
+				valueName, ok := k.(string)
+				if !ok {
+					return nil, fmt.Errorf("Map of keys to values expected for key %q", name)
+				}
+				oyafile.Values[valueName] = v
 			}
 		default:
 			script, ok := value.(string)

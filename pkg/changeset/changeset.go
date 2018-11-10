@@ -35,7 +35,7 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
 	defaultHook := oyafile.BuiltinHook{
 		Name: "Changeset",
-		OnExec: func(env map[string]string, stdout, stderr io.Writer) error {
+		OnExec: func(values map[string]interface{}, stdout, stderr io.Writer) error {
 			oyafiles, err := oyafile.List(rootOyafile.Dir)
 			if err != nil {
 				return err
