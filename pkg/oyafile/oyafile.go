@@ -96,7 +96,7 @@ func (oyafile Oyafile) ExecHook(hookName string, stdout, stderr io.Writer) (foun
 	if !ok {
 		return false, nil
 	}
-	return true, hook.Exec(oyafile.Values, stdout, stderr)
+	return true, hook.Exec(stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {
