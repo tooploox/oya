@@ -12,7 +12,7 @@ import (
 
 type Script string
 
-func (s Script) Exec(values map[string]interface{}, stdout, stderr io.Writer, shell string) error {
+func (s Script) Exec(values Scope, stdout, stderr io.Writer, shell string) error {
 	scriptFile, err := ioutil.TempFile("", "oya-script-")
 	if err != nil {
 		return err

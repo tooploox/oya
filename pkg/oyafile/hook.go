@@ -3,7 +3,7 @@ package oyafile
 import "io"
 
 type Hook interface {
-	Exec(values map[string]interface{}, stdout, stderr io.Writer) error
+	Exec(values Scope, stdout, stderr io.Writer) error
 }
 
 type ScriptedHook struct {
@@ -12,15 +12,15 @@ type ScriptedHook struct {
 	Shell string
 }
 
-func (h ScriptedHook) Exec(values map[string]interface{}, stdout, stderr io.Writer) error {
+func (h ScriptedHook) Exec(values Scope, stdout, stderr io.Writer) error {
 	return h.Script.Exec(values, stdout, stderr, h.Shell)
 }
 
 type BuiltinHook struct {
 	Name   string
-	OnExec func(values map[string]interface{}, stdout, stderr io.Writer) error
+	OnExec func(values Scope, stdout, stderr io.Writer) error
 }
 
-func (h BuiltinHook) Exec(values map[string]interface{}, stdout, stderr io.Writer) error {
+func (h BuiltinHook) Exec(values Scope, stdout, stderr io.Writer) error {
 	return h.OnExec(values, stdout, stderr)
 }

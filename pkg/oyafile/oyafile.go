@@ -28,6 +28,8 @@ type Oyafile struct {
 	Values    map[string]interface{}
 }
 
+type Scope map[string]interface{}
+
 func New(oyafilePath string, vendorDir string) *Oyafile {
 	return &Oyafile{
 		Dir:       path.Dir(oyafilePath),
@@ -36,7 +38,7 @@ func New(oyafilePath string, vendorDir string) *Oyafile {
 		Shell:     "/bin/sh",
 		Imports:   make(map[Alias]ImportPath),
 		Hooks:     make(map[string]Hook),
-		Values:    make(map[string]interface{}),
+		Values:    make(Scope),
 	}
 }
 
