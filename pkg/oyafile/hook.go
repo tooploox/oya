@@ -1,6 +1,8 @@
 package oyafile
 
-import "io"
+import (
+	"io"
+)
 
 type Hook interface {
 	Exec(stdout, stderr io.Writer) error

@@ -212,6 +212,7 @@ func (oyafile *Oyafile) resolveImports() error {
 			// TODO: Warn?
 			return nil
 		}
+		oyafile.Values[string(alias)] = imported.Values
 		for key, hook := range imported.Hooks {
 			// TODO: Detect if hook already set.
 			log.Printf("Importing hook %v.%v", alias, key)

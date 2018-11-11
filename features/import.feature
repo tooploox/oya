@@ -70,3 +70,25 @@ Scenario: Import hook using BasePath
   foo
 
   """
+
+@current
+Scenario: Access package variables
+  Given file ./Oyafile containing
+    """
+    Import:
+      foo: github.com/test/foo
+    all: |
+      echo $foo.bar
+    """
+  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      bar: xxx
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  xxx
+
+  """
