@@ -1,19 +1,26 @@
-* Fetching packages.
-* CLI
-* Customizable Shell via .Values.Shell
-Values:
-  Shell: /bin/bash
-  custom: uuu
-
-
-Changeset: echo ""
-
-build: |
-  go build main.go --foor {{ .Values.uuu }
-
-* Support for templating
 * Values inheritance
-* Exclusions (-../)
+** Import via modules
+ /Oyafile
+ /oya.mod
+    main
+
+ Import:
+
+
+
+
+* Simplify oya get/vendor (based on Import statements) TBD
+** Just use Import
+** oya get -- adds to packages.lock if not there
+** oya records new imports using sha in packages.lock
+** oya vendor -- vendors recorded imports (keep .git)
+** oya get -u <uri> updates package sha in packages.lock and fetches it
+* Bring README up to date
+* Add a tutorial on using docker package
+* CLI
+* Install hook for packages
+* Error if user adds a capitalized hook/value
+* Exclusions via -...
 * .oyaignore
    Exclude sub-directiories -- have to be built by cd'ing and running oya.
 * .Values.EarlyTerminate (default: true)
@@ -22,34 +29,3 @@ build: |
 ** Absolute path
 ** Non-existent path
 ** Path without Oyafile
-
-
-* Whiteboard
-
-** Installing packs
-
-oya install github.com/oya/packs/helm-circle-ci-monorepo
-
-- environment
-
-Adds ./oya/bin/build_docker etc.
-
-oya init
-
-Updates Oyafile
-
-build: |
-  build_docker
-
-Install CircleCI scripts etc.
-
-** Updating
-
-oya update github.com/oya/packs/docker-go
-
-** All you
-
-* Import -- imports all hooks
-
-* oya vendor (based on Import)
-* oya hooks
