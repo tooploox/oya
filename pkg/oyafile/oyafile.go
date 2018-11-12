@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -19,68 +18,69 @@ type Alias string
 type ImportPath string
 
 type Oyafile struct {
-	Dir       string
-	Path      string
-	VendorDir string
-	Shell     string
-	Imports   map[Alias]ImportPath
-	Hooks     map[string]Hook
-	Values    Scope
+	Dir     string
+	Path    string
+	RootDir string
+	Shell   string
+	Imports map[Alias]ImportPath
+	Hooks   map[string]Hook
+	Values  Scope
 }
 
 type Scope map[string]interface{}
 
-func New(oyafilePath string, vendorDir string) *Oyafile {
+func New(oyafilePath string, rootDir string) *Oyafile {
+
 	dir := path.Dir(oyafilePath)
 	return &Oyafile{
-		Dir:       dir,
-		Path:      oyafilePath,
-		VendorDir: vendorDir,
-		Shell:     "/bin/sh",
-		Imports:   make(map[Alias]ImportPath),
-		Hooks:     make(map[string]Hook),
-		Values:    defaultValues(dir),
+		Dir:     dir,
+		Path:    oyafilePath,
+		RootDir: rootDir,
+		Shell:   "/bin/sh",
+		Imports: make(map[Alias]ImportPath),
+		Hooks:   make(map[string]Hook),
+		Values:  defaultValues(dir),
 	}
 }
 
-func Load(oyafilePath string, vendorDir string) (*Oyafile, bool, error) {
+func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
 	if _, err := os.Stat(oyafilePath); os.IsNotExist(err) {
 		return nil, false, nil
 	}
 	// YAML parser does not handle files without at least one node.
 	empty, err := isEmptyYAML(oyafilePath)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "error loading Oyafile %s", oyafilePath)
+		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 	if empty {
-		return New(oyafilePath, vendorDir), true, nil
+		return New(oyafilePath, rootDir), true, nil
 	}
 	file, err := os.Open(oyafilePath)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "error loading Oyafile %s", oyafilePath)
+		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 	defer func() { _ = file.Close() }()
 	decoder := yaml.NewDecoder(file)
 	var of OyafileFormat
 	err = decoder.Decode(&of)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
+		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
-	oyafile, err := parseOyafile(oyafilePath, vendorDir, of)
+	oyafile, err := parseOyafile(oyafilePath, rootDir, of)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
+		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 	err = oyafile.resolveImports()
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "error parsing Oyafile %s", oyafilePath)
+		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 
 	return oyafile, true, nil
 }
 
-func LoadFromDir(dirPath, vendorDir string) (*Oyafile, bool, error) {
+func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	oyafilePath := fullPath(dirPath, "")
-	return Load(oyafilePath, vendorDir)
+	return Load(oyafilePath, rootDir)
 }
 
 func InitDir(dirPath string) error {
@@ -103,6 +103,10 @@ func (oyafile Oyafile) Equals(other Oyafile) bool {
 	// TODO: Far from perfect, we should ensure relative vs absolute paths work.
 	// The simplest thing is probably to ensure oyafile.Dir is always absolute.
 	return filepath.Clean(oyafile.Dir) == filepath.Clean(other.Dir)
+}
+
+func wrapLoadErr(err error, oyafilePath string) error {
+	return errors.Wrapf(err, "error loading Oyafile %v", oyafilePath)
 }
 
 func fullPath(projectDir, name string) string {
@@ -150,8 +154,8 @@ func isNode(line string) bool {
 	return false
 }
 
-func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
-	oyafile := New(path, vendorDir)
+func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
+	oyafile := New(path, rootDir)
 	for name, value := range of {
 		switch name {
 		case "Import":
@@ -197,38 +201,4 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 	}
 
 	return oyafile, nil
-}
-
-func validateImportPath(importPath ImportPath, fullImportPath string) error {
-	f, err := os.Stat(fullImportPath)
-	if err != nil || !f.IsDir() {
-		return errors.Errorf("missing package %v", importPath)
-	}
-	return nil
-}
-
-func (oyafile *Oyafile) resolveImports() error {
-	for alias, path := range oyafile.Imports {
-		fullPath := filepath.Join(oyafile.VendorDir, string(path))
-		log.Debugf("Importing Oyafile in %v as %v", fullPath, alias)
-		if err := validateImportPath(path, fullPath); err != nil {
-			return err
-		}
-		imported, found, err := LoadFromDir(fullPath, oyafile.VendorDir)
-		if err != nil {
-			return errors.Wrap(err, "error resolving imports")
-		}
-		if !found {
-			log.Debugf("Import %v has no Oyafile", path)
-			// TODO: Warn?
-			return nil
-		}
-		oyafile.Values[string(alias)] = imported.Values
-		for key, hook := range imported.Hooks {
-			// TODO: Detect if hook already set.
-			log.Printf("Importing hook %v.%v", alias, key)
-			oyafile.Hooks[fmt.Sprintf("%v.%v", alias, key)] = hook
-		}
-	}
-	return nil
 }

@@ -1,14 +1,13 @@
-* Values inheritance
+* Sharing Values
 ** Import via modules
  /Oyafile
  /oya.mod
-    main
+    github.com/Tooploox/pledge
 
  Import:
-
-
-
-
+    main: github.com/Tooploox/pledge
+** Same but Oyafile contains Module:
+** Simple directory-level inheritance
 * Simplify oya get/vendor (based on Import statements) TBD
 ** Just use Import
 ** oya get -- adds to packages.lock if not there

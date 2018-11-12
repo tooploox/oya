@@ -70,8 +70,8 @@ func mustListOyafiles(t *testing.T, dir string) []*oyafile.Oyafile {
 }
 
 func mustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
-	vendorDir := filepath.Join(rootDir, "oya/vendor")
-	o, found, err := oyafile.LoadFromDir(dir, vendorDir)
+	RootDir := filepath.Join(rootDir, ".fixtures/")
+	o, found, err := oyafile.LoadFromDir(dir, rootDir)
 	tu.AssertNoErr(t, err, "Error loading root Oyafile")
 	tu.AssertTrue(t, found, "Root Oyafile not found")
 	return o

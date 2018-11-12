@@ -88,7 +88,7 @@ func calculateChangeset(currOyafile *oyafile.Oyafile) ([]*oyafile.Oyafile, error
 	oyafiles := make([]*oyafile.Oyafile, 0, len(dirs))
 	for _, dir := range dirs {
 		fullPath := filepath.Join(currOyafile.Dir, dir)
-		o, exists, err := oyafile.LoadFromDir(fullPath, currOyafile.VendorDir)
+		o, exists, err := oyafile.LoadFromDir(fullPath, currOyafile.RootDir)
 		if !exists {
 			// TODO: Warning that changeset contains paths without Oyafiles?
 			continue

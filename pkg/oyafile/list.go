@@ -8,7 +8,6 @@ import (
 )
 
 const DefaultName = "Oyafile"
-const VendorDir = "oya/vendor"
 
 func List(rootDir string) ([]*Oyafile, error) {
 	var oyafiles []*Oyafile
@@ -16,7 +15,7 @@ func List(rootDir string) ([]*Oyafile, error) {
 		if !info.IsDir() {
 			return nil
 		}
-		oyafile, ok, err := LoadFromDir(path, filepath.Join(rootDir, VendorDir))
+		oyafile, ok, err := LoadFromDir(path, rootDir)
 		if err != nil {
 			return errors.Wrapf(err, "error listing Oyafiles in %s", rootDir)
 		}

@@ -92,6 +92,41 @@ Scenario: Access package values
 
   """
 
+@current
+Scenario: Access current module values
+  Given file ./Oyafile containing
+    """
+    Module: main
+    Values:
+      foo: main
+    """
+  And file ./project1/Oyafile containing
+    """
+    Values:
+      foo: project1
+    """
+  And file ./project2/Oyafile containing
+    """
+    Import:
+      main: /
+      p1: /project1
+    Values:
+      foo: project2
+    all: |
+      echo $main.foo
+      echo $p1.foo
+      echo $foo
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  main
+  project1
+  project2
+
+  """
+
 Scenario: Invalid import
   Given file ./Oyafile containing
     """
