@@ -11,15 +11,15 @@ import (
 func Get(vendorDir, uri string, stdout, stderr io.Writer) error {
 	repoUri, ref, err := parseUri(uri)
 	if err != nil {
-		return errors.Wrapf(err, "error getting p %v", uri)
+		return wrapErr(err, uri)
 	}
 	p, err := pack.NewFromUri(repoUri, ref)
 	if err != nil {
-		return errors.Wrapf(err, "error getting p %v", uri)
+		return wrapErr(err, uri)
 	}
 	err = p.Vendor(vendorDir)
 	if err != nil {
-		return errors.Wrapf(err, "error getting p %v", uri)
+		return wrapErr(err, uri)
 	}
 	return nil
 }
@@ -34,4 +34,8 @@ func parseUri(uri string) (string, string, error) {
 	default:
 		return "", "", errors.Errorf("unsupported package uri: %v", uri)
 	}
+}
+
+func wrapErr(err error, uri string) error {
+	return errors.Wrapf(err, "error getting p %v", uri)
 }
