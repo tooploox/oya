@@ -3,6 +3,8 @@ package oyafile
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 const DefaultName = "Oyafile"
@@ -15,7 +17,7 @@ func List(rootDir string) ([]*Oyafile, error) {
 		}
 		oyafile, ok, err := LoadFromDir(path, rootDir)
 		if err != nil {
-			return nil
+			return errors.Wrapf(err, "Error loading Oyafile from %v", path)
 		}
 		if !ok {
 			return nil
