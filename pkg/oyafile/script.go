@@ -3,11 +3,10 @@ package oyafile
 import (
 	"io"
 	"io/ioutil"
-	"os"
 
+	"github.com/bilus/oya/pkg/template"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
-	kasia "github.com/ziutek/kasia.go"
 )
 
 type Script string
@@ -17,12 +16,12 @@ func (s Script) Exec(values Scope, stdout, stderr io.Writer, shell string) error
 	if err != nil {
 		return err
 	}
-	defer os.Remove(scriptFile.Name())
-	scriptTpl, err := kasia.Parse(string(s))
+	// defer os.Remove(scriptFile.Name())
+	scriptTpl, err := template.Parse(string(s))
 	if err != nil {
 		return errors.Wrapf(err, "error running script")
 	}
-	err = scriptTpl.Run(scriptFile, values)
+	err = scriptTpl.Render(scriptFile, values)
 	if err != nil {
 		_ = scriptFile.Close()
 		return err
