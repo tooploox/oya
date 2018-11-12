@@ -6,6 +6,7 @@ Background:
 Scenario: Import hooks from vendored package
   Given file ./Oyafile containing
     """
+    Module: project
     Import:
       foo: github.com/test/foo
     """
@@ -30,6 +31,7 @@ Scenario: Import hooks from vendored package
 Scenario: Import hook using pack values
   Given file ./Oyafile containing
     """
+    Module: project
     Import:
       foo: github.com/test/foo
     """
@@ -52,6 +54,7 @@ Scenario: Import hook using pack values
 Scenario: Import hook using BasePath
   Given file ./Oyafile containing
     """
+    Module: project
     Import:
       foo: github.com/test/foo
     """
@@ -74,6 +77,7 @@ Scenario: Import hook using BasePath
 Scenario: Access package values
   Given file ./Oyafile containing
     """
+    Module: project
     Import:
       foo: github.com/test/foo
     all: |
@@ -130,6 +134,7 @@ Scenario: Access current module values
 Scenario: Invalid import
   Given file ./Oyafile containing
     """
+    Module: project
     Import:
       foo: github.com/test/foo
 

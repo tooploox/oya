@@ -6,6 +6,7 @@ Background:
 Scenario: Successful run hook
   Given file ./Oyafile containing
     """
+    Module: project
     all: |
       foo=4
       if [ $$foo -ge 3 ]; then
@@ -26,6 +27,7 @@ Scenario: Successful run hook
 Scenario: Nested Oyafiles
   Given file ./Oyafile containing
     """
+    Module: project
     all: |
       touch Root
       echo "Root"
@@ -58,6 +60,7 @@ Scenario: Nested Oyafiles
 Scenario: No changes
   Given file ./Oyafile containing
     """
+    Module: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -77,6 +80,7 @@ Scenario: No changes
 Scenario: Child marks itself as changed
   Given file ./Oyafile containing
     """
+    Module: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -98,6 +102,7 @@ Scenario: Child marks itself as changed
 Scenario: Child marks parent as changed
   Given file ./Oyafile containing
     """
+    Module: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -119,6 +124,7 @@ Scenario: Child marks parent as changed
 Scenario: Parent marks child as changed
   Given file ./Oyafile containing
     """
+    Module: project
     Changeset: echo "+project1/"
     all: |
       echo "Root"
@@ -160,6 +166,7 @@ Scenario: Missing hook
 Scenario: Script template
   Given file ./Oyafile containing
     """
+    Module: project
     Values:
       value: some value
     all: |

@@ -1,9 +1,0 @@
-Values:
-  env:
-    releaseName: staging
-    namespace: default
-
-Import:
-  env: github.com/bilus/oya/plugins/helm/env
-
-# env/upgrade

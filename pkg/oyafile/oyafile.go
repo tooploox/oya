@@ -25,6 +25,7 @@ type Oyafile struct {
 	Imports map[Alias]ImportPath
 	Hooks   map[string]Hook
 	Values  Scope
+	Module  string // Set for root Oyafile
 }
 
 type Scope map[string]interface{}
@@ -92,7 +93,33 @@ func InitDir(dirPath string) error {
 	if err != nil {
 		return err
 	}
+	_, err = f.WriteString("Module: project\n")
+	if err != nil {
+		return err
+	}
 	return f.Close()
+}
+
+func (o *Oyafile) IsRoot() bool {
+	return len(string(o.Module)) > 0
+}
+
+func DetectRootDir(startDir string) (string, error) {
+	path := startDir
+	maxParts := 256
+	for i := 0; i < maxParts; i++ {
+		o, found, err := LoadFromDir(path, path)
+		if err == nil && found && o.IsRoot() {
+			return path, nil
+		}
+		if path == "/" {
+			break
+		}
+		path = filepath.Dir(path)
+	}
+
+	return "", errors.Errorf("failed to detect Oya project root directory starting at %v", startDir)
+
 }
 
 func (oyafile Oyafile) ExecHook(hookName string, stdout, stderr io.Writer) (found bool, err error) {
@@ -190,6 +217,12 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 				}
 				oyafile.Values[valueName] = v
 			}
+		case "Module":
+			moduleName, ok := value.(string)
+			if !ok {
+				return nil, fmt.Errorf("expected Module to point to a string, actual: name")
+			}
+			oyafile.Module = moduleName
 		default:
 			script, ok := value.(string)
 			if !ok {

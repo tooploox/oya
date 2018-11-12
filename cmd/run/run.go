@@ -3,6 +3,7 @@ package run
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
@@ -21,6 +22,14 @@ func (e ErrNoHook) Error() string {
 }
 
 func Run(rootDir, hookName string, stdout, stderr io.Writer) error {
+	if len(rootDir) == 0 {
+		var err error
+		rootDir, err = detectRootDir()
+		if err != nil {
+			return errors.Wrapf(err, "error detecting Oya root directory")
+		}
+	}
+
 	log.Debugf("Hook %q at %v", hookName, rootDir)
 
 	oyafiles, err := oyafile.List(rootDir)
@@ -61,4 +70,12 @@ func Run(rootDir, hookName string, stdout, stderr io.Writer) error {
 		}
 	}
 	return nil
+}
+
+func detectRootDir() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return oyafile.DetectRootDir(cwd)
 }
