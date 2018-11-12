@@ -18,10 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package cmd
 
-import "github.com/bilus/oya/cmd"
+import (
+	"os"
 
-func main() {
-	cmd.Execute()
+	i "github.com/bilus/oya/cmd/init"
+	"github.com/spf13/cobra"
+)
+
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize an Oya project",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		return i.Init(cwd, os.Stdout, os.Stderr)
+	},
+	Args: cobra.NoArgs,
+}
+
+func init() {
+	rootCmd.AddCommand(initCmd)
 }

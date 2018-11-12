@@ -84,6 +84,10 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 }
 
 func InitDir(dirPath string) error {
+	_, found, err := LoadFromDir(dirPath, dirPath)
+	if err == nil && found {
+		return errors.Errorf("already an Oya project")
+	}
 	f, err := os.Create(fullPath(dirPath, ""))
 	if err != nil {
 		return err

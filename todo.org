@@ -1,4 +1,5 @@
-* Sharing Values
+* DONE Sharing Values
+  CLOSED: [2018-11-12 Mon 14:10]
 ** Import via modules
  /Oyafile
  /oya.mod
@@ -8,15 +9,15 @@
     main: github.com/Tooploox/pledge
 ** Same but Oyafile contains Module:
 ** Simple directory-level inheritance
+* Add a tutorial on using docker package
+* CLI
+* Bring README up to date
 * Simplify oya get/vendor (based on Import statements) TBD
 ** Just use Import
 ** oya get -- adds to packages.lock if not there
 ** oya records new imports using sha in packages.lock
 ** oya vendor -- vendors recorded imports (keep .git)
 ** oya get -u <uri> updates package sha in packages.lock and fetches it
-* Bring README up to date
-* Add a tutorial on using docker package
-* CLI
 * Install hook for packages
 * Error if user adds a capitalized hook/value
 * Exclusions via -...
