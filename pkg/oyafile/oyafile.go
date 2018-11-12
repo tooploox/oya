@@ -157,35 +157,35 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 		case "Import":
 			imports, ok := value.(map[interface{}]interface{})
 			if !ok {
-				return nil, fmt.Errorf("Map of aliases to paths expected for key %q", name)
+				return nil, fmt.Errorf("map of aliases to paths expected for key %q", name)
 			}
 			for alias, path := range imports {
 				alias, ok := alias.(string)
 				if !ok {
-					return nil, fmt.Errorf("Expected string alias for key %q", name)
+					return nil, fmt.Errorf("expected string alias for key %q", name)
 				}
 				path, ok := path.(string)
 				if !ok {
-					return nil, fmt.Errorf("Expected path for key %q", name)
+					return nil, fmt.Errorf("expected path for key %q", name)
 				}
 				oyafile.Imports[Alias(alias)] = ImportPath(path)
 			}
 		case "Values":
 			values, ok := value.(map[interface{}]interface{})
 			if !ok {
-				return nil, fmt.Errorf("Map of keys to values expected for key %q", name)
+				return nil, fmt.Errorf("map of keys to values expected for key %q", name)
 			}
 			for k, v := range values {
 				valueName, ok := k.(string)
 				if !ok {
-					return nil, fmt.Errorf("Map of keys to values expected for key %q", name)
+					return nil, fmt.Errorf("map of keys to values expected for key %q", name)
 				}
 				oyafile.Values[valueName] = v
 			}
 		default:
 			script, ok := value.(string)
 			if !ok {
-				return nil, fmt.Errorf("Script expected for key %q", name)
+				return nil, fmt.Errorf("script expected for key %q", name)
 			}
 			oyafile.Hooks[name] = ScriptedHook{
 				Name:   name,
@@ -199,10 +199,21 @@ func parseOyafile(path, vendorDir string, of OyafileFormat) (*Oyafile, error) {
 	return oyafile, nil
 }
 
+func validateImportPath(importPath ImportPath, fullImportPath string) error {
+	f, err := os.Stat(fullImportPath)
+	if err != nil || !f.IsDir() {
+		return errors.Errorf("missing package %v", importPath)
+	}
+	return nil
+}
+
 func (oyafile *Oyafile) resolveImports() error {
 	for alias, path := range oyafile.Imports {
 		fullPath := filepath.Join(oyafile.VendorDir, string(path))
 		log.Debugf("Importing Oyafile in %v as %v", fullPath, alias)
+		if err := validateImportPath(path, fullPath); err != nil {
+			return err
+		}
 		imported, found, err := LoadFromDir(fullPath, oyafile.VendorDir)
 		if err != nil {
 			return errors.Wrap(err, "error resolving imports")

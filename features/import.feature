@@ -3,7 +3,7 @@ Feature: Running hooks
 Background:
    Given I'm in project dir
 
-Scenario: Import hooks from vendored idr
+Scenario: Import hooks from vendored package
   Given file ./Oyafile containing
     """
     Import:
@@ -71,8 +71,7 @@ Scenario: Import hook using BasePath
 
   """
 
-@current
-Scenario: Access package variables
+Scenario: Access package values
   Given file ./Oyafile containing
     """
     Import:
@@ -91,4 +90,18 @@ Scenario: Access package variables
   """
   xxx
 
+  """
+
+Scenario: Invalid import
+  Given file ./Oyafile containing
+    """
+    Import:
+      foo: github.com/test/foo
+
+    all: echo "OK"
+    """
+  When I run "oya run all"
+  Then the command fails with error matching
+  """
+  .*missing package github.com/test/foo$
   """

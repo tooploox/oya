@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"testing"
 	"time"
 
@@ -132,12 +133,19 @@ func (c *SuiteContext) theCommandSucceeds() error {
 }
 
 func (c *SuiteContext) theCommandFailsWithError(errMsg *gherkin.DocString) error {
+	errMsg.Content = fmt.Sprintf("^%v$", errMsg.Content)
+	return c.theCommandFailsWithErrorMatching(errMsg)
+}
+
+func (c *SuiteContext) theCommandFailsWithErrorMatching(errMsg *gherkin.DocString) error {
 	if c.lastCommandErr == nil {
-		return errors.Wrap(c.lastCommandErr, "command unexpectedly succeeded")
+		return errors.Errorf("last command unexpectedly succeeded")
 	}
-	if c.lastCommandErr.Error() != errMsg.Content {
+
+	rx := regexp.MustCompile(errMsg.Content)
+	if !rx.MatchString(c.lastCommandErr.Error()) {
 		return errors.Wrap(c.lastCommandErr,
-			fmt.Sprintf("unexpected error %q; expected %q", c.lastCommandErr, errMsg.Content))
+			fmt.Sprintf("unexpected error %q; expected to match %q", c.lastCommandErr, errMsg.Content))
 	}
 	return nil
 }
@@ -169,6 +177,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
 	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
+	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
