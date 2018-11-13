@@ -180,3 +180,21 @@ Scenario: Script template
   some value
 
   """
+
+Scenario: Ignore vendored Oyafiles
+  Given file ./Oyafile containing
+    """
+    Module: project
+    all: echo "main"
+    """
+  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    all: echo "vendored"
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  main
+
+  """

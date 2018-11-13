@@ -10,10 +10,14 @@ import (
 const DefaultName = "Oyafile"
 
 func List(rootDir string) ([]*Oyafile, error) {
+	vendorDir := filepath.Join(rootDir, VendorDir)
 	var oyafiles []*Oyafile
 	return oyafiles, filepath.Walk(rootDir, func(path string, info os.FileInfo, _ error) error {
 		if !info.IsDir() {
 			return nil
+		}
+		if path == vendorDir {
+			return filepath.SkipDir
 		}
 		oyafile, ok, err := LoadFromDir(path, rootDir)
 		if err != nil {

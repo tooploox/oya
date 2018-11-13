@@ -1,7 +1,6 @@
 package changeset_test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/bilus/oya/pkg/changeset"
@@ -70,7 +69,6 @@ func mustListOyafiles(t *testing.T, dir string) []*oyafile.Oyafile {
 }
 
 func mustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
-	RootDir := filepath.Join(rootDir, ".fixtures/")
 	o, found, err := oyafile.LoadFromDir(dir, rootDir)
 	tu.AssertNoErr(t, err, "Error loading root Oyafile")
 	tu.AssertTrue(t, found, "Root Oyafile not found")

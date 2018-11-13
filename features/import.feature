@@ -131,7 +131,6 @@ Scenario: Access current module values
 
   """
 
-@xxx
 Scenario: Invalid import
   Given file ./Oyafile containing
     """
