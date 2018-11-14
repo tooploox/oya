@@ -13,11 +13,27 @@
   CLOSED: [2018-11-12 Mon 18:44]
 * DONE Ignore Oyafiles under oya/vendor
   CLOSED: [2018-11-13 Tue 23:49]
-* TODO Try to implement Docker pack
-* Arguments to go run -- pass to hook
+* DONE Try to implement minimal/fake Docker pack
+  CLOSED: [2018-11-15 Thu 00:58]
+* TODO templatized paths
+* hook -> task
+* oya -T --tasks list available tasks
+* Consider dropping run
+  oya run init --> oya Init
+  ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built in hooks (implicitly), customization point (can import, can add before/after hooks etc.)
+* Arguments to go run -- pass to task
+  oya build -- --flag=5
+  $Flags -- map
+  $Args -- positional arguments
+* TODO Docker pack, no language autodetect, Python + Go
 * Add a tutorial on using docker package
+* Report missing variables (Template.Strict)
+* Fix html escaping using kasia
 * Rest of CLI, cleanup, messages
 * Command to list hooks
+* .oyaignore
+   Exclude sub-directiories -- have to be built by cd'ing and running oya.
+https://godoc.org/k8s.io/helm/pkg/ignore
 * Bring README up to date
 * Cleanup Modules/packs
 ** Package > pack everywhere? Or name it "package" in docs?
@@ -32,11 +48,10 @@
 ** Packs must have Module/Pack directive
 ** Install hook for packages
 * Exclusions via -...
-* .oyaignore
-   Exclude sub-directiories -- have to be built by cd'ing and running oya.
 * .Values.EarlyTerminate (default: true)
    Set to false to avoid terminating on first error
 * Fail for incorrect changeset paths
 ** Absolute path
 ** Non-existent path
 ** Path without Oyafile
+https://godoc.org/k8s.io/helm/pkg/ignore

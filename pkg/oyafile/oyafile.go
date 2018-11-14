@@ -109,6 +109,9 @@ func DetectRootDir(startDir string) (string, error) {
 	maxParts := 256
 	for i := 0; i < maxParts; i++ {
 		o, found, err := LoadFromDir(path, path)
+		if err != nil {
+			return "", err
+		}
 		if err == nil && found && o.IsRoot() {
 			return path, nil
 		}
