@@ -95,6 +95,7 @@ func InitDir(dirPath string) error {
 	}
 	_, err = f.WriteString("Module: project\n")
 	if err != nil {
+		_ = f.Close()
 		return err
 	}
 	return f.Close()
