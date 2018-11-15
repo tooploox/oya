@@ -2,6 +2,7 @@ package render
 
 import (
 	"io"
+	"os"
 	"path/filepath"
 
 	"github.com/bilus/oya/pkg/oyafile"
@@ -24,11 +25,20 @@ func Render(oyafilePath, templatePath string, stdout, stderr io.Writer) error {
 		return err
 	}
 
-	if found {
-		return t.Render(stdout, o.Values)
-	} else {
-		return t.Render(stdout, nil)
+	fname := filepath.Base(templatePath)
+
+	out, err := os.Create(fname)
+	if err != nil {
+		return err
 	}
+	defer func() {
+		_ = out.Close()
+	}()
+
+	if found {
+		return t.Render(out, o.Values)
+	}
+	return t.Render(out, nil)
 }
 
 func detectRootDir(currentDir string) (string, error) {
