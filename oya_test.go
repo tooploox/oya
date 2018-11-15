@@ -127,8 +127,8 @@ func (c *SuiteContext) iRunOyaGet(uri string) error {
 	return nil
 }
 
-func (c *SuiteContext) iRunOyaRender(dir, tmpltPath string) error {
-	c.lastCommandErr = render.Render(dir, tmpltPath, c.stdout, c.stderr)
+func (c *SuiteContext) iRunOyaRender(oyafilePath, tmpltPath string) error {
+	c.lastCommandErr = render.Render(oyafilePath, tmpltPath, c.projectDir, c.stdout, c.stderr)
 	return nil
 }
 

@@ -32,7 +32,11 @@ var renderCmd = &cobra.Command{
 			return err
 		}
 		templatePath := args[0]
-		return render.Render(oyafilePath, templatePath, os.Stdout, os.Stderr)
+		outputPath, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		return render.Render(oyafilePath, templatePath, outputPath, os.Stdout, os.Stderr)
 	},
 }
 

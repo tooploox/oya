@@ -15,7 +15,10 @@
   CLOSED: [2018-11-13 Tue 23:49]
 * DONE Try to implement minimal/fake Docker pack
   CLOSED: [2018-11-15 Thu 00:58]
+* DONE Render directories
+  CLOSED: [2018-11-16 Fri 00:29]
 * TODO templatized paths
+* TODO Use cobra commands in tests.
 * hook -> task
 * oya -T --tasks list available tasks
 * Consider dropping run
