@@ -1,7 +1,9 @@
 package render
 
 import (
+	"bytes"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -38,7 +40,12 @@ func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writ
 			relPath = filepath.Base(templatePath)
 		}
 
-		return renderFile(path, filepath.Join(outputPath, relPath), values)
+		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
+		if err != nil {
+			return err
+		}
+		log.Println(outputPath, "+", relPath, "=", filePath)
+		return renderFile(path, filePath, values)
 	})
 }
 
@@ -53,6 +60,9 @@ func renderFile(templatePath, outputPath string, values oyafile.Scope) error {
 	}
 
 	err = os.MkdirAll(filepath.Dir(outputPath), 0700)
+	if err != nil {
+		return err
+	}
 
 	out, err := os.Create(outputPath)
 	if err != nil {
@@ -63,4 +73,17 @@ func renderFile(templatePath, outputPath string, values oyafile.Scope) error {
 	}()
 
 	return t.Render(out, values)
+}
+
+func renderString(templateSource string, values oyafile.Scope) (string, error) {
+	t, err := template.Parse(templateSource)
+	if err != nil {
+		return "", err
+	}
+	out := new(bytes.Buffer)
+	err = t.Render(out, values)
+	if err != nil {
+		return "", err
+	}
+	return out.String(), nil
 }
