@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -24,11 +25,9 @@ type Oyafile struct {
 	Shell   string
 	Imports map[Alias]ImportPath
 	Hooks   map[string]Hook
-	Values  Scope
+	Values  template.Scope
 	Module  string // Set for root Oyafile
 }
-
-type Scope map[string]interface{}
 
 func New(oyafilePath string, rootDir string) *Oyafile {
 
@@ -126,8 +125,8 @@ func fullPath(projectDir, name string) string {
 	return path.Join(projectDir, name)
 }
 
-func defaultValues(dirPath string) Scope {
-	return Scope{
+func defaultValues(dirPath string) template.Scope {
+	return template.Scope{
 		"BasePath": dirPath,
 	}
 }

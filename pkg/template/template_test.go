@@ -2,6 +2,9 @@ package template_test
 
 import (
 	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/bilus/oya/pkg/template"
@@ -34,4 +37,16 @@ func TestTemplate_Render_Parsed(t *testing.T) {
 	err = tpl.Render(output, map[string]string{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected template to render")
 	tu.AssertEqual(t, "bar", output.String())
+}
+
+func TestRenderAll(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	err = template.RenderAll("./fixtures/", outputDir, template.Scope{"foo": "bar"})
+	tu.AssertNoErr(t, err, "Expected templates to render")
+
+	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
+	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"), "bar\n")
 }

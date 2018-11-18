@@ -61,3 +61,4 @@ https://godoc.org/k8s.io/helm/pkg/ignore
 ** Non-existent path
 ** Path without Oyafile
 https://godoc.org/k8s.io/helm/pkg/ignore
+* support template types as plugins (.kasia)

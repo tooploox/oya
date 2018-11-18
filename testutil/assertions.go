@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"io/ioutil"
 	"os"
 	"reflect"
 	"sort"
@@ -74,4 +75,12 @@ func AssertPathExists(t *testing.T, path string) {
 	if err != nil {
 		t.Errorf("path %v does not exist", path)
 	}
+}
+
+func AssertFileContains(t *testing.T, path string, expectedContent string) {
+	t.Helper()
+	AssertPathExists(t, path)
+	actual, err := ioutil.ReadFile(path)
+	AssertNoErr(t, err, "Expected no error reading %v", path)
+	AssertEqual(t, expectedContent, string(actual))
 }

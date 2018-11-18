@@ -2,6 +2,8 @@ package oyafile
 
 import (
 	"io"
+
+	"github.com/bilus/oya/pkg/template"
 )
 
 type Hook interface {
@@ -12,7 +14,7 @@ type ScriptedHook struct {
 	Name string
 	Script
 	Shell string
-	Scope *Scope
+	Scope *template.Scope
 }
 
 func (h ScriptedHook) Exec(stdout, stderr io.Writer) error {
