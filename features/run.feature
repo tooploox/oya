@@ -146,16 +146,18 @@ Scenario: Parent marks child as changed
 Scenario: No Oyafile
   Given file ./NotOyafile containing
     """
+    Module: project
     """
   When I run "oya run all"
-  Then the command fails with error
-    """
-    missing Oyafile
-    """
+  Then the command fails with error matching
+  """
+  .*no Oyafile project in.*
+  """
 
 Scenario: Missing hook
   Given file ./Oyafile containing
     """
+    Module: project
     """
   When I run "oya run all"
   Then the command fails with error

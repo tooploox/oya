@@ -3,21 +3,22 @@ package render
 import (
 	"bytes"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
+	log "github.com/sirupsen/logrus"
 )
 
 func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writer) error {
-	rootDir, err := detectRootDir(outputPath)
+	proj, err := project.Detect(outputPath)
 	if err != nil {
 		return err
 	}
 
-	o, found, err := oyafile.Load(oyafilePath, rootDir)
+	o, found, err := proj.LoadOyafile(oyafilePath)
 	if err != nil {
 		return err
 	}
@@ -47,10 +48,6 @@ func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writ
 		log.Println(outputPath, "+", relPath, "=", filePath)
 		return renderFile(path, filePath, values)
 	})
-}
-
-func detectRootDir(currentDir string) (string, error) {
-	return oyafile.DetectRootDir(currentDir)
 }
 
 func renderFile(templatePath, outputPath string, values oyafile.Scope) error {

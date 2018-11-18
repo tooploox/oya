@@ -28,7 +28,7 @@
 ** Bring README up to date
 ** Cleanup Modules/packs
 ** Package > pack everywhere? Or name it "package" in docs?
-** Module -> Project -> Pack?
+** Module -> Project
 ** Exclude modules inside the current module when running oya run
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import

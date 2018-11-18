@@ -20,7 +20,7 @@ func AssertNoErr(t *testing.T, err error, msg string, args ...interface{}) {
 func AssertErr(t *testing.T, err error, msg string, args ...interface{}) {
 	t.Helper()
 	if err == nil {
-		t.Fatalf(errors.Wrapf(err, msg, args...).Error())
+		t.Fatalf(msg, args...)
 	}
 }
 

@@ -101,31 +101,6 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (o *Oyafile) IsRoot() bool {
-	return len(string(o.Module)) > 0
-}
-
-func DetectRootDir(startDir string) (string, error) {
-	path := startDir
-	maxParts := 256
-	for i := 0; i < maxParts; i++ {
-		o, found, err := LoadFromDir(path, path)
-		if err != nil {
-			return "", err
-		}
-		if err == nil && found && o.IsRoot() {
-			return path, nil
-		}
-		if path == "/" {
-			break
-		}
-		path = filepath.Dir(path)
-	}
-
-	return "", errors.Errorf("failed to detect Oya project root directory starting at %v", startDir)
-
-}
-
 func (oyafile Oyafile) ExecHook(hookName string, stdout, stderr io.Writer) (found bool, err error) {
 	hook, ok := oyafile.Hooks[hookName]
 	if !ok {
