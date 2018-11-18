@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -109,44 +110,23 @@ func (c *SuiteContext) fileExists(path string) error {
 	return err
 }
 
-func withArgs(args []string) func() {
-	oldArgs := os.Args
-	os.Args = args
-	return func() {
-		os.Args = oldArgs
+func (c *SuiteContext) execute(command string) error {
+	err := os.Chdir(c.projectDir)
+	if err != nil {
+		return err
 	}
-}
-
-func (c *SuiteContext) iRunOyaRun(hook string) error {
-	os.Chdir(c.projectDir)
-	defer withArgs([]string{"oya", "run", hook})()
+	oldArgs := os.Args
+	os.Args = strings.Fields(command)
+	defer func() {
+		os.Args = oldArgs
+	}()
 	cmd.SetOutput(c.stdout)
 	c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 
-func (c *SuiteContext) iRunOyaInit() error {
-	os.Chdir(c.projectDir)
-	defer withArgs([]string{"oya", "init"})()
-	cmd.SetOutput(c.stdout)
-	c.lastCommandErr = cmd.ExecuteE()
-	return nil
-}
-
-func (c *SuiteContext) iRunOyaGet(uri string) error {
-	os.Chdir(c.projectDir)
-	defer withArgs([]string{"oya", "get", uri})()
-	cmd.SetOutput(c.stdout)
-	c.lastCommandErr = cmd.ExecuteE()
-	return nil
-}
-
-func (c *SuiteContext) iRunOyaRender(oyafilePath, tmpltPath string) error {
-	os.Chdir(c.projectDir)
-	defer withArgs([]string{"oya", "render", "-f", oyafilePath, tmpltPath})()
-	cmd.SetOutput(c.stdout)
-	c.lastCommandErr = cmd.ExecuteE()
-	return nil
+func (c *SuiteContext) iRunOya(command string) error {
+	return c.execute("oya " + command)
 }
 
 func (c *SuiteContext) theCommandSucceeds() error {
@@ -194,10 +174,7 @@ func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
-	s.Step(`^I run "oya run (.+)"$`, c.iRunOyaRun)
-	s.Step(`^I run "oya init"$`, c.iRunOyaInit)
-	s.Step(`^I run "oya get (.+)"$`, c.iRunOyaGet)
-	s.Step(`^I run "oya render -f ([^ ]+) (.+)"$`, c.iRunOyaRender)
+	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)

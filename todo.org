@@ -20,9 +20,12 @@
 * DONE templatized paths
   CLOSED: [2018-11-17 Sat 18:31]
 * TODO Refactor
-** TODO Use cobra commands in tests
-** TODO Tests for existing functionality
-** TODO Rendering -> pkg
+** DONE Use cobra commands in tests
+   CLOSED: [2018-11-18 Sun 18:06]
+** DONE Tests for existing functionality
+   CLOSED: [2018-11-18 Sun 18:06]
+** DONE Rendering -> pkg
+   CLOSED: [2018-11-18 Sun 18:06]
 ** TODO hook -> task
 ** Report missing variables (Template.Strict)
 ** Bring README up to date
