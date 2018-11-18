@@ -6,16 +6,20 @@ import (
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/pack"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
+// TODO: Duplicated in oyafile module.
+const VendorDir = "oya/vendor"
+
 type Project struct {
-	RootDir string
+	Root *oyafile.Oyafile
 }
 
 func Detect(workDir string) (Project, error) {
-	rootDir, found, err := detectRootDir(workDir)
+	o, found, err := detectRoot(workDir)
 	if err != nil {
 		return Project{}, err
 	}
@@ -23,16 +27,11 @@ func Detect(workDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		RootDir: rootDir,
+		Root: o,
 	}, nil
 }
 
 func (p Project) Run(workDir, hookName string, stdout, stderr io.Writer) error {
-	_, found, _ := oyafile.LoadFromDir(workDir, p.RootDir)
-	if !found {
-		return ErrNoOyafile{Path: workDir}
-	}
-
 	log.Debugf("Hook %q at %v", hookName, workDir)
 
 	oyafiles, err := oyafile.List(workDir)
@@ -43,7 +42,7 @@ func (p Project) Run(workDir, hookName string, stdout, stderr io.Writer) error {
 		return ErrNoOyafiles{Path: workDir}
 	}
 
-	if oyafiles[0].Dir != p.RootDir {
+	if !oyafiles[0].Equals(*p.Root) {
 		panic("oyafile.List post-condition failed: expected first oyafile to be root Oyafile")
 	}
 
@@ -76,23 +75,27 @@ func (p Project) Run(workDir, hookName string, stdout, stderr io.Writer) error {
 }
 
 func (p Project) LoadOyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.Load(oyafilePath, p.RootDir)
+	return oyafile.Load(oyafilePath, p.Root.RootDir)
+}
+
+func (p Project) Vendor(pack pack.Pack) error {
+	return pack.Vendor(filepath.Join(p.Root.RootDir, VendorDir))
 }
 
 func isRoot(o *oyafile.Oyafile) bool {
 	return len(o.Module) > 0
 }
 
-func detectRootDir(startDir string) (string, bool, error) {
+func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 	path := startDir
 	maxParts := 256
 	for i := 0; i < maxParts; i++ {
 		o, found, err := oyafile.LoadFromDir(path, path)
 		if err != nil {
-			return "", false, err
+			return nil, false, err
 		}
 		if err == nil && found && isRoot(o) {
-			return filepath.Clean(path), true, nil
+			return o, true, nil
 		}
 		if path == "/" {
 			break
@@ -100,5 +103,5 @@ func detectRootDir(startDir string) (string, bool, error) {
 		path = filepath.Dir(path)
 	}
 
-	return "", false, nil
+	return nil, false, nil
 }

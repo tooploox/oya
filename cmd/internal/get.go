@@ -1,23 +1,28 @@
-package get
+package internal
 
 import (
 	"io"
 	"strings"
 
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/project"
 	"github.com/pkg/errors"
 )
 
-func Get(vendorDir, uri string, stdout, stderr io.Writer) error {
+func Get(workDir, uri string, stdout, stderr io.Writer) error {
 	repoUri, ref, err := parseUri(uri)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	p, err := pack.NewFromUri(repoUri, ref)
+	pack, err := pack.NewFromUri(repoUri, ref)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	err = p.Vendor(vendorDir)
+	prj, err := project.Detect(workDir)
+	if err != nil {
+		return wrapErr(err, uri)
+	}
+	err = prj.Vendor(pack)
 	if err != nil {
 		return wrapErr(err, uri)
 	}

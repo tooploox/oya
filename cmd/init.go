@@ -23,7 +23,7 @@ package cmd
 import (
 	"os"
 
-	i "github.com/bilus/oya/cmd/init"
+	"github.com/bilus/oya/cmd/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +36,7 @@ var initCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return i.Init(cwd, os.Stdout, os.Stderr)
+		return internal.Init(cwd, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 	Args: cobra.NoArgs,
 }

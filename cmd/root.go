@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -53,6 +54,17 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+// ExecuteE executes a command same as Execute but returns error.
+func ExecuteE() error {
+	_, err := rootCmd.ExecuteC()
+	return err
+}
+
+// SetOutput overrides cobra output (for testing).
+func SetOutput(out io.Writer) {
+	rootCmd.SetOutput(out)
 }
 
 func init() {

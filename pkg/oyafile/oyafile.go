@@ -30,12 +30,11 @@ type Oyafile struct {
 }
 
 func New(oyafilePath string, rootDir string) *Oyafile {
-
 	dir := path.Dir(oyafilePath)
 	return &Oyafile{
-		Dir:     dir,
-		Path:    oyafilePath,
-		RootDir: rootDir,
+		Dir:     filepath.Clean(dir),
+		Path:    filepath.Clean(oyafilePath),
+		RootDir: filepath.Clean(rootDir),
 		Shell:   "/bin/sh",
 		Imports: make(map[Alias]ImportPath),
 		Hooks:   make(map[string]Hook),

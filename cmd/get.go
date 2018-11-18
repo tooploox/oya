@@ -21,21 +21,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// runCmd represents the run command
-var runCmd = &cobra.Command{
-	Use:   "run HOOK",
-	Short: "Executes a Oya hook",
+// getCmd represents the get command
+var getCmd = &cobra.Command{
+	Use:   "get URI",
+	Short: "Gets Oya package from external repo",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		hookName := args[0]
 		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, hookName, cmd.OutOrStdout(), cmd.OutOrStderr())
+		return internal.Get(cwd, args[0], cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(getCmd)
 }

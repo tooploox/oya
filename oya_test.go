@@ -13,10 +13,7 @@ import (
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
-	"github.com/bilus/oya/cmd/get"
-	cmdinit "github.com/bilus/oya/cmd/init"
-	"github.com/bilus/oya/cmd/render"
-	"github.com/bilus/oya/cmd/run"
+	"github.com/bilus/oya/cmd"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -112,23 +109,43 @@ func (c *SuiteContext) fileExists(path string) error {
 	return err
 }
 
+func withArgs(args []string) func() {
+	oldArgs := os.Args
+	os.Args = args
+	return func() {
+		os.Args = oldArgs
+	}
+}
+
 func (c *SuiteContext) iRunOyaRun(hook string) error {
-	c.lastCommandErr = run.Run(c.projectDir, hook, c.stdout, c.stderr)
+	os.Chdir(c.projectDir)
+	defer withArgs([]string{"oya", "run", hook})()
+	cmd.SetOutput(c.stdout)
+	c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 
 func (c *SuiteContext) iRunOyaInit() error {
-	c.lastCommandErr = cmdinit.Init(c.projectDir, c.stdout, c.stderr)
+	os.Chdir(c.projectDir)
+	defer withArgs([]string{"oya", "init"})()
+	cmd.SetOutput(c.stdout)
+	c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 
 func (c *SuiteContext) iRunOyaGet(uri string) error {
-	c.lastCommandErr = get.Get(c.vendorDir, uri, c.stdout, c.stderr)
+	os.Chdir(c.projectDir)
+	defer withArgs([]string{"oya", "get", uri})()
+	cmd.SetOutput(c.stdout)
+	c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 
 func (c *SuiteContext) iRunOyaRender(oyafilePath, tmpltPath string) error {
-	c.lastCommandErr = render.Render(oyafilePath, tmpltPath, c.projectDir, c.stdout, c.stderr)
+	os.Chdir(c.projectDir)
+	defer withArgs([]string{"oya", "render", "-f", oyafilePath, tmpltPath})()
+	cmd.SetOutput(c.stdout)
+	c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 

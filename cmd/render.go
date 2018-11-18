@@ -17,7 +17,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/bilus/oya/cmd/render"
+	"github.com/bilus/oya/cmd/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +36,7 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return render.Render(oyafilePath, templatePath, outputPath, os.Stdout, os.Stderr)
+		return internal.Render(oyafilePath, templatePath, outputPath, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
