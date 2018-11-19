@@ -83,7 +83,7 @@ func (p Project) Vendor(pack pack.Pack) error {
 }
 
 func isRoot(o *oyafile.Oyafile) bool {
-	return len(o.Module) > 0
+	return len(o.Project) > 0
 }
 
 func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {

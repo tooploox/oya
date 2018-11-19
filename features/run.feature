@@ -6,7 +6,7 @@ Background:
 Scenario: Successful run task
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     all: |
       foo=4
       if [ $$foo -ge 3 ]; then
@@ -27,7 +27,7 @@ Scenario: Successful run task
 Scenario: Nested Oyafiles
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     all: |
       touch Root
       echo "Root"
@@ -60,7 +60,7 @@ Scenario: Nested Oyafiles
 Scenario: No changes
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -80,7 +80,7 @@ Scenario: No changes
 Scenario: Child marks itself as changed
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -102,7 +102,7 @@ Scenario: Child marks itself as changed
 Scenario: Child marks parent as changed
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Changeset: echo ""
     all: |
       echo "Root"
@@ -124,7 +124,7 @@ Scenario: Child marks parent as changed
 Scenario: Parent marks child as changed
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Changeset: echo "+project1/"
     all: |
       echo "Root"
@@ -146,7 +146,7 @@ Scenario: Parent marks child as changed
 Scenario: No Oyafile
   Given file ./NotOyafile containing
     """
-    Module: project
+    Project: project
     """
   When I run "oya run all"
   Then the command fails with error matching
@@ -157,7 +157,7 @@ Scenario: No Oyafile
 Scenario: Missing task
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     """
   When I run "oya run all"
   Then the command fails with error
@@ -168,7 +168,7 @@ Scenario: Missing task
 Scenario: Script template
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Values:
       value: some value
     all: |
@@ -186,7 +186,7 @@ Scenario: Script template
 Scenario: Ignore vendored Oyafiles
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     all: echo "main"
     """
   And file ./oya/vendor/github.com/test/foo/Oyafile containing

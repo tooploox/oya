@@ -6,7 +6,7 @@ Background:
 Scenario: Import tasks from vendored packs
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Import:
       foo: github.com/test/foo
     """
@@ -31,7 +31,7 @@ Scenario: Import tasks from vendored packs
 Scenario: Import task using pack values
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Import:
       foo: github.com/test/foo
     """
@@ -54,7 +54,7 @@ Scenario: Import task using pack values
 Scenario: Import task using BasePath
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Import:
       foo: github.com/test/foo
     """
@@ -77,7 +77,7 @@ Scenario: Import task using BasePath
 Scenario: Access pack values
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Import:
       foo: github.com/test/foo
     all: |
@@ -97,10 +97,10 @@ Scenario: Access pack values
   """
 
 @current
-Scenario: Access current module values
+Scenario: Access current project values
   Given file ./Oyafile containing
     """
-    Module: main
+    Project: main
     Values:
       foo: main
     """
@@ -134,7 +134,7 @@ Scenario: Access current module values
 Scenario: Invalid import
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Import:
       foo: github.com/test/foo
 

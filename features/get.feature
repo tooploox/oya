@@ -6,7 +6,7 @@ Background:
 Scenario: Get a pack
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     """
   When I run "oya get github.com/bilus/oya@fixtures"
   Then the command succeeds

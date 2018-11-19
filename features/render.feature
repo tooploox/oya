@@ -6,7 +6,7 @@ Background:
 Scenario: Render a template
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Values:
       foo: xxx
     """
@@ -24,7 +24,7 @@ Scenario: Render a template
 Scenario: Render a template directory
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Values:
       foo: xxx
       bar: yyy
@@ -51,7 +51,7 @@ Scenario: Render a template directory
 Scenario: Render templated paths
   Given file ./Oyafile containing
     """
-    Module: project
+    Project: project
     Values:
       foo: xxx
       bar: yyy

@@ -7,7 +7,7 @@
 
  Import:
     main: github.com/Tooploox/pledge
-** Same but Oyafile contains Module:
+** Same but Oyafile contains Project:
 ** Simple directory-level inheritance
 * DONE CLI init + run
   CLOSED: [2018-11-12 Mon 18:44]
@@ -32,8 +32,8 @@
    CLOSED: [2018-11-19 Mon 23:27]
 ** DONE Package > pack everywhere? Or name it "package" in docs?
    CLOSED: [2018-11-19 Mon 23:34]
-** TODO Cleanup Modules/packs
-** Package > pack everywhere? Or name it "package" in docs?
+** DONE Cleanup Modules/packs => Project
+   CLOSED: [2018-11-19 Mon 23:50]
 ** Exclude modules inside the current module when running oya run
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import

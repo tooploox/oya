@@ -26,7 +26,7 @@ type Oyafile struct {
 	Imports map[Alias]ImportPath
 	Tasks   map[string]Task
 	Values  template.Scope
-	Module  string // Set for root Oyafile
+	Project string // Set for root Oyafile
 }
 
 func New(oyafilePath string, rootDir string) *Oyafile {
@@ -91,7 +91,7 @@ func InitDir(dirPath string) error {
 	if err != nil {
 		return err
 	}
-	_, err = f.WriteString("Module: project\n")
+	_, err = f.WriteString("Project: project\n")
 	if err != nil {
 		_ = f.Close()
 		return err
@@ -194,12 +194,12 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 				}
 				oyafile.Values[valueName] = v
 			}
-		case "Module":
-			moduleName, ok := value.(string)
+		case "Project":
+			projectName, ok := value.(string)
 			if !ok {
-				return nil, fmt.Errorf("expected Module to point to a string, actual: name")
+				return nil, fmt.Errorf("expected Project: defining the project name, actual: %v", value)
 			}
-			oyafile.Module = moduleName
+			oyafile.Project = projectName
 		default:
 			script, ok := value.(string)
 			if !ok {
