@@ -200,3 +200,22 @@ Scenario: Ignore vendored Oyafiles
   main
 
   """
+
+Scenario: Ignore projects inside current project
+  Given file ./Oyafile containing
+    """
+    Project: main
+    all: echo "main"
+    """
+  And file ./foo/Oyafile containing
+    """
+    Project: foo
+    all: echo "foo"
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  main
+
+  """

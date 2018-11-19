@@ -34,7 +34,8 @@
    CLOSED: [2018-11-19 Mon 23:34]
 ** DONE Cleanup Modules/packs => Project
    CLOSED: [2018-11-19 Mon 23:50]
-** Exclude modules inside the current module when running oya run
+** DONE Exclude modules inside the current module when running oya run
+   CLOSED: [2018-11-20 Tue 00:22]
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
@@ -42,21 +43,21 @@
 *** oya records new imports using sha in packages.lock
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
-** Install task for packages
-** Install task for packages
+** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
 ** Rest of CLI, cleanup, messages
 ** Bring README up to date
-* $Args, $Flags
-* .kasia extension
-* oya -T --tasks list available tasks
-* Consider dropping run
-  oya run init --> oya Init
-  ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built-in tasks(implicitly), customization point (can import, can add before/after tasks etc.)
 * Arguments to go run -- pass to task
   oya build -- --flag=5
   $Flags -- map
   $Args -- positional arguments
+* Install task for packages
+* .kasia extension
+* oya -T --tasks list available tasks
 * TODO Docker pack, no language autodetect, Python + Go
+---
+* Consider dropping run
+  oya run init --> oya Init
+  ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built-in tasks(implicitly), customization point (can import, can add before/after tasks etc.)
 * Add a tutorial on using docker package
 * .oyaignore
    Exclude sub-directiories -- have to be built by cd'ing and running oya.

@@ -9,6 +9,7 @@ import (
 
 const DefaultName = "Oyafile"
 
+// TODO: Cleanup, should probably be Project.List.
 func List(rootDir string) ([]*Oyafile, error) {
 	vendorDir := filepath.Join(rootDir, VendorDir)
 	var oyafiles []*Oyafile
@@ -19,6 +20,7 @@ func List(rootDir string) ([]*Oyafile, error) {
 		if !info.IsDir() {
 			return nil
 		}
+		// TODO: Remove once we start verifying that all imported plugins have Project:
 		if path == vendorDir {
 			return filepath.SkipDir
 		}
@@ -28,6 +30,10 @@ func List(rootDir string) ([]*Oyafile, error) {
 		}
 		if !ok {
 			return nil
+		}
+		if oyafile.Project != "" && path != rootDir {
+			// Exclude projects nested under the current project.
+			return filepath.SkipDir
 		}
 		oyafiles = append(oyafiles, oyafile)
 		return nil
