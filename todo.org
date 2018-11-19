@@ -26,8 +26,9 @@
    CLOSED: [2018-11-18 Sun 18:06]
 ** DONE Rendering -> pkg
    CLOSED: [2018-11-18 Sun 18:06]
-** TODO hook -> task
-** Report missing variables (Template.Strict)
+** DONE task -> task
+   CLOSED: [2018-11-19 Mon 23:12]
+** TODO Report missing variables (Template.Strict)
 ** Bring README up to date
 ** Cleanup Modules/packs
 ** Package > pack everywhere? Or name it "package" in docs?
@@ -40,13 +41,15 @@
 *** oya vendor -- vendors recorded imports (keep .git)
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 ** Packs must have Module/Pack directive
-** Install hook for packages
+** Install task for packages
 ** Fix html escaping using kasia
 ** Rest of CLI, cleanup, messages
+* $Args, $Flags
+* .kasia extension
 * oya -T --tasks list available tasks
 * Consider dropping run
   oya run init --> oya Init
-  ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built in hooks (implicitly), customization point (can import, can add before/after hooks etc.)
+  ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built-in tasks(implicitly), customization point (can import, can add before/after tasks etc.)
 * Arguments to go run -- pass to task
   oya build -- --flag=5
   $Flags -- map

@@ -19,10 +19,10 @@ func (oyafile *Oyafile) resolveImports() error {
 			return err
 		}
 		oyafile.Values[string(alias)] = pack.Values
-		for key, hook := range pack.Hooks {
-			// TODO: Detect if hook already set.
-			log.Printf("Importing hook %v.%v", alias, key)
-			oyafile.Hooks[fmt.Sprintf("%v.%v", alias, key)] = hook
+		for key, task := range pack.Tasks {
+			// TODO: Detect if task already set.
+			log.Printf("Importing task %v.%v", alias, key)
+			oyafile.Tasks[fmt.Sprintf("%v.%v", alias, key)] = task
 		}
 	}
 	return nil

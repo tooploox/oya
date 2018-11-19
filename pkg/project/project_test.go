@@ -41,12 +41,12 @@ func TestProject_Run_NoOyafile(t *testing.T) {
 	tu.AssertErr(t, err, "Expected error trying to run without Oyafile")
 }
 
-func TestProject_Run_NoHook(t *testing.T) {
+func TestProject_Run_NoTask(t *testing.T) {
 	workDir := "./fixtures/project"
 	project, err := project.Detect(workDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
-	err = project.Run(workDir, "noSuchHook", ioutil.Discard, ioutil.Discard)
-	tu.AssertErr(t, err, "Expected error when trying to run without matching hook")
+	err = project.Run(workDir, "noSuchTask", ioutil.Discard, ioutil.Discard)
+	tu.AssertErr(t, err, "Expected error when trying to run without matching task")
 }
 
 func TestProject_Run_NoChanges(t *testing.T) {

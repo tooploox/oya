@@ -23,16 +23,16 @@ import (
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
-	Use:   "run HOOK",
-	Short: "Executes a Oya hook",
+	Use:   "run TASK",
+	Short: "Runs an Oya task",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		hookName := args[0]
+		taskName := args[0]
 		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, hookName, cmd.OutOrStdout(), cmd.OutOrStderr())
+		return internal.Run(cwd, taskName, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 

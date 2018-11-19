@@ -14,18 +14,18 @@
    (see Workflows below), an Oyafile and supporting scripts and compatible
    generators.
 
-1. Define a hook you can run:
+1. Define a task you can run:
 
         mkdir app1
         cat > Oyafile
         build: echo "Hello, world"
 
-1. Run the hook:
+1. Run the task:
 
         oya run build
         Hello, world
 
-The hook in the above example is called "build" but there's nothing special about the name. In fact, a hook name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different hooks as you like.
+The task in the above example is called "build" but there's nothing special about the name. In fact, a task name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different tasks as you like.
 
 ## Plugins
 
@@ -57,11 +57,11 @@ buildChart:
 
 ## How it works
 
-A directory is included in the build process if contains an Oyafile regardless of how deeply nested it is. You can use Oyafiles in these directories to define their own hooks.
+A directory is included in the build process if contains an Oyafile regardless of how deeply nested it is. You can use Oyafiles in these directories to define their own tasks.
 
 For example, to set up a CI/CD pipeline in a mono-repository containing several
 microservices, you'd put each microservice in its directory, each with its own
-Oyafile containing the hooks necessary to support the CI/CD workflow.
+Oyafile containing the tasks necessary to support the CI/CD workflow.
 
 
 Imagine you have the following file structure:
@@ -85,7 +85,7 @@ the current directory, to build the **changeset**: the list of directories that
 are marked as changed. In the above example it would be, as you probably
 guessed, `.` (the top-level directory) and `subdir` (the sub-directory).
 
-Finally, Oya executes the hook you specified for every directory marked as
+Finally, Oya executes the task you specified for every directory marked as
 changed, starting from the top directory. Going back to our example, it would
 generate the following output:
 
@@ -94,9 +94,9 @@ Top-level directory
 Sub-directory
 ```
 
-As you say, hooks and their corresponding scripts are defined in `Oyafile`s.
+As you say, tasks and their corresponding scripts are defined in `Oyafile`s.
 Their names must be camel-case yaml identifiers, starting with a lower-case
-letter. Built-in hooks start with capital letters.
+letter. Built-in tasks start with capital letters.
 
 More realistic example of an `Oyafile`:
 
@@ -115,8 +115,8 @@ Oya first walks all directories to build the changeset: a list of directories
 containing an Oyafile that are marked as "changed".
 
 It then walks the list,
-running the matching hook in each. CI/CD tool-specific script outputting list of
-modified files in buildable directories given the current hook name.
+running the matching task in each. CI/CD tool-specific script outputting list of
+modified files in buildable directories given the current task name.
      - each path must be normalized and prefixed with `+`
      - cannot be overriden, only valid for top-level Oyafile
      - in the future, you'll be able to override for a buildable directory and

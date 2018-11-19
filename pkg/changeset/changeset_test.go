@@ -17,8 +17,8 @@ func TestOneOyafile(t *testing.T) {
 	tu.AssertEqual(t, 1, len(actual))
 }
 
-func TestNoChangesetHook(t *testing.T) {
-	rootDir := "./fixtures/TestNoChangesetHook"
+func TestNoChangesetTask(t *testing.T) {
+	rootDir := "./fixtures/TestNoChangesetTask"
 	allOyafiles, err := oyafile.List(rootDir)
 	tu.AssertNoErr(t, err, "Error listing Oyafiles")
 	expected := allOyafiles

@@ -18,7 +18,7 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 
 	rootOyafile := candidates[0]
 	// Set to default if not present.
-	rootOyafile.Hooks["Changeset"] = rootChangesetHook(rootOyafile)
+	rootOyafile.Tasks["Changeset"] = rootChangesetTask(rootOyafile)
 
 	var changeset []*oyafile.Oyafile
 	for _, candidate := range candidates {
@@ -32,8 +32,8 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	return changeset, nil
 }
 
-func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
-	defaultHook := oyafile.BuiltinHook{
+func rootChangesetTask(rootOyafile *oyafile.Oyafile) oyafile.Task {
+	defaultTask := oyafile.BuiltinTask{
 		Name: "Changeset",
 		OnExec: func(stdout, stderr io.Writer) error {
 			oyafiles, err := oyafile.List(rootOyafile.Dir)
@@ -55,18 +55,18 @@ func rootChangesetHook(rootOyafile *oyafile.Oyafile) oyafile.Hook {
 		},
 	}
 
-	customHook, ok := rootOyafile.Hooks["Changeset"]
+	customTask, ok := rootOyafile.Tasks["Changeset"]
 	if ok {
-		return customHook
+		return customTask
 	}
-	return defaultHook
+	return defaultTask
 }
 
-func execChangesetHook(changesetHook oyafile.Hook) ([]string, error) {
+func execChangesetTask(changesetTask oyafile.Task) ([]string, error) {
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
-	err := changesetHook.Exec(stdout, stderr)
+	err := changesetTask.Exec(stdout, stderr)
 	if err != nil {
 		return nil, err
 	}
@@ -75,12 +75,12 @@ func execChangesetHook(changesetHook oyafile.Hook) ([]string, error) {
 }
 
 func calculateChangeset(currOyafile *oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
-	changesetHook, ok := currOyafile.Hooks["Changeset"]
+	changesetTask, ok := currOyafile.Tasks["Changeset"]
 	if !ok {
 		return nil, nil
 	}
 
-	dirs, err := execChangesetHook(changesetHook)
+	dirs, err := execChangesetTask(changesetTask)
 	if err != nil {
 		return nil, err
 	}

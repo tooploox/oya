@@ -24,7 +24,7 @@ type Oyafile struct {
 	RootDir string
 	Shell   string
 	Imports map[Alias]ImportPath
-	Hooks   map[string]Hook
+	Tasks   map[string]Task
 	Values  template.Scope
 	Module  string // Set for root Oyafile
 }
@@ -37,7 +37,7 @@ func New(oyafilePath string, rootDir string) *Oyafile {
 		RootDir: filepath.Clean(rootDir),
 		Shell:   "/bin/sh",
 		Imports: make(map[Alias]ImportPath),
-		Hooks:   make(map[string]Hook),
+		Tasks:   make(map[string]Task),
 		Values:  defaultValues(dir),
 	}
 }
@@ -99,12 +99,12 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (oyafile Oyafile) ExecHook(hookName string, stdout, stderr io.Writer) (found bool, err error) {
-	hook, ok := oyafile.Hooks[hookName]
+func (oyafile Oyafile) RunTask(taskName string, stdout, stderr io.Writer) (found bool, err error) {
+	task, ok := oyafile.Tasks[taskName]
 	if !ok {
 		return false, nil
 	}
-	return true, hook.Exec(stdout, stderr)
+	return true, task.Exec(stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {
@@ -205,7 +205,7 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 			if !ok {
 				return nil, fmt.Errorf("script expected for key %q", name)
 			}
-			oyafile.Hooks[name] = ScriptedHook{
+			oyafile.Tasks[name] = ScriptedTask{
 				Name:   name,
 				Script: Script(script),
 				Shell:  oyafile.Shell,

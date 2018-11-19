@@ -9,10 +9,10 @@ import (
 func Oyafile(dirPath string, kvs ...string) *oyafile.Oyafile {
 	o := oyafile.New(filepath.Join(dirPath, oyafile.DefaultName), filepath.Join(dirPath, "oya/vendor"))
 	for i := 0; i < len(kvs); i = i + 2 {
-		hook := kvs[i]
+		task := kvs[i]
 		script := kvs[i+1]
-		o.Hooks[hook] = oyafile.ScriptedHook{
-			Name:   hook,
+		o.Tasks[task] = oyafile.ScriptedTask{
+			Name:   task,
 			Script: oyafile.Script(script),
 		}
 	}

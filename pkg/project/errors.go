@@ -26,10 +26,10 @@ func (e ErrNoProject) Error() string {
 	return fmt.Sprintf("no Oyafile project in %v or any parent directories", e.Path)
 }
 
-type ErrNoHook struct {
-	Hook string
+type ErrNoTask struct {
+	Task string
 }
 
-func (e ErrNoHook) Error() string {
-	return fmt.Sprintf("missing hook %q", e.Hook)
+func (e ErrNoTask) Error() string {
+	return fmt.Sprintf("missing task %q", e.Task)
 }

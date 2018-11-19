@@ -12,7 +12,10 @@ const DefaultName = "Oyafile"
 func List(rootDir string) ([]*Oyafile, error) {
 	vendorDir := filepath.Join(rootDir, VendorDir)
 	var oyafiles []*Oyafile
-	return oyafiles, filepath.Walk(rootDir, func(path string, info os.FileInfo, _ error) error {
+	return oyafiles, filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !info.IsDir() {
 			return nil
 		}

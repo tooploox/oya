@@ -1,9 +1,9 @@
-Feature: Running hooks
+Feature: Running tasks
 
 Background:
    Given I'm in project dir
 
-Scenario: Successful run hook
+Scenario: Successful run task
   Given file ./Oyafile containing
     """
     Module: project
@@ -154,7 +154,7 @@ Scenario: No Oyafile
   .*no Oyafile project in.*
   """
 
-Scenario: Missing hook
+Scenario: Missing task
   Given file ./Oyafile containing
     """
     Module: project
@@ -162,7 +162,7 @@ Scenario: Missing hook
   When I run "oya run all"
   Then the command fails with error
     """
-    missing hook "all"
+    missing task "all"
     """
 
 Scenario: Script template

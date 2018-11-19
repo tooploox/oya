@@ -1,9 +1,9 @@
-Feature: Running hooks
+Feature: Running tasks
 
 Background:
    Given I'm in project dir
 
-Scenario: Import hooks from vendored package
+Scenario: Import tasks from vendored package
   Given file ./Oyafile containing
     """
     Module: project
@@ -28,7 +28,7 @@ Scenario: Import hooks from vendored package
   """
   And file ./OK exists
 
-Scenario: Import hook using pack values
+Scenario: Import task using pack values
   Given file ./Oyafile containing
     """
     Module: project
@@ -51,7 +51,7 @@ Scenario: Import hook using pack values
 
   """
 
-Scenario: Import hook using BasePath
+Scenario: Import task using BasePath
   Given file ./Oyafile containing
     """
     Module: project

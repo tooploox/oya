@@ -6,26 +6,26 @@ import (
 	"github.com/bilus/oya/pkg/template"
 )
 
-type Hook interface {
+type Task interface {
 	Exec(stdout, stderr io.Writer) error
 }
 
-type ScriptedHook struct {
+type ScriptedTask struct {
 	Name string
 	Script
 	Shell string
 	Scope *template.Scope
 }
 
-func (h ScriptedHook) Exec(stdout, stderr io.Writer) error {
+func (h ScriptedTask) Exec(stdout, stderr io.Writer) error {
 	return h.Script.Exec(*h.Scope, stdout, stderr, h.Shell)
 }
 
-type BuiltinHook struct {
+type BuiltinTask struct {
 	Name   string
 	OnExec func(stdout, stderr io.Writer) error
 }
 
-func (h BuiltinHook) Exec(stdout, stderr io.Writer) error {
+func (h BuiltinTask) Exec(stdout, stderr io.Writer) error {
 	return h.OnExec(stdout, stderr)
 }

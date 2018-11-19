@@ -31,8 +31,8 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir, hookName string, stdout, stderr io.Writer) error {
-	log.Debugf("Hook %q at %v", hookName, workDir)
+func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
+	log.Debugf("Task %q at %v", taskName, workDir)
 
 	oyafiles, err := oyafile.List(workDir)
 	if err != nil {
@@ -55,20 +55,20 @@ func (p Project) Run(workDir, hookName string, stdout, stderr io.Writer) error {
 		return nil
 	}
 
-	foundAtLeastOnHook := false
+	foundAtLeastOneTask := false
 	for _, o := range changes {
-		found, err := o.ExecHook(hookName, stdout, stderr)
+		found, err := o.RunTask(taskName, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
 		if found {
-			foundAtLeastOnHook = found
+			foundAtLeastOneTask = found
 		}
 	}
 
-	if !foundAtLeastOnHook {
-		return ErrNoHook{
-			Hook: hookName,
+	if !foundAtLeastOneTask {
+		return ErrNoTask{
+			Task: taskName,
 		}
 	}
 	return nil
