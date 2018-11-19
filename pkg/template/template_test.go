@@ -39,6 +39,13 @@ func TestTemplate_Render_Parsed(t *testing.T) {
 	tu.AssertEqual(t, "bar", output.String())
 }
 
+func TestTemplate_Render_MissingVariables(t *testing.T) {
+	tpl, err := template.Parse("$noSuchVar")
+	tu.AssertNoErr(t, err, "Expected template to parse")
+	err = tpl.Render(ioutil.Discard, map[string]string{"foo": "bar"})
+	tu.AssertErr(t, err, "Expected template not to render")
+}
+
 func TestRenderAll(t *testing.T) {
 	outputDir, err := ioutil.TempDir("", "oya")
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")

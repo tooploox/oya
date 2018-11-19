@@ -28,7 +28,8 @@
    CLOSED: [2018-11-18 Sun 18:06]
 ** DONE task -> task
    CLOSED: [2018-11-19 Mon 23:12]
-** TODO Report missing variables (Template.Strict)
+** DONE Report missing variables (Template.Strict)
+   CLOSED: [2018-11-19 Mon 23:27]
 ** Bring README up to date
 ** Cleanup Modules/packs
 ** Package > pack everywhere? Or name it "package" in docs?

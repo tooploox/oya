@@ -1,7 +1,6 @@
 package template
 
 import (
-	"bytes"
 	"io"
 	"io/ioutil"
 	"os"
@@ -13,7 +12,8 @@ import (
 type Scope map[string]interface{}
 
 type Template interface {
-	Render(out io.Writer, values interface{}) error
+	Render(out io.Writer, values ...interface{}) error
+	RenderString(values ...interface{}) (string, error)
 }
 
 type kasiaTemplate struct {
@@ -33,6 +33,7 @@ func Parse(source string) (Template, error) {
 	if err != nil {
 		return nil, err
 	}
+	kt.Strict = true
 	return kasiaTemplate{impl: kt}, nil
 }
 
@@ -56,6 +57,14 @@ func RenderAll(templatePath, outputPath string, values Scope) error {
 		}
 		return renderFile(path, filePath, values)
 	})
+}
+
+func (t kasiaTemplate) Render(out io.Writer, values ...interface{}) error {
+	return t.impl.Run(out, values...)
+}
+
+func (t kasiaTemplate) RenderString(values ...interface{}) (string, error) {
+	return t.impl.RenderString(values...)
 }
 
 func renderFile(templatePath, outputPath string, values Scope) error {
@@ -85,19 +94,9 @@ func renderString(templateSource string, values Scope) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	out := new(bytes.Buffer)
-	err = t.Render(out, values)
+	str, err := t.RenderString(values)
 	if err != nil {
 		return "", err
 	}
-	return out.String(), nil
-}
-
-type emptyValues struct{}
-
-func (t kasiaTemplate) Render(out io.Writer, values interface{}) error {
-	if values == nil {
-		values = emptyValues{}
-	}
-	return t.impl.Run(out, values)
+	return str, nil
 }
