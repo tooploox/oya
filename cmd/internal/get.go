@@ -37,7 +37,7 @@ func parseUri(uri string) (string, string, error) {
 	case 2:
 		return parts[0], parts[1], nil
 	default:
-		return "", "", errors.Errorf("unsupported package uri: %v", uri)
+		return "", "", errors.Errorf("unsupported pack uri: %v", uri)
 	}
 }
 

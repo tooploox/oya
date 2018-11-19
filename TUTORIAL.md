@@ -2,7 +2,7 @@
 
 ## What is Oya
 
-Oya lets you bootstrap CI/CD for your project using ready-made packages supporting various workflows and CI/CD tools.
+Oya lets you bootstrap CI/CD for your project using ready-made packs supporting various workflows and CI/CD tools.
 
 ## Install Oya and its dependencies
 
@@ -28,9 +28,9 @@ The first step is initializing the repository:
 
 All it does is generate an empty Oyafile in the root directory.
 
-Let's dockerize our app using an Oya package that makes it easy. First, install the package:
+Let's dockerize our app using an Oya pack that makes it easy. First, install the pack:
 
-    oya get github.com/bilus/oya/packages/docker [--alias docker]
+    oya get github.com/bilus/oya/packs/docker [--alias docker]
 
 Then, generate the assets necessary to put the application into a Docker image:
 
@@ -61,11 +61,11 @@ HERE NEXT
 
 We need to tell Oya this is what we want to do:
 
-    oya get github.com/bilus/oya/packages/gke
+    oya get github.com/bilus/oya/packs/gke
 
-The command installs the gke package. We'll also need the docker package to simplify putting our app in a docker container:
+The command installs the gke pack. We'll also need the docker pack to simplify putting our app in a docker container:
 
-    oya get github.com/bilus/oya/packages/docker
+    oya get github.com/bilus/oya/packs/docker
 
 Let's generate code necessary to deploy our app in a docker container:
 

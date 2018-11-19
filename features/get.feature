@@ -1,9 +1,9 @@
-Feature: Getting packages
+Feature: Getting packs
 
 Background:
    Given I'm in project dir
 
-Scenario: Get a package
+Scenario: Get a pack
   Given file ./Oyafile containing
     """
     Module: project

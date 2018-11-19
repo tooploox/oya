@@ -13,7 +13,7 @@ const VendorDir = "oya/vendor"
 
 func (oyafile *Oyafile) resolveImports() error {
 	for alias, path := range oyafile.Imports {
-		log.Debugf("Importing package %v as %v", path, alias)
+		log.Debugf("Importing pack %v as %v", path, alias)
 		pack, err := oyafile.loadPack(path)
 		if err != nil {
 			return err
@@ -44,7 +44,7 @@ func (oyafile *Oyafile) loadPack(path ImportPath) (*Oyafile, error) {
 		return pack, nil
 	}
 
-	return nil, errors.Errorf("missing package %v", path)
+	return nil, errors.Errorf("missing pack %v", path)
 }
 
 func (oyafile *Oyafile) importDirs() []string {

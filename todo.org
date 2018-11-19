@@ -30,21 +30,22 @@
    CLOSED: [2018-11-19 Mon 23:12]
 ** DONE Report missing variables (Template.Strict)
    CLOSED: [2018-11-19 Mon 23:27]
-** Bring README up to date
-** Cleanup Modules/packs
+** DONE Package > pack everywhere? Or name it "package" in docs?
+   CLOSED: [2018-11-19 Mon 23:34]
+** TODO Cleanup Modules/packs
 ** Package > pack everywhere? Or name it "package" in docs?
-** Module -> Project
 ** Exclude modules inside the current module when running oya run
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
+*** oya get -- adds to packages.lock if not there
 *** oya records new imports using sha in packages.lock
-*** oya vendor -- vendors recorded imports (keep .git)
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
-** Packs must have Module/Pack directive
+*** oya get -u <uri> updates package sha in packages.lock and fetches it
 ** Install task for packages
-** Fix html escaping using kasia
+** Install task for packages
 ** Rest of CLI, cleanup, messages
+** Bring README up to date
 * $Args, $Flags
 * .kasia extension
 * oya -T --tasks list available tasks

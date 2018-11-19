@@ -3,7 +3,7 @@ Feature: Running tasks
 Background:
    Given I'm in project dir
 
-Scenario: Import tasks from vendored package
+Scenario: Import tasks from vendored packs
   Given file ./Oyafile containing
     """
     Module: project
@@ -74,7 +74,7 @@ Scenario: Import task using BasePath
 
   """
 
-Scenario: Access package values
+Scenario: Access pack values
   Given file ./Oyafile containing
     """
     Module: project
@@ -143,5 +143,5 @@ Scenario: Invalid import
   When I run "oya run all"
   Then the command fails with error matching
   """
-  .*missing package github.com/test/foo$
+  .*missing pack github.com/test/foo$
   """

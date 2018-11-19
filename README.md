@@ -29,7 +29,7 @@ The task in the above example is called "build" but there's nothing special abou
 
 ## Plugins
 
-oya vendor p github.com/bilus/oya/packages/circleci-helm-platform
+oya vendor p github.com/bilus/oya/packs/circleci-helm-platform
 
 installs into vendor/
 symlinks vendor/p to it
@@ -41,12 +41,12 @@ oya p/generate/docker
 delivery/broadcasts/Oyafile
 
 Import:
-  - github.com/bilus/oya/packages/jenkins-monorepo
+  - github.com/bilus/oya/packs/jenkins-monorepo
 
 --
 
 Path:
-  jm: github.com/bilus/oya/packages/jenkins-monorepo/bin
+  jm: github.com/bilus/oya/packs/jenkins-monorepo/bin
 
 buildDocker:
   jm/buildDocker

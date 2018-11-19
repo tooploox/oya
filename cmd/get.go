@@ -24,7 +24,7 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get URI",
-	Short: "Gets Oya package from external repo",
+	Short: "Get Oya pack from external repo",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()

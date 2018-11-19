@@ -32,7 +32,7 @@ func (p *GitPack) Vendor(vendorDir string) error {
 	log.Debugf("Getting %q into %q", p.src(), fullPath)
 	err := getter.GetAny(fullPath, p.src())
 	if err != nil {
-		return errors.Wrapf(err, "error vendoring package %v", p.repoUri)
+		return errors.Wrapf(err, "error vendoring pack %v", p.repoUri)
 	}
 	return nil
 }
