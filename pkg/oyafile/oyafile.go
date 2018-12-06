@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
@@ -26,10 +27,17 @@ type Oyafile struct {
 	Imports map[Alias]ImportPath
 	Tasks   map[string]Task
 	Values  template.Scope
-	Project string // Set for root Oyafile
+	Project string   // Set for root Oyafile
+	Ignore  []string // Directory exclusion rules
+
+	relPath string
 }
 
-func New(oyafilePath string, rootDir string) *Oyafile {
+func New(oyafilePath string, rootDir string) (*Oyafile, error) {
+	relPath, err := filepath.Rel(rootDir, oyafilePath)
+	if err != nil {
+		return nil, err
+	}
 	dir := path.Dir(oyafilePath)
 	return &Oyafile{
 		Dir:     filepath.Clean(dir),
@@ -39,7 +47,8 @@ func New(oyafilePath string, rootDir string) *Oyafile {
 		Imports: make(map[Alias]ImportPath),
 		Tasks:   make(map[string]Task),
 		Values:  defaultValues(dir),
-	}
+		relPath: relPath,
+	}, nil
 }
 
 func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
@@ -52,7 +61,11 @@ func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 	if empty {
-		return New(oyafilePath, rootDir), true, nil
+		o, err := New(oyafilePath, rootDir)
+		if err != nil {
+			return nil, false, err
+		}
+		return o, true, nil
 	}
 	file, err := os.Open(oyafilePath)
 	if err != nil {
@@ -113,6 +126,10 @@ func (oyafile Oyafile) Equals(other Oyafile) bool {
 	return filepath.Clean(oyafile.Dir) == filepath.Clean(other.Dir)
 }
 
+func (oyafile Oyafile) IsRoot() bool {
+	return oyafile.Project != "" && filepath.Clean(oyafile.Dir) == filepath.Clean(oyafile.RootDir)
+}
+
 func wrapLoadErr(err error, oyafilePath string) error {
 	return errors.Wrapf(err, "error loading Oyafile %v", oyafilePath)
 }
@@ -163,7 +180,10 @@ func isNode(line string) bool {
 }
 
 func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
-	oyafile := New(path, rootDir)
+	oyafile, err := New(path, rootDir)
+	if err != nil {
+		return nil, err
+	}
 	for name, value := range of {
 		switch name {
 		case "Import":
@@ -200,6 +220,20 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 				return nil, fmt.Errorf("expected Project: defining the project name, actual: %v", value)
 			}
 			oyafile.Project = projectName
+		case "Ignore":
+			rulesI, ok := value.([]interface{})
+			if !ok {
+				return nil, fmt.Errorf("expected Ignore: containing an array of ignore rules, actual: %v", value)
+			}
+			rules := make([]string, len(rulesI))
+			for i, ri := range rulesI {
+				rule, ok := ri.(string)
+				if !ok {
+					return nil, fmt.Errorf("expected Ignore: containing an array of ignore rules, actual: %v", ri)
+				}
+				rules[i] = rule
+			}
+			oyafile.Ignore = rules
 		default:
 			script, ok := value.(string)
 			if !ok {
@@ -215,4 +249,12 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 	}
 
 	return oyafile, nil
+}
+
+func (o *Oyafile) Ignores() string {
+	return strings.Join(o.Ignore, "\n")
+}
+
+func (o *Oyafile) RelPath() string {
+	return o.relPath
 }

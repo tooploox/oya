@@ -531,6 +531,12 @@
 			"path": "k8s.io/apimachinery/pkg/util/validation/field",
 			"revision": "60666be32c5de527b69dabe8e4400b4f0aa897de",
 			"revisionTime": "2018-10-15T20:53:01Z"
+		},
+		{
+			"checksumSHA1": "xsayrw6ecL+j2DZSIm/Saw8tj6g=",
+			"path": "k8s.io/helm/pkg/ignore",
+			"revision": "99f20d82bb2acf51c5d89e9ef832eb77c1bb44c3",
+			"revisionTime": "2018-06-18T14:21:40Z"
 		}
 	],
 	"rootPath": "github.com/bilus/oya"

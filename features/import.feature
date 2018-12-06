@@ -96,7 +96,6 @@ Scenario: Access pack values
 
   """
 
-@current
 Scenario: Access current project values
   Given file ./Oyafile containing
     """

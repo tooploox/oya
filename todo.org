@@ -36,6 +36,9 @@
    CLOSED: [2018-11-19 Mon 23:50]
 ** DONE Exclude modules inside the current module when running oya run
    CLOSED: [2018-11-20 Tue 00:22]
+** TODO .oyaignore
+    Exclude sub-directiories -- have to be built by cd'ing and running oya.
+ https://godoc.org/k8s.io/helm/pkg/ignore
 ** TODO Automate Oya testing using Oya + CircleCI
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
@@ -61,9 +64,6 @@
   oya run init --> oya Init
   ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built-in tasks(implicitly), customization point (can import, can add before/after tasks etc.)
 * Add a tutorial on using docker package
-* .oyaignore
-   Exclude sub-directiories -- have to be built by cd'ing and running oya.
-https://godoc.org/k8s.io/helm/pkg/ignore
 * Exclusions via -...
 * .Values.EarlyTerminate (default: true)
    Set to false to avoid terminating on first error

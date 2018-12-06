@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/bilus/oya/cmd/internal"
 	"github.com/spf13/cobra"
@@ -36,7 +37,11 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Render(oyafilePath, templatePath, outputPath, cmd.OutOrStdout(), cmd.OutOrStderr())
+		fullOyafilePath, err := filepath.Abs(oyafilePath)
+		if err != nil {
+			return err
+		}
+		return internal.Render(fullOyafilePath, templatePath, outputPath, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
