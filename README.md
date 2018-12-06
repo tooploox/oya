@@ -190,3 +190,24 @@ b. Each environment has its own branch
 * [4] Just put a CI/CD config into the root.
 * [5] No way to just share code, need to package into libraries. Bad for small
   teams wanting to quickly prototype.
+
+
+--
+
+## Adding CircleCI integration
+
+1. Install Oya
+
+```
+curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
+```
+
+2. Initialize project
+
+```
+oya init
+oya +github.com/bilus/oya-packs/circleci
+oya vendor
+```
+
+3. Push to git

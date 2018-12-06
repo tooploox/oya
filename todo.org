@@ -36,6 +36,7 @@
    CLOSED: [2018-11-19 Mon 23:50]
 ** DONE Exclude modules inside the current module when running oya run
    CLOSED: [2018-11-20 Tue 00:22]
+** TODO Automate Oya testing using Oya + CircleCI
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
@@ -43,6 +44,7 @@
 *** oya records new imports using sha in packages.lock
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
+****
 ** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
 ** Rest of CLI, cleanup, messages
 ** Bring README up to date
