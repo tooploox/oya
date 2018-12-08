@@ -52,9 +52,6 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 }
 
 func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
-	if _, err := os.Stat(oyafilePath); os.IsNotExist(err) {
-		return nil, false, nil
-	}
 	// YAML parser does not handle files without at least one node.
 	empty, err := isEmptyYAML(oyafilePath)
 	if err != nil {
@@ -92,6 +89,16 @@ func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
 
 func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	oyafilePath := fullPath(dirPath, "")
+	fi, err := os.Stat(oyafilePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, false, nil
+		}
+		return nil, false, err
+	}
+	if fi.IsDir() {
+		return nil, false, nil
+	}
 	return Load(oyafilePath, rootDir)
 }
 
