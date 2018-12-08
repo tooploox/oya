@@ -36,7 +36,8 @@
    CLOSED: [2018-11-19 Mon 23:50]
 ** DONE Exclude modules inside the current module when running oya run
    CLOSED: [2018-11-20 Tue 00:22]
-** TODO .oyaignore
+** DONE .oyaignore
+   CLOSED: [2018-12-08 Sat 17:22]
     Exclude sub-directiories -- have to be built by cd'ing and running oya.
  https://godoc.org/k8s.io/helm/pkg/ignore
 ** TODO Automate Oya testing using Oya + CircleCI
