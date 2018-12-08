@@ -21,6 +21,5 @@ jobs:
       # specify any bash command here prefixed with `run: `
       - run: go get github.com/kardianos/govendor
       - run: govendor sync
-      - run: go test -v ./...
       - run: go get github.com/DATA-DOG/godog/cmd/godog
-      - run: godog
+      - run: go run oya.go run test

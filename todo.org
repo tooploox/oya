@@ -36,10 +36,17 @@
    CLOSED: [2018-11-19 Mon 23:50]
 ** DONE Exclude modules inside the current module when running oya run
    CLOSED: [2018-11-20 Tue 00:22]
-** TODO .oyaignore
+** DONE .oyaignore
+   CLOSED: [2018-12-08 Sat 17:22]
     Exclude sub-directiories -- have to be built by cd'ing and running oya.
  https://godoc.org/k8s.io/helm/pkg/ignore
-** TODO Automate Oya testing using Oya + CircleCI
+** DONE Automate Oya testing using Oya + CircleCI
+   CLOSED: [2018-12-08 Sat 17:32]
+** NEXT Automate Neutron deploy using Oya
+*** TODO On push to branch, build & upload docker with sha tag
+*** TODO On merge to master, build & upload docker with release tag
+*** TODO On push to any branch, run tests
+*** TODO On merge to master, deploy to cluster if deployment dir changed
 ** Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
