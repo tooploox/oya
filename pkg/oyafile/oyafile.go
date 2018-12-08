@@ -14,6 +14,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const DefaultName = "Oyafile"
+
 type OyafileFormat = map[string]interface{}
 
 type Alias string

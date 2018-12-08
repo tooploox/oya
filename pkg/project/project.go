@@ -18,6 +18,16 @@ type Project struct {
 	Root *oyafile.Oyafile
 }
 
+func Load(rootDir string) (Project, error) {
+	root, ok, err := oyafile.LoadFromDir(rootDir, rootDir)
+	if !ok {
+		err = errors.Errorf("Missing Oyafile at %v", rootDir)
+	}
+	return Project{
+		Root: root,
+	}, err
+}
+
 func Detect(workDir string) (Project, error) {
 	o, found, err := detectRoot(workDir)
 	if err != nil {
@@ -34,7 +44,7 @@ func Detect(workDir string) (Project, error) {
 func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
-	oyafiles, err := oyafile.List(workDir)
+	oyafiles, err := listOyafiles(workDir)
 	if err != nil {
 		return err
 	}
@@ -73,7 +83,7 @@ func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
 	return nil
 }
 
-func (p Project) LoadOyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
+func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
 	return oyafile.Load(oyafilePath, p.Root.RootDir)
 }
 

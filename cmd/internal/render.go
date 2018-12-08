@@ -13,7 +13,7 @@ func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writ
 		return err
 	}
 
-	o, found, err := proj.LoadOyafile(oyafilePath)
+	o, found, err := proj.Oyafile(oyafilePath)
 	if err != nil {
 		return err
 	}

@@ -1,26 +1,29 @@
-package oyafile
+package project
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/pkg/errors"
 	"k8s.io/helm/pkg/ignore"
 )
 
-const DefaultName = "Oyafile"
+func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
+	return listOyafiles(p.Root.RootDir)
+}
 
 // TODO: Cleanup, should probably be Project.List.
-func List(rootDir string) ([]*Oyafile, error) {
-	ignore, err := makeIgnoreFunc(rootDir)
+func listOyafiles(startDir string) ([]*oyafile.Oyafile, error) {
+	ignore, err := makeIgnoreFunc(startDir)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error setting up ignores in %v", rootDir)
+		return nil, errors.Wrapf(err, "error setting up ignores in %v", startDir)
 	}
 
-	vendorDir := filepath.Join(rootDir, VendorDir)
-	var oyafiles []*Oyafile
-	return oyafiles, filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+	vendorDir := filepath.Join(startDir, VendorDir)
+	var oyafiles []*oyafile.Oyafile
+	return oyafiles, filepath.Walk(startDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -31,7 +34,7 @@ func List(rootDir string) ([]*Oyafile, error) {
 		if path == vendorDir {
 			return filepath.SkipDir
 		}
-		oyafile, ok, err := LoadFromDir(path, rootDir)
+		oyafile, ok, err := oyafile.LoadFromDir(path, startDir)
 		if err != nil {
 			return errors.Wrapf(err, "error loading Oyafile from %v", path)
 		}
@@ -49,19 +52,19 @@ func List(rootDir string) ([]*Oyafile, error) {
 		return nil
 	})
 }
-func makeIgnoreFunc(rootDir string) (func(*Oyafile) (bool, error), error) {
-	oyafile, ok, err := LoadFromDir(rootDir, rootDir)
+func makeIgnoreFunc(startDir string) (func(*oyafile.Oyafile) (bool, error), error) {
+	o, ok, err := oyafile.LoadFromDir(startDir, startDir)
 	if !ok {
-		return nil, errors.Errorf("%v not found at %v", DefaultName, rootDir)
+		return nil, errors.Errorf("No oyafile found at %v", startDir)
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error loading Oyafile from %v", rootDir)
+		return nil, errors.Wrapf(err, "error loading oyafile.Oyafile from %v", startDir)
 	}
-	ignore, err := ignore.Parse(strings.NewReader(oyafile.Ignores()))
+	ignore, err := ignore.Parse(strings.NewReader(o.Ignores()))
 	if err != nil {
-		return nil, errors.Wrapf(err, "Ignore: in %v contains invalid entries", oyafile.Path)
+		return nil, errors.Wrapf(err, "Ignore: in %v contains invalid entries", o.Path)
 	}
-	return func(o *Oyafile) (bool, error) {
+	return func(o *oyafile.Oyafile) (bool, error) {
 		if o.Project != "" && !o.IsRoot() {
 			// Exclude projects nested under the current project.
 			return true, nil
