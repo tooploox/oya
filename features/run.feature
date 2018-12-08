@@ -219,3 +219,36 @@ Scenario: Ignore projects inside current project
   main
 
   """
+
+@xxx
+Scenario: Running in subdir
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      touch Root
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      touch Project1
+      echo "Project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    all: |
+      touch Project2
+      echo "Project2"
+    """
+  And I'm in the ./project1 dir
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Project1
+
+  """
+  And file ./Root does not exist
+  And file ./Project1 exists
+  And file ./Project2 does not exist

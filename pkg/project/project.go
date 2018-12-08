@@ -38,12 +38,11 @@ func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
+	for _, o := range oyafiles {
+		log.Println(o.Path)
+	}
 	if len(oyafiles) == 0 {
 		return ErrNoOyafiles{Path: workDir}
-	}
-
-	if !oyafiles[0].Equals(*p.Root) {
-		panic("oyafile.List post-condition failed: expected first oyafile to be root Oyafile")
 	}
 
 	changes, err := changeset.Calculate(oyafiles)

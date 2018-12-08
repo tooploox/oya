@@ -90,6 +90,10 @@ func (c *SuiteContext) iAmInProjectDir() error {
 	return os.Chdir(c.projectDir)
 }
 
+func (c *SuiteContext) imInDir(subdir string) error {
+	return os.Chdir(subdir)
+}
+
 func (c *SuiteContext) fileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
 }
@@ -110,11 +114,18 @@ func (c *SuiteContext) fileExists(path string) error {
 	return err
 }
 
-func (c *SuiteContext) execute(command string) error {
-	err := os.Chdir(c.projectDir)
+func (c *SuiteContext) fileDoesNotExist(path string) error {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
+	return errors.Errorf("expected %v to not exist", path)
+}
+
+func (c *SuiteContext) execute(command string) error {
 	oldArgs := os.Args
 	os.Args = strings.Fields(command)
 	defer func() {
@@ -173,10 +184,12 @@ func (c *SuiteContext) theCommandOutputs(target string, expected *gherkin.DocStr
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
+	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
+	s.Step(`^file (.+) does not exist$`, c.fileDoesNotExist)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
 	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
