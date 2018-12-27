@@ -54,11 +54,11 @@ func defaultRootChangesetTask(candidates []*oyafile.Oyafile) oyafile.Task {
 	}
 }
 
-func execChangesetTask(changesetTask oyafile.Task) ([]string, error) {
+func execChangesetTask(workDir string, changesetTask oyafile.Task) ([]string, error) {
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
-	err := changesetTask.Exec(stdout, stderr)
+	err := changesetTask.Exec(workDir, stdout, stderr)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func calculateChangeset(currOyafile *oyafile.Oyafile) ([]*oyafile.Oyafile, error
 		return nil, nil
 	}
 
-	dirs, err := execChangesetTask(changesetTask)
+	dirs, err := execChangesetTask(currOyafile.Dir, changesetTask)
 	if err != nil {
 		return nil, err
 	}

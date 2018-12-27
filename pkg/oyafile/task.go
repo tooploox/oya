@@ -7,7 +7,7 @@ import (
 )
 
 type Task interface {
-	Exec(stdout, stderr io.Writer) error
+	Exec(workDir string, stdout, stderr io.Writer) error
 }
 
 type ScriptedTask struct {
@@ -17,8 +17,8 @@ type ScriptedTask struct {
 	Scope *template.Scope
 }
 
-func (h ScriptedTask) Exec(stdout, stderr io.Writer) error {
-	return h.Script.Exec(*h.Scope, stdout, stderr, h.Shell)
+func (h ScriptedTask) Exec(workDir string, stdout, stderr io.Writer) error {
+	return h.Script.Exec(workDir, *h.Scope, stdout, stderr, h.Shell)
 }
 
 type BuiltinTask struct {
@@ -26,6 +26,6 @@ type BuiltinTask struct {
 	OnExec func(stdout, stderr io.Writer) error
 }
 
-func (h BuiltinTask) Exec(stdout, stderr io.Writer) error {
+func (h BuiltinTask) Exec(workDir string, stdout, stderr io.Writer) error {
 	return h.OnExec(stdout, stderr)
 }

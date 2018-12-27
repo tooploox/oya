@@ -24,6 +24,7 @@ Scenario: Successful run task
   And file ./OK exists
 
 
+@xxx
 Scenario: Nested Oyafiles
   Given file ./Oyafile containing
     """
@@ -54,8 +55,8 @@ Scenario: Nested Oyafiles
 
   """
   And file ./Root exists
-  And file ./Project1 exists
-  And file ./Project2 exists
+  And file ./project1/Project1 exists
+  And file ./project2/Project2 exists
 
 Scenario: No changes
   Given file ./Oyafile containing
@@ -249,6 +250,6 @@ Scenario: Running in subdir
   Project1
 
   """
-  And file ./Root does not exist
+  And file ././Root does not exist
   And file ./Project1 exists
-  And file ./Project2 does not exist
+  And file ./../project2/Project2 does not exist

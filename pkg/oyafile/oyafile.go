@@ -126,7 +126,7 @@ func (oyafile Oyafile) RunTask(taskName string, stdout, stderr io.Writer) (found
 	if !ok {
 		return false, nil
 	}
-	return true, task.Exec(stdout, stderr)
+	return true, task.Exec(oyafile.Dir, stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

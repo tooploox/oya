@@ -58,6 +58,7 @@
 ** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
 ** Rest of CLI, cleanup, messages
 ** Bring README up to date
+* Secrets
 * Arguments to go run -- pass to task
   oya build -- --flag=5
   $Flags -- map

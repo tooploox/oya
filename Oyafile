@@ -12,6 +12,7 @@ installPrerequsites: |
   go get github.com/kardianos/govendor
   govendor sync
   go get github.com/DATA-DOG/godog/cmd/godog
+  printenv
 
 
 test: |

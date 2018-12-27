@@ -110,6 +110,8 @@ func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) er
 }
 
 func (c *SuiteContext) fileExists(path string) error {
+	d, _ := os.Getwd()
+	log.Println("Currentdir", d)
 	_, err := os.Stat(path)
 	return err
 }

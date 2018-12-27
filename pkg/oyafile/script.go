@@ -3,6 +3,7 @@ package oyafile
 import (
 	"io"
 	"io/ioutil"
+	"os"
 
 	"github.com/bilus/oya/pkg/template"
 	"github.com/magefile/mage/sh"
@@ -11,7 +12,7 @@ import (
 
 type Script string
 
-func (s Script) Exec(values template.Scope, stdout, stderr io.Writer, shell string) error {
+func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Writer, shell string) error {
 	scriptFile, err := ioutil.TempFile("", "oya-script-")
 	if err != nil {
 		return err
@@ -27,6 +28,16 @@ func (s Script) Exec(values template.Scope, stdout, stderr io.Writer, shell stri
 		return err
 	}
 	err = scriptFile.Close()
+	if err != nil {
+		return err
+	}
+
+	oldCwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	defer os.Chdir(oldCwd)
+	err = os.Chdir(workDir)
 	if err != nil {
 		return err
 	}
