@@ -3,7 +3,7 @@ Feature: Running tasks
 Background:
    Given I'm in project dir
 
-Scenario: Successful run task
+Scenario: Successfully run task
   Given file ./Oyafile containing
     """
     Project: project
