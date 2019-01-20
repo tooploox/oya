@@ -1,9 +1,10 @@
 package project
 
 import (
-	"fmt"
 	"io"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
@@ -118,9 +119,27 @@ func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {
-	fmt.Println("PA", positionalArgs)
 	return template.Scope{
 		"Args":  positionalArgs,
-		"Flags": flags,
+		"Flags": camelizeFlags(flags),
 	}
+}
+
+func camelizeFlags(flags map[string]string) map[string]string {
+	result := make(map[string]string)
+	for k, v := range flags {
+		result[camelize(k)] = v
+	}
+	return result
+}
+
+var sepRx = regexp.MustCompile("(-|_).")
+
+// camelize turns - or _ separated identifiers into camel case.
+// Example: "aa-bb" becomes "aaBb".
+func camelize(s string) string {
+	return sepRx.ReplaceAllStringFunc(s, func(match string) string {
+		return strings.ToUpper(match[1:])
+	})
+
 }

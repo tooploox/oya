@@ -14,9 +14,10 @@ Scenario: Pass flags and positional arguments to a task
       $end
       echo Flags.switch = $Flags.switch
       echo Flags.value = $Flags.value
+      echo Flags.otherSwitch = $Flags.otherSwitch
       echo bashVariable = $$bashVariable
     """
-  When I run "oya run task positional1 positional2 --switch --value=5"
+  When I run "oya run task positional1 positional2 --switch --value=5 --other-switch"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -24,6 +25,7 @@ Scenario: Pass flags and positional arguments to a task
   Args[1] = positional2
   Flags.switch = true
   Flags.value = 5
+  Flags.otherSwitch = true
   bashVariable = 42
 
   """
