@@ -58,11 +58,13 @@
 ** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
 ** Rest of CLI, cleanup, messages
 ** Bring README up to date
-* Secrets
-* Arguments to go run -- pass to task
-  oya build -- --flag=5
+* DONE Arguments to go run -- pass to task
+  CLOSED: [2019-01-20 Sun 17:52]
+  oya run build -- --flag=5
   $Flags -- map
   $Args -- positional arguments
+* Secrets
+** Oyafile.enc
 * Install task for packages
 * .kasia extension
 * oya -T --tasks list available tasks
