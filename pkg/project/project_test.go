@@ -9,6 +9,11 @@ import (
 	tu "github.com/bilus/oya/testutil"
 )
 
+var (
+	noArgs  []string
+	noFlags map[string]string
+)
+
 func TestProject_Detect_NoOya(t *testing.T) {
 	workDir := "./fixtures/empty_project"
 	_, err := project.Detect(workDir)
@@ -37,7 +42,7 @@ func TestProject_Run_NoOyafile(t *testing.T) {
 	workDir := "./fixtures/project/empty_subdir"
 	project, err := project.Detect(workDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
-	err = project.Run(workDir, "build", ioutil.Discard, ioutil.Discard)
+	err = project.Run(workDir, "build", noArgs, noFlags, ioutil.Discard, ioutil.Discard)
 	tu.AssertErr(t, err, "Expected error trying to run without Oyafile")
 }
 
@@ -45,7 +50,7 @@ func TestProject_Run_NoTask(t *testing.T) {
 	workDir := "./fixtures/project"
 	project, err := project.Detect(workDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
-	err = project.Run(workDir, "noSuchTask", ioutil.Discard, ioutil.Discard)
+	err = project.Run(workDir, "noSuchTask", noArgs, noFlags, ioutil.Discard, ioutil.Discard)
 	tu.AssertErr(t, err, "Expected error when trying to run without matching task")
 }
 
@@ -55,7 +60,7 @@ func TestProject_Run_NoChanges(t *testing.T) {
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	err = project.Run(workDir, "build", stdout, stderr)
+	err = project.Run(workDir, "build", noArgs, noFlags, stdout, stderr)
 	tu.AssertNoErr(t, err, "Expected no error running with empty changeset")
 	tu.AssertEqual(t, 0, len(stdout.String()))
 	tu.AssertEqual(t, 0, len(stderr.String()))
@@ -67,7 +72,24 @@ func TestProject_Run_WithChanges(t *testing.T) {
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	err = project.Run(workDir, "build", stdout, stderr)
+	err = project.Run(workDir, "build", noArgs, noFlags, stdout, stderr)
 	tu.AssertNoErr(t, err, "Expected no error running non-empty changeset")
 	tu.AssertEqual(t, "build run", stdout.String())
+}
+
+func TestProject_Run_WithArgs(t *testing.T) {
+	workDir := "./fixtures/project"
+	project, err := project.Detect(workDir)
+	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	err = project.Run(workDir, "build",
+		[]string{"arg1", "arg2"},
+		map[string]string{
+			"flag1": "flag1",
+			"flag2": "flag2",
+		},
+		stdout, stderr)
+	tu.AssertNoErr(t, err, "Expected no error running non-empty changeset")
+	tu.AssertEqual(t, "build run\nArgs: arg1 arg2\nFlags: flag1 flag2", stdout.String())
 }

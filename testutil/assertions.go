@@ -66,7 +66,6 @@ func AssertObjectsEqual(t *testing.T, expected, actual interface{}) {
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Objects are not equal. Diff:\n %v", diff.ObjectGoPrintSideBySide(expected, actual))
 	}
-
 }
 
 func AssertPathExists(t *testing.T, path string) {

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/template"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -58,7 +59,7 @@ func execChangesetTask(workDir string, changesetTask oyafile.Task) ([]string, er
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
-	err := changesetTask.Exec(workDir, stdout, stderr)
+	err := changesetTask.Exec(workDir, template.Scope{}, stdout, stderr)
 	if err != nil {
 		return nil, err
 	}

@@ -11,6 +11,17 @@ import (
 
 type Scope map[string]interface{}
 
+func (scope Scope) Merge(other Scope) Scope {
+	result := Scope{}
+	for k, v := range scope {
+		result[k] = v
+	}
+	for k, v := range other {
+		result[k] = v
+	}
+	return result
+}
+
 type Template interface {
 	Render(out io.Writer, values ...interface{}) error
 	RenderString(values ...interface{}) (string, error)

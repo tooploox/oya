@@ -1,12 +1,14 @@
 package project
 
 import (
+	"fmt"
 	"io"
 	"path/filepath"
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -41,7 +43,7 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	oyafiles, err := listOyafiles(workDir)
@@ -66,7 +68,7 @@ func (p Project) Run(workDir, taskName string, stdout, stderr io.Writer) error {
 
 	foundAtLeastOneTask := false
 	for _, o := range changes {
-		found, err := o.RunTask(taskName, stdout, stderr)
+		found, err := o.RunTask(taskName, toScope(positionalArgs, flags), stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
@@ -113,4 +115,12 @@ func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 	}
 
 	return nil, false, nil
+}
+
+func toScope(positionalArgs []string, flags map[string]string) template.Scope {
+	fmt.Println("PA", positionalArgs)
+	return template.Scope{
+		"Args":  positionalArgs,
+		"Flags": flags,
+	}
 }
