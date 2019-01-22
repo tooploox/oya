@@ -2,7 +2,7 @@
 
 ## Contributing
 
-1. Install go 1.11 (goenv is recommended).
+1. Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
 2. Checkout oya outside GOHOME.
 3. Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
 4. Run acceptance tests: `godog`.
