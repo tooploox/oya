@@ -1,5 +1,19 @@
 # Oya
 
+## Contributing
+
+1. Install go 1.11 (goenv is recommended).
+2. Checkout oya outside GOHOME.
+3. Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
+4. Run acceptance tests: `godog`.
+5. Run tests: `go test ./...`.
+6. Run Oya: `go run oya.go`.
+
+
+
+# Documentation below is a draft and is likely incompatible with the current version.
+
+
 ## Usage
 
 1. Install oya and its dependencies:
