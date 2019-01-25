@@ -85,7 +85,7 @@ func AddImport(dirPath string, uri string) error {
 			arr = append(arr, line)
 			if strings.Contains(line, "Project") {
 				importStr := "Import:"
-				uriStr := fmt.Sprintf("  next: %s", uri)
+				uriStr := fmt.Sprintf("  oya: %s", uri)
 				arr = append(arr, importStr)
 				arr = append(arr, uriStr)
 			}
@@ -95,6 +95,7 @@ func AddImport(dirPath string, uri string) error {
 		uriStr := fmt.Sprintf("  next: %s", uri)
 		arr = append(arr, importStr)
 		arr = append(arr, uriStr)
+		arr = append(fileArr, arr...)
 	}
 
 	ioutil.WriteFile(oyafilePath, []byte(strings.Join(arr, "\n")), info.Mode())
