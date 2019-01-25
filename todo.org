@@ -57,7 +57,12 @@
 ** TODO On merge to master, deploy to cluster if deployment dir changed
 * oya -T --tasks list available tasks
 * TODO Secrets
-* TODO Install task for packages
+* CANCELLED Install task for packages                             :CANCELLED:
+  CLOSED: [2019-01-25 Fri 10:34]
+  :LOGBOOK:
+  - State "CANCELLED"  from "TODO"       [2019-01-25 Fri 10:34] \\
+    It's enough to have "install" task by convention in packs and then oya tasks will show it.
+  :END:
 * TODO Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there

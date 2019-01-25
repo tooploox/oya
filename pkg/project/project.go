@@ -75,6 +75,8 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 	return nil
 }
 
+// Tasks returns tasks tables by its Oyafile path (relative to project root) for each Oyafile in the changeset.
+// It returns only tasks for the current working directory and its subdirectories.
 func (p Project) Tasks(workDir string, stdout, stderr io.Writer) (map[string]oyafile.TaskTable, error) {
 	changes, err := p.changeset(workDir)
 	if err != nil {
@@ -83,7 +85,6 @@ func (p Project) Tasks(workDir string, stdout, stderr io.Writer) (map[string]oya
 
 	tasksByDir := make(map[string]oyafile.TaskTable)
 	for _, o := range changes {
-		log.Println(o.RelPath())
 		tasksByDir[o.RelPath()] = o.Tasks
 	}
 
