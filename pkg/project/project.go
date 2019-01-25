@@ -47,7 +47,7 @@ func Detect(workDir string) (Project, error) {
 func (p Project) Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
-	changes, err := p.changeset(workDir)
+	changes, err := p.Changeset(workDir)
 	if err != nil {
 		return err
 	}
@@ -75,23 +75,7 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 	return nil
 }
 
-// Tasks returns tasks tables by its Oyafile path (relative to project root) for each Oyafile in the changeset.
-// It returns only tasks for the current working directory and its subdirectories.
-func (p Project) Tasks(workDir string, stdout, stderr io.Writer) (map[string]oyafile.TaskTable, error) {
-	changes, err := p.changeset(workDir)
-	if err != nil {
-		return nil, err
-	}
-
-	tasksByDir := make(map[string]oyafile.TaskTable)
-	for _, o := range changes {
-		tasksByDir[o.RelPath()] = o.Tasks
-	}
-
-	return tasksByDir, nil
-}
-
-func (p Project) changeset(workDir string) ([]*oyafile.Oyafile, error) {
+func (p Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
 	oyafiles, err := listOyafiles(workDir)
 	if err != nil {
 		return nil, err

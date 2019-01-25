@@ -18,7 +18,7 @@ func (oyafile *Oyafile) resolveImports() error {
 			return err
 		}
 		oyafile.Values[string(alias)] = pack.Values
-		oyafile.Tasks.AliasTasks(alias, pack.Tasks)
+		oyafile.Tasks.ImportTasks(alias, pack.Tasks)
 	}
 	return nil
 }

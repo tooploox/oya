@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -37,6 +38,7 @@ type Oyafile struct {
 
 func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
+	log.Println("New", rootDir, oyafilePath, relPath)
 	if err != nil {
 		return nil, err
 	}
@@ -244,20 +246,29 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 			}
 			oyafile.Ignore = rules
 		default:
-			script, ok := value.(string)
+			s, ok := value.(string)
 			if !ok {
 				return nil, fmt.Errorf("script expected for key %q", name)
 			}
-			oyafile.Tasks.AddTask(name, ScriptedTask{
-				Name:   name,
-				Script: Script(script),
-				Shell:  oyafile.Shell,
-				Scope:  &oyafile.Values,
-			})
+			if taskName, ok := parseMeta("Doc", name); ok {
+				oyafile.Tasks.AddDoc(taskName, s)
+			} else {
+				oyafile.Tasks.AddTask(name, ScriptedTask{
+					Name:   name,
+					Script: Script(s),
+					Shell:  oyafile.Shell,
+					Scope:  &oyafile.Values,
+				})
+			}
 		}
 	}
 
 	return oyafile, nil
+}
+
+func parseMeta(metaName, key string) (string, bool) {
+	taskName := strings.TrimSuffix(key, "."+metaName)
+	return taskName, taskName != key
 }
 
 func (o *Oyafile) Ignores() string {

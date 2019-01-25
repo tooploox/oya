@@ -4,45 +4,47 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"text/tabwriter"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/project"
 )
 
 func Tasks(workDir string, stdout, stderr io.Writer) error {
+
+	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
+
 	p, err := project.Detect(workDir)
 	if err != nil {
 		return err
 	}
-	tasks, err := p.Tasks(workDir, stdout, stderr)
-	if err != nil {
-		return err
-	}
-
-	relWorkDir, err := filepath.Rel(p.Root.RootDir, workDir)
+	oyafiles, err := p.Changeset(workDir)
 	if err != nil {
 		return err
 	}
 
 	first := true
-
-	for path, tt := range tasks {
-		relPath, err := filepath.Rel(relWorkDir, path)
+	for _, o := range oyafiles {
+		relPath, err := filepath.Rel(workDir, o.Path)
 		if err != nil {
 			return err
 		}
 
 		if !first {
-			println(stdout, "")
+			fmt.Fprintln(w)
 		} else {
 			first = false
 		}
 
-		println(stdout, fmt.Sprintf("# in ./%s", relPath))
+		fmt.Fprintf(w, "# in ./%s\n", relPath)
 
-		err = tt.ForEach(func(taskName string, task oyafile.Task) error {
+		err = o.Tasks.ForEachSorted(func(taskName string, task oyafile.Task, meta oyafile.Meta) error {
 			if !task.IsBuiltIn() {
-				println(stdout, fmt.Sprintf("oya run %s", taskName))
+				if len(meta.Doc) > 0 {
+					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
+				} else {
+					fmt.Fprintf(w, "oya run %s\n", taskName)
+				}
 			}
 			return nil
 		})
@@ -51,6 +53,7 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 			return err
 		}
 	}
+	w.Flush()
 	return nil
 }
 

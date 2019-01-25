@@ -3,7 +3,6 @@ Feature: Listing available tasks
 Background:
    Given I'm in project dir
 
-@current
 Scenario: Single Oyafile
   Given file ./Oyafile containing
     """
@@ -20,7 +19,6 @@ Scenario: Single Oyafile
 
   """
 
-@current
 Scenario: Show only user-defined
   Given file ./Oyafile containing
     """
@@ -38,7 +36,6 @@ Scenario: Show only user-defined
 
   """
 
-@current
 Scenario: SUbdirectories
   Given file ./Oyafile containing
     """
@@ -63,23 +60,82 @@ Scenario: SUbdirectories
 
   """
 
-# @current
-# Scenario: Docstring
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     build.Doc: Build it
-#     build: |
-#       echo "Done"
-#     """
-#   When I run "oya tasks"
-#   Then the command succeeds
-#   And the command outputs to stdout
-#   """
-#   # in ./
-#   oya run build  # Build it
-#   """
+Scenario: Docstring prints
+  Given file ./Oyafile containing
+    """
+    Project: project
 
+    build.Doc: Build it
+    build: |
+      echo "Done"
 
-# TODO: Subdirs -- execd from project dir
-# TODO: Subdirs -- execd from subdir
+    """
+  When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  # in ./Oyafile
+  oya run build  # Build it
+
+  """
+
+Scenario: Doc strings are properly aligned
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    build.Doc: Build it
+    build: |
+      echo "Done"
+
+    testAll.Doc: Run all tests
+    testAll: |
+      echo "Done"
+    """
+  And file ./subdir1/Oyafile containing
+    """
+    foo.Doc: Do foo
+    foo: |
+      echo "Done"
+    """
+  When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  # in ./Oyafile
+  oya run build    # Build it
+  oya run testAll  # Run all tests
+
+  # in ./subdir1/Oyafile
+  oya run foo  # Do foo
+
+  """
+
+Scenario: Parent dir tasks are not listed
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    build.Doc: Build it
+    build: |
+      echo "Done"
+
+    testAll.Doc: Run all tests
+    testAll: |
+      echo "Done"
+    """
+  And file ./subdir1/Oyafile containing
+    """
+    foo.Doc: Do foo
+    foo: |
+      echo "Done"
+    """
+  And I'm in the ./subdir1 dir
+  When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  # in ./Oyafile
+  oya run foo  # Do foo
+
+  """
