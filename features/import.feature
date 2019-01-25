@@ -33,3 +33,16 @@ Scenario: Import a pack to other already imported
       oya: github.com/bilus/oya/next
       other: github.com/bilus/oya/other
     """
+
+Scenario: Import a pack to empty Oyafile
+  Given file ./Oyafile containing
+    """
+    """
+  When I run "oya import github.com/bilus/oya/next"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+
+    Import:
+      oya: github.com/bilus/oya/next
+    """
