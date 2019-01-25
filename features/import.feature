@@ -30,6 +30,6 @@ Scenario: Import a pack to other already imported
     """
     Project: project
     Import:
-      next: github.com/bilus/oya/next
+      oya: github.com/bilus/oya/next
       other: github.com/bilus/oya/other
     """

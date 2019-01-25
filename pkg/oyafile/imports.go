@@ -69,6 +69,8 @@ func AddImport(dirPath string, uri string) error {
 		return err
 	}
 
+	importStr := "Import:"
+	uriStr := fmt.Sprintf("  oya: %s", uri)
 	fileContent := string(file)
 	fileArr := strings.Split(fileContent, "\n")
 	var arr []string
@@ -76,7 +78,6 @@ func AddImport(dirPath string, uri string) error {
 		for _, line := range fileArr {
 			arr = append(arr, line)
 			if strings.Contains(line, "Import") {
-				uriStr := fmt.Sprintf("  next: %s", uri)
 				arr = append(arr, uriStr)
 			}
 		}
@@ -84,15 +85,11 @@ func AddImport(dirPath string, uri string) error {
 		for _, line := range fileArr {
 			arr = append(arr, line)
 			if strings.Contains(line, "Project") {
-				importStr := "Import:"
-				uriStr := fmt.Sprintf("  oya: %s", uri)
 				arr = append(arr, importStr)
 				arr = append(arr, uriStr)
 			}
 		}
 	} else {
-		importStr := "Import:"
-		uriStr := fmt.Sprintf("  next: %s", uri)
 		arr = append(arr, importStr)
 		arr = append(arr, uriStr)
 		arr = append(fileArr, arr...)
