@@ -2,8 +2,10 @@ package oyafile
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -57,4 +59,44 @@ func (oyafile *Oyafile) importDirs() []string {
 func isValidImportPath(fullImportPath string) bool {
 	f, err := os.Stat(fullImportPath)
 	return err == nil && f.IsDir()
+}
+
+func AddImport(dirPath string, uri string) error {
+	oyafilePath := filepath.Join(dirPath, DefaultName)
+	info, _ := os.Stat(oyafilePath)
+	file, err := ioutil.ReadFile(oyafilePath)
+	if err != nil {
+		return err
+	}
+
+	fileContent := string(file)
+	fileArr := strings.Split(fileContent, "\n")
+	var arr []string
+	if strings.Contains(fileContent, "Import:") {
+		for _, line := range fileArr {
+			arr = append(arr, line)
+			if strings.Contains(line, "Import") {
+				uriStr := fmt.Sprintf("  next: %s", uri)
+				arr = append(arr, uriStr)
+			}
+		}
+	} else if strings.Contains(fileContent, "Project:") {
+		for _, line := range fileArr {
+			arr = append(arr, line)
+			if strings.Contains(line, "Project") {
+				importStr := "Import:"
+				uriStr := fmt.Sprintf("  next: %s", uri)
+				arr = append(arr, importStr)
+				arr = append(arr, uriStr)
+			}
+		}
+	} else {
+		importStr := "Import:"
+		uriStr := fmt.Sprintf("  next: %s", uri)
+		arr = append(arr, importStr)
+		arr = append(arr, uriStr)
+	}
+
+	ioutil.WriteFile(oyafilePath, []byte(strings.Join(arr, "\n")), info.Mode())
+	return nil
 }
