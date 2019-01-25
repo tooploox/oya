@@ -2,10 +2,8 @@ package oyafile
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -63,38 +61,13 @@ func isValidImportPath(fullImportPath string) bool {
 
 func AddImport(dirPath string, uri string) error {
 	oyafilePath := filepath.Join(dirPath, DefaultName)
-	info, _ := os.Stat(oyafilePath)
-	file, err := ioutil.ReadFile(oyafilePath)
+
+	om, err := NewOyafileRawModifier(oyafilePath)
 	if err != nil {
 		return err
 	}
+	// Todo: Get name from last /thing in uri
+	om.addImport("oya", uri)
 
-	importStr := "Import:"
-	uriStr := fmt.Sprintf("  oya: %s", uri)
-	fileContent := string(file)
-	fileArr := strings.Split(fileContent, "\n")
-	var arr []string
-	if strings.Contains(fileContent, "Import:") {
-		for _, line := range fileArr {
-			arr = append(arr, line)
-			if strings.Contains(line, "Import") {
-				arr = append(arr, uriStr)
-			}
-		}
-	} else if strings.Contains(fileContent, "Project:") {
-		for _, line := range fileArr {
-			arr = append(arr, line)
-			if strings.Contains(line, "Project") {
-				arr = append(arr, importStr)
-				arr = append(arr, uriStr)
-			}
-		}
-	} else {
-		arr = append(arr, importStr)
-		arr = append(arr, uriStr)
-		arr = append(fileArr, arr...)
-	}
-
-	ioutil.WriteFile(oyafilePath, []byte(strings.Join(arr, "\n")), info.Mode())
 	return nil
 }
