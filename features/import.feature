@@ -33,7 +33,7 @@ Scenario: Import a pack to other already imported
     """
     Project: project
     Import:
-      oya: github.com/bilus/oya/next
+      next: github.com/bilus/oya/next
       other: github.com/bilus/oya/other
     
     task: |
@@ -49,22 +49,24 @@ Scenario: Import a pack to empty Oyafile
   And file ./Oyafile contains
     """
     Import:
-      oya: github.com/bilus/oya/next
+      next: github.com/bilus/oya/next
 
     """
 
 Scenario: Import a pack to Oyafile with other things
   Given file ./Oyafile containing
     """
+    Project: project
     task: |
       echo "check" 
     """
-  When I run "oya import github.com/bilus/oya/next"
+  When I run "oya import github.com/bilus/oya"
   Then the command succeeds
   And file ./Oyafile contains
     """
+    Project: project
     Import:
-      oya: github.com/bilus/oya/next
+      oya: github.com/bilus/oya
     task: |
       echo "check" 
     """

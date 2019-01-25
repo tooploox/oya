@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -62,12 +63,14 @@ func isValidImportPath(fullImportPath string) bool {
 func AddImport(dirPath string, uri string) error {
 	oyafilePath := filepath.Join(dirPath, DefaultName)
 
+	uriArr := strings.Split(uri, "/")
+	packName := uriArr[len(uriArr)-1]
+
 	om, err := NewOyafileRawModifier(oyafilePath)
 	if err != nil {
 		return err
 	}
-	// Todo: Get name from last /thing in uri
-	om.addImport("oya", uri)
+	om.addImport(packName, uri)
 
 	return nil
 }
