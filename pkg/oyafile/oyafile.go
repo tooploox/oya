@@ -27,7 +27,7 @@ type Oyafile struct {
 	RootDir string
 	Shell   string
 	Imports map[Alias]ImportPath
-	Tasks   map[string]Task
+	Tasks   TaskTable
 	Values  template.Scope
 	Project string   // Set for root Oyafile
 	Ignore  []string // Directory exclusion rules
@@ -47,7 +47,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		RootDir: filepath.Clean(rootDir),
 		Shell:   "/bin/sh",
 		Imports: make(map[Alias]ImportPath),
-		Tasks:   make(map[string]Task),
+		Tasks:   newTaskTable(),
 		Values:  defaultValues(dir),
 		relPath: relPath,
 	}, nil
@@ -121,8 +121,8 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
-	task, ok := oyafile.Tasks[taskName]
+func (oyafile Oyafile) RunTask(taskName string, stdout, stderr io.Writer) (found bool, err error) {
+	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil
 	}
@@ -248,12 +248,12 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 			if !ok {
 				return nil, fmt.Errorf("script expected for key %q", name)
 			}
-			oyafile.Tasks[name] = ScriptedTask{
+			oyafile.Tasks.AddTask(name, ScriptedTask{
 				Name:   name,
 				Script: Script(script),
 				Shell:  oyafile.Shell,
 				Scope:  &oyafile.Values,
-			}
+			})
 		}
 	}
 
