@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var importKey = "Import:"
@@ -36,6 +38,11 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	uriStr := fmt.Sprintf(uriVal, name, uri)
 	fileContent := string(o.file)
 	updated := false
+
+	if gotIt := o.isAlreadyImported(uri, fileContent); gotIt {
+		return errors.Errorf("Pack already imported: %v", uri)
+	}
+
 	output, updated = o.appendAfter(importRegxp, []string{uriStr})
 	if !updated {
 		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
@@ -50,6 +57,11 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	}
 
 	return nil
+}
+
+func (o *OyafileRawModifier) isAlreadyImported(uri string, fileContent string) bool {
+	find := regexp.MustCompile("(?m)" + uri + "$")
+	return find.MatchString(fileContent)
 }
 
 func (o *OyafileRawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {

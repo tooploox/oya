@@ -70,7 +70,9 @@ func AddImport(dirPath string, uri string) error {
 	if err != nil {
 		return err
 	}
-	om.addImport(packName, uri)
+	if err := om.addImport(packName, uri); err != nil {
+		return err
+	}
 
 	return nil
 }

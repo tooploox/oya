@@ -72,3 +72,19 @@ Scenario: Import a pack to Oyafile with other things
     task: |
       echo "check" 
     """
+
+Scenario: Import a pack which is already imported
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      oya: github.com/bilus/oya
+
+    task: |
+      echo "check" 
+    """
+  When I run "oya import github.com/bilus/oya"
+  Then the command fails with error matching
+  """
+  .*Pack already imported: github.com/bilus/oya.*
+  """
