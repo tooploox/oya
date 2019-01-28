@@ -32,17 +32,19 @@ func NewOyafileRawModifier(oyafilePath string) (OyafileRawModifier, error) {
 }
 
 func (o *OyafileRawModifier) addImport(name string, uri string) error {
+	var output []string
 	uriStr := fmt.Sprintf(uriVal, name, uri)
 	fileContent := string(o.file)
-	var output []string
-	if importRegxp.MatchString(fileContent) {
-		output = o.appendAfter(importRegxp, []string{uriStr})
-	} else if projectRegxp.MatchString(fileContent) {
-		output = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
-	} else {
-		output = []string{importKey, uriStr}
-		output = append(output, strings.Split(fileContent, "\n")...)
+	updated := false
+	output, updated = o.appendAfter(importRegxp, []string{uriStr})
+	if !updated {
+		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
+		if !updated {
+			output = []string{importKey, uriStr}
+			output = append(output, strings.Split(fileContent, "\n")...)
+		}
 	}
+
 	if err := writeToFile(o.filePath, output); err != nil {
 		return err
 	}
@@ -50,16 +52,18 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	return nil
 }
 
-func (o *OyafileRawModifier) appendAfter(find *regexp.Regexp, data []string) []string {
+func (o *OyafileRawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
 	var output []string
+	updated := false
 	fileArr := strings.Split(string(o.file), "\n")
 	for _, line := range fileArr {
 		output = append(output, line)
 		if find.MatchString(line) {
+			updated = true
 			output = append(output, data...)
 		}
 	}
-	return output
+	return output, updated
 }
 
 func writeToFile(filePath string, content []string) error {
