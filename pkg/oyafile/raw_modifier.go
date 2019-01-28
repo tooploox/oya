@@ -4,8 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 )
+
+var importKey = "Import:"
+var projectKey = "Project:"
+var uriVal = "  %s: %s"
+var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
+var projectRegxp = regexp.MustCompile("^" + projectKey)
 
 type OyafileRawModifier struct {
 	filePath string
@@ -25,16 +32,15 @@ func NewOyafileRawModifier(oyafilePath string) (OyafileRawModifier, error) {
 }
 
 func (o *OyafileRawModifier) addImport(name string, uri string) error {
-	importStr := "Import:"
-	uriStr := fmt.Sprintf("  %s: %s", name, uri)
+	uriStr := fmt.Sprintf(uriVal, name, uri)
 	fileContent := string(o.file)
 	var output []string
-	if strings.Contains(fileContent, "Import:") {
-		output = o.appendAfter("Import:", []string{uriStr})
-	} else if strings.Contains(fileContent, "Project:") {
-		output = o.appendAfter("Project:", []string{importStr, uriStr, ""})
+	if importRegxp.MatchString(fileContent) {
+		output = o.appendAfter(importRegxp, []string{uriStr})
+	} else if projectRegxp.MatchString(fileContent) {
+		output = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
 	} else {
-		output = []string{importStr, uriStr}
+		output = []string{importKey, uriStr}
 		output = append(output, strings.Split(fileContent, "\n")...)
 	}
 	if err := writeToFile(o.filePath, output); err != nil {
@@ -44,12 +50,12 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	return nil
 }
 
-func (o *OyafileRawModifier) appendAfter(find string, data []string) []string {
+func (o *OyafileRawModifier) appendAfter(find *regexp.Regexp, data []string) []string {
 	var output []string
 	fileArr := strings.Split(string(o.file), "\n")
 	for _, line := range fileArr {
 		output = append(output, line)
-		if strings.Contains(line, find) {
+		if find.MatchString(line) {
 			output = append(output, data...)
 		}
 	}
