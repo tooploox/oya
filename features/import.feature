@@ -15,6 +15,7 @@ Scenario: Import a pack
     Project: project
     Import:
       oya: github.com/bilus/oya
+
     """
 
 Scenario: Import a pack to other already imported
@@ -67,6 +68,7 @@ Scenario: Import a pack to Oyafile with other things
     Project: project
     Import:
       oya: github.com/bilus/oya
+
     task: |
       echo "check" 
     """

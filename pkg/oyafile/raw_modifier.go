@@ -32,7 +32,7 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	if strings.Contains(fileContent, "Import:") {
 		output = o.appendAfter("Import:", []string{uriStr})
 	} else if strings.Contains(fileContent, "Project:") {
-		output = o.appendAfter("Project:", []string{importStr, uriStr})
+		output = o.appendAfter("Project:", []string{importStr, uriStr, ""})
 	} else {
 		output = []string{importStr, uriStr}
 		output = append(output, strings.Split(fileContent, "\n")...)

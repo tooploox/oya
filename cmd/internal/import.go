@@ -10,7 +10,7 @@ import (
 func Import(rootDir, uri string, stdout, stderr io.Writer) error {
 	err := oyafile.AddImport(rootDir, uri)
 	if err != nil {
-		return errors.Wrapf(err, "Error while importing pack %v", uri)
+		return errors.Wrapf(err, "Error while adding imports to %s", oyafile.DefaultName)
 	}
 	return nil
 }
