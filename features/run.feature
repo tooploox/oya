@@ -189,7 +189,7 @@ Scenario: Ignore vendored Oyafiles
     Project: project
     all: echo "main"
     """
-  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
     all: echo "vendored"
     """

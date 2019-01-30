@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const VendorDir = "oya/vendor"
+const VendorDir = ".oya/vendor"
 
 func (oyafile *Oyafile) resolveImports() error {
 	for alias, path := range oyafile.Imports {

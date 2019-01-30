@@ -15,7 +15,7 @@ import (
 )
 
 // TODO: Duplicated in oyafile module.
-const VendorDir = "oya/vendor"
+const VendorDir = ".oya/vendor"
 
 type Project struct {
 	Root *oyafile.Oyafile

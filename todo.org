@@ -19,6 +19,12 @@
   CLOSED: [2018-11-16 Fri 00:29]
 * DONE templatized paths
   CLOSED: [2018-11-17 Sat 18:31]
+* DONE Arguments to go run -- pass to task
+  CLOSED: [2019-01-21 Mon 23:50]
+  oya build -- --flag=5
+  $Flags -- map
+  $Args -- positional arguments
+* oya -T --tasks list available tasks
 * TODO Refactor
 ** DONE Use cobra commands in tests
    CLOSED: [2018-11-18 Sun 18:06]
@@ -47,7 +53,11 @@
 *** TODO On merge to master, build & upload docker with release tag
 *** TODO On push to any branch, run tests
 *** TODO On merge to master, deploy to cluster if deployment dir changed
-** Simplify oya get/vendor (based on Import statements) TBD
+** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
+** Rest of CLI, cleanup, messages
+* TODO Secrets
+* TODO Install task for packages
+* TODO Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
 *** oya get -- adds to packages.lock if not there

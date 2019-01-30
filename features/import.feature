@@ -10,7 +10,7 @@ Scenario: Import tasks from vendored packs
     Import:
       foo: github.com/test/foo
     """
-  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
     all: |
       foo=4
@@ -35,7 +35,7 @@ Scenario: Import task using pack values
     Import:
       foo: github.com/test/foo
     """
-  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
     Values:
       foo: xxx
@@ -58,7 +58,7 @@ Scenario: Import task using BasePath
     Import:
       foo: github.com/test/foo
     """
-  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
     Values:
       foo: xxx
@@ -83,7 +83,7 @@ Scenario: Access pack values
     all: |
       echo $foo.bar
     """
-  And file ./oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
     Values:
       bar: xxx
