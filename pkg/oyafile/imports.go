@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
+	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,7 +21,12 @@ func (oyafile *Oyafile) resolveImports() error {
 		if err != nil {
 			return err
 		}
+
 		oyafile.Values[string(alias)] = pack.Values
+		for key, val := range valuesForPack(alias, oyafile.Values) {
+			pack.Values[key] = val
+		}
+
 		for key, task := range pack.Tasks {
 			// TODO: Detect if task already set.
 			log.Printf("Importing task %v.%v", alias, key)
@@ -27,6 +34,17 @@ func (oyafile *Oyafile) resolveImports() error {
 		}
 	}
 	return nil
+}
+
+func valuesForPack(alias Alias, values template.Scope) template.Scope {
+	packValues := template.Scope{}
+	find := regexp.MustCompile("^" + string(alias) + "\\.(.*)$")
+	for key, val := range values {
+		if match := find.FindStringSubmatch(key); len(match) == 2 {
+			packValues[match[1]] = val
+		}
+	}
+	return packValues
 }
 
 func (oyafile *Oyafile) loadPack(path ImportPath) (*Oyafile, error) {
