@@ -47,18 +47,7 @@ func Detect(workDir string) (Project, error) {
 func (p Project) Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
-	oyafiles, err := listOyafiles(workDir)
-	if err != nil {
-		return err
-	}
-	for _, o := range oyafiles {
-		log.Println(o.Path)
-	}
-	if len(oyafiles) == 0 {
-		return ErrNoOyafiles{Path: workDir}
-	}
-
-	changes, err := changeset.Calculate(oyafiles)
+	changes, err := p.Changeset(workDir)
 	if err != nil {
 		return err
 	}
@@ -84,6 +73,21 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 		}
 	}
 	return nil
+}
+
+func (p Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
+	oyafiles, err := listOyafiles(workDir)
+	if err != nil {
+		return nil, err
+	}
+	for _, o := range oyafiles {
+		log.Println(o.Path)
+	}
+	if len(oyafiles) == 0 {
+		return nil, ErrNoOyafiles{Path: workDir}
+	}
+
+	return changeset.Calculate(oyafiles)
 }
 
 func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
