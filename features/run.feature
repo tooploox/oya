@@ -3,7 +3,7 @@ Feature: Running tasks
 Background:
    Given I'm in project dir
 
-Scenario: Successful run task
+Scenario: Successfully run task
   Given file ./Oyafile containing
     """
     Project: project
@@ -24,7 +24,6 @@ Scenario: Successful run task
   And file ./OK exists
 
 
-@xxx
 Scenario: Nested Oyafiles
   Given file ./Oyafile containing
     """
@@ -221,7 +220,6 @@ Scenario: Ignore projects inside current project
 
   """
 
-@xxx
 Scenario: Running in subdir
   Given file ./Oyafile containing
     """

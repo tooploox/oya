@@ -121,12 +121,12 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (oyafile Oyafile) RunTask(taskName string, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
 	task, ok := oyafile.Tasks[taskName]
 	if !ok {
 		return false, nil
 	}
-	return true, task.Exec(oyafile.Dir, stdout, stderr)
+	return true, task.Exec(oyafile.Dir, scope, stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

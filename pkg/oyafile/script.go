@@ -1,6 +1,7 @@
 package oyafile
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -13,6 +14,7 @@ import (
 type Script string
 
 func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Writer, shell string) error {
+	fmt.Println("values", values)
 	scriptFile, err := ioutil.TempFile("", "oya-script-")
 	if err != nil {
 		return err

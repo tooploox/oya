@@ -65,8 +65,19 @@
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 ****
-* .kasia plugin based on extension or way to specify templating language
-* TODO Bring README up to date
+** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
+** Rest of CLI, cleanup, messages
+** Bring README up to date
+* DONE Arguments to go run -- pass to task
+  CLOSED: [2019-01-20 Sun 17:52]
+  oya run build -- --flag=5
+  $Flags -- map
+  $Args -- positional arguments
+* Secrets
+** Oyafile.enc
+* Install task for packages
+* .kasia extension
+* oya -T --tasks list available tasks
 * TODO Docker pack, no language autodetect, Python + Go
 ---
 * Consider dropping run
