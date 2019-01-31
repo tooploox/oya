@@ -20,13 +20,6 @@ type ScriptedTask struct {
 	Scope *template.Scope
 }
 
-type ScriptedTask struct {
-	Name string
-	Script
-	Shell string
-	Scope *template.Scope
-}
-
 func (h ScriptedTask) Exec(workDir string, params template.Scope, stdout, stderr io.Writer) error {
 	return h.Script.Exec(workDir, params.Merge(*h.Scope), stdout, stderr, h.Shell)
 }

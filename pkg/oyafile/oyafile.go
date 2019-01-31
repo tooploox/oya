@@ -123,7 +123,7 @@ func InitDir(dirPath string) error {
 	return f.Close()
 }
 
-func (oyafile Oyafile) RunTask(taskName string, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil
