@@ -1,0 +1,8 @@
+Project: project
+
+foo: |
+  echo "foo"
+
+bar: |
+  $Tasks.foo()
+  echo "bar"

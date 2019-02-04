@@ -2,9 +2,7 @@ package oyafile
 
 import (
 	"bufio"
-	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +14,12 @@ import (
 )
 
 const DefaultName = "Oyafile"
+
+// OyaCmdOverride is used in tests, to override the path to the current oya executable.
+// It is used to invoke other tasks from a task body.
+// When tests are run, the current process executable path points to the test runner
+// so it has to be overridden (with 'go run oya.go', roughly speaking).
+var OyaCmdOverride *string
 
 type OyafileFormat = map[string]interface{}
 
@@ -30,15 +34,27 @@ type Oyafile struct {
 	Imports map[Alias]ImportPath
 	Tasks   TaskTable
 	Values  template.Scope
-	Project string   // Set for root Oyafile
-	Ignore  []string // Directory exclusion rules
+	Project string   // Project is set for root Oyafile.
+	Ignore  []string // Ignore contains directory exclusion rules.
 
 	relPath string
+
+	OyaCmd string // OyaCmd contains the path to the current oya executable.
 }
 
 func New(oyafilePath string, rootDir string) (*Oyafile, error) {
+	var oyaCmd string
+	if OyaCmdOverride != nil {
+		oyaCmd = *OyaCmdOverride
+	} else {
+		var err error
+		oyaCmd, err = os.Executable()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
-	log.Println("New", rootDir, oyafilePath, relPath)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +66,9 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		Shell:   "/bin/sh",
 		Imports: make(map[Alias]ImportPath),
 		Tasks:   newTaskTable(),
-		Values:  defaultValues(dir),
+		Values:  template.Scope{},
 		relPath: relPath,
+		OyaCmd:  oyaCmd,
 	}, nil
 }
 
@@ -84,6 +101,10 @@ func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
 	err = oyafile.resolveImports()
+	if err != nil {
+		return nil, false, wrapLoadErr(err, oyafilePath)
+	}
+	err = oyafile.addBuiltIns()
 	if err != nil {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
@@ -128,6 +149,10 @@ func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, st
 	if !ok {
 		return false, nil
 	}
+	scope["Tasks"], err = oyafile.bindTasks(scope, stdout, stderr)
+	if err != nil {
+		return true, err
+	}
 	return true, task.Exec(oyafile.Dir, scope, stdout, stderr)
 }
 
@@ -150,12 +175,6 @@ func fullPath(projectDir, name string) string {
 		name = DefaultName
 	}
 	return path.Join(projectDir, name)
-}
-
-func defaultValues(dirPath string) template.Scope {
-	return template.Scope{
-		"BasePath": dirPath,
-	}
 }
 
 // isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
@@ -188,87 +207,6 @@ func isNode(line string) bool {
 		}
 	}
 	return false
-}
-
-func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
-	oyafile, err := New(path, rootDir)
-	if err != nil {
-		return nil, err
-	}
-	for name, value := range of {
-		switch name {
-		case "Import":
-			imports, ok := value.(map[interface{}]interface{})
-			if !ok {
-				return nil, fmt.Errorf("map of aliases to paths expected for key %q", name)
-			}
-			for alias, path := range imports {
-				alias, ok := alias.(string)
-				if !ok {
-					return nil, fmt.Errorf("expected string alias for key %q", name)
-				}
-				path, ok := path.(string)
-				if !ok {
-					return nil, fmt.Errorf("expected path for key %q", name)
-				}
-				oyafile.Imports[Alias(alias)] = ImportPath(path)
-			}
-		case "Values":
-			values, ok := value.(map[interface{}]interface{})
-			if !ok {
-				return nil, fmt.Errorf("map of keys to values expected for key %q", name)
-			}
-			for k, v := range values {
-				valueName, ok := k.(string)
-				if !ok {
-					return nil, fmt.Errorf("map of keys to values expected for key %q", name)
-				}
-				oyafile.Values[valueName] = v
-			}
-		case "Project":
-			projectName, ok := value.(string)
-			if !ok {
-				return nil, fmt.Errorf("expected Project: defining the project name, actual: %v", value)
-			}
-			oyafile.Project = projectName
-		case "Ignore":
-			rulesI, ok := value.([]interface{})
-			if !ok {
-				return nil, fmt.Errorf("expected Ignore: containing an array of ignore rules, actual: %v", value)
-			}
-			rules := make([]string, len(rulesI))
-			for i, ri := range rulesI {
-				rule, ok := ri.(string)
-				if !ok {
-					return nil, fmt.Errorf("expected Ignore: containing an array of ignore rules, actual: %v", ri)
-				}
-				rules[i] = rule
-			}
-			oyafile.Ignore = rules
-		default:
-			s, ok := value.(string)
-			if !ok {
-				return nil, fmt.Errorf("script expected for key %q", name)
-			}
-			if taskName, ok := parseMeta("Doc", name); ok {
-				oyafile.Tasks.AddDoc(taskName, s)
-			} else {
-				oyafile.Tasks.AddTask(name, ScriptedTask{
-					Name:   name,
-					Script: Script(s),
-					Shell:  oyafile.Shell,
-					Scope:  &oyafile.Values,
-				})
-			}
-		}
-	}
-
-	return oyafile, nil
-}
-
-func parseMeta(metaName, key string) (string, bool) {
-	taskName := strings.TrimSuffix(key, "."+metaName)
-	return taskName, taskName != key
 }
 
 func (o *Oyafile) Ignores() string {
