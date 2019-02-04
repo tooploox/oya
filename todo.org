@@ -24,8 +24,8 @@
   oya build -- --flag=5
   $Flags -- map
   $Args -- positional arguments
-* oya -T --tasks list available tasks
-* TODO Refactor
+* DONE Refactor
+  CLOSED: [2019-01-24 Thu 22:31]
 ** DONE Use cobra commands in tests
    CLOSED: [2018-11-18 Sun 18:06]
 ** DONE Tests for existing functionality
@@ -48,15 +48,21 @@
  https://godoc.org/k8s.io/helm/pkg/ignore
 ** DONE Automate Oya testing using Oya + CircleCI
    CLOSED: [2018-12-08 Sat 17:32]
-** NEXT Automate Neutron deploy using Oya
-*** TODO On push to branch, build & upload docker with sha tag
-*** TODO On merge to master, build & upload docker with release tag
-*** TODO On push to any branch, run tests
-*** TODO On merge to master, deploy to cluster if deployment dir changed
-** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
-** Rest of CLI, cleanup, messages
+* Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
+* Rest of CLI, cleanup, messages
+* NEXT Automate Neutron deploy using Oya
+** TODO On push to branch, build & upload docker with sha tag
+** TODO On merge to master, build & upload docker with release tag
+** TODO On push to any branch, run tests
+** TODO On merge to master, deploy to cluster if deployment dir changed
+* oya -T --tasks list available tasks
 * TODO Secrets
-* TODO Install task for packages
+* CANCELLED Install task for packages                             :CANCELLED:
+  CLOSED: [2019-01-25 Fri 10:34]
+  :LOGBOOK:
+  - State "CANCELLED"  from "TODO"       [2019-01-25 Fri 10:34] \\
+    It's enough to have "install" task by convention in packs and then oya tasks will show it.
+  :END:
 * TODO Simplify oya get/vendor (based on Import statements) TBD
 *** Just use Import
 *** oya get -- adds to packages.lock if not there
@@ -64,16 +70,23 @@
 *** oya records new imports using sha in packages.lock
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
 *** oya get -u <uri> updates package sha in packages.lock and fetches it
-****
-* .kasia plugin based on extension or way to specify templating language
-* TODO Bring README up to date
+** Require imported project to have correct Project + remove skipping dirs under vendor from oyafile.List
+** Rest of CLI, cleanup, messages
+** Bring README up to date
+* DONE Arguments to go run -- pass to task
+  CLOSED: [2019-01-20 Sun 17:52]
+  oya run build -- --flag=5
+  $Flags -- map
+  $Args -- positional arguments
+* Secrets
+** Oyafile.enc
+* Install task for packages
+* .kasia extension
 * TODO Docker pack, no language autodetect, Python + Go
----
+* .kasia plugin based on extension or way to specify templating language
 * Consider dropping run
   oya run init --> oya Init
   ~/.oya/Oyafile -- oyafile imported by all Oyafiles, contains built-in tasks(implicitly), customization point (can import, can add before/after tasks etc.)
-* Add a tutorial on using docker package
-* Exclusions via -...
 * .Values.EarlyTerminate (default: true)
    Set to false to avoid terminating on first error
 * Fail for incorrect changeset paths
@@ -81,4 +94,4 @@
 ** Non-existent path
 ** Path without Oyafile
 https://godoc.org/k8s.io/helm/pkg/ignore
-* support template types as plugins (.kasia)
+* Support template types as plugins (.kasia)

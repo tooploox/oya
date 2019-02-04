@@ -3,7 +3,6 @@ Feature: .oyaignore
 Background:
    Given I'm in project dir
 
-@current
 Scenario: Empty .oyaignore
   Given file ./Oyafile containing
     """
@@ -23,7 +22,6 @@ Scenario: Empty .oyaignore
 
   """
 
-@current
 Scenario: Ignore file
   Given file ./Oyafile containing
     """
@@ -44,7 +42,6 @@ Scenario: Ignore file
 
   """
 
-@current
 Scenario: Wildcard ignore
   Given file ./Oyafile containing
     """

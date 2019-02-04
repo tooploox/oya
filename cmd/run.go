@@ -18,24 +18,34 @@ import (
 	"os"
 
 	"github.com/bilus/oya/cmd/internal"
+	"github.com/bilus/oya/pkg/flags"
 	"github.com/spf13/cobra"
 )
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
-	Use:   "run TASK",
-	Short: "Runs an Oya task",
-	Args:  cobra.ExactArgs(1),
+	Use:                "run TASK",
+	Short:              "Runs an Oya task",
+	Args:               cobra.ArbitraryArgs,
+	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		taskName := args[0]
 		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, cmd.OutOrStdout(), cmd.OutOrStderr())
+		positionalArgs, flags, err := parseArgs(args)
+		if err != nil {
+			return err
+		}
+		return internal.Run(cwd, taskName, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+}
+
+func parseArgs(args []string) ([]string, map[string]string, error) {
+	return flags.Parse(args[1:])
 }

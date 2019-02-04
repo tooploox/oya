@@ -1,7 +1,6 @@
 package oyafile
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,11 +19,7 @@ func (oyafile *Oyafile) resolveImports() error {
 			return err
 		}
 		oyafile.Values[string(alias)] = pack.Values
-		for key, task := range pack.Tasks {
-			// TODO: Detect if task already set.
-			log.Printf("Importing task %v.%v", alias, key)
-			oyafile.Tasks[fmt.Sprintf("%v.%v", alias, key)] = task
-		}
+		oyafile.Tasks.ImportTasks(alias, pack.Tasks)
 	}
 	return nil
 }

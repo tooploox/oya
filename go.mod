@@ -22,7 +22,7 @@ require (
 	github.com/sirupsen/logrus v0.0.0-20180213143110-8c0189d9f6bb
 	github.com/spf13/afero v1.1.2
 	github.com/spf13/cast v1.3.0
-	github.com/spf13/cobra v0.0.0-20181021141114-fe5e611709b0
+	github.com/spf13/cobra v0.0.3
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/pflag v1.0.2
 	github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e

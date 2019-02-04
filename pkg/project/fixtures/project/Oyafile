@@ -1,3 +1,10 @@
 Project: project
 
-build: printf "build run"
+build: |
+       printf "build run"
+       $if Args:
+           printf "\nArgs: $Args[0] $Args[1]"
+       $end
+       $if Flags:
+           printf "\nFlags: $Flags.flag1 $Flags.flag2"
+       $end
