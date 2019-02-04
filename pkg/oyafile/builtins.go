@@ -18,14 +18,19 @@ func (o *Oyafile) defaultValues() template.Scope {
 	}
 }
 
-func (o *Oyafile) bindTasks(params template.Scope, stdout, stderr io.Writer) (map[string]func() string, error) {
+// bindTasks returns a map of functions allowing invoking other tasks via $Tasks.xyz().
+// It makes invokable only tasks defined in the same Oyafile, stripping away any aliases, so the tasks are accessible names exactly as they appear in a given Oyafile.
+func (o *Oyafile) bindTasks(task Task, stdout, stderr io.Writer) (map[string]func() string, error) {
 	tasks := make(map[string]func() string)
 
+	importAlias, _ := task.SplitName()
+
 	o.Tasks.ForEach(func(taskName string, task Task, _ Meta) error {
-		tasks[taskName] = func() string {
-			// found, err := o.RunTask(taskName, params, stdout, stderr)
-			// TODO: Use exe path
-			return fmt.Sprintf("%s run %s\n", o.OyaCmd, taskName)
+		alias, baseName := task.SplitName()
+		if alias == importAlias {
+			tasks[baseName] = func() string {
+				return fmt.Sprintf("%s run %s\n", o.OyaCmd, taskName)
+			}
 		}
 		return nil
 	})
