@@ -83,3 +83,41 @@ Scenario: Run pack's tasks
   oya run foo.baz
 
   """
+
+Scenario: Access Oyafile base directory
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  And file ./subdir/Oyafile containing
+    """
+    all: |
+      echo $BasePath
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout text matching
+  """
+  ^.*subdir
+
+  """
+
+Scenario: Access pack base directory
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    all: |
+      echo $BasePath
+    """
+  When I run "oya run foo.all"
+  Then the command succeeds
+  And the command outputs to stdout text matching
+  """
+  ^.*github.com/test/foo
+
+  """
