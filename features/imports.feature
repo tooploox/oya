@@ -144,3 +144,55 @@ Scenario: Invalid import
   """
   .*missing pack github.com/test/foo$
   """
+
+Scenario: Pack values can be set from project Oyafile prefixed with pack alias
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      foo.fruit: banana
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    all: |
+      echo $fruit
+    """
+  When I run "oya run foo.all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  banana
+
+  """
+
+Scenario: Pack values are overriden form project Oyafile
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      foo.wege: broccoli
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      fruit: banana
+      wege: carrot
+
+    all: |
+      echo $fruit
+      echo $wege
+    """
+  When I run "oya run foo.all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  banana
+  broccoli
+
+  """
