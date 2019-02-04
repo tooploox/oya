@@ -3,6 +3,7 @@ package oyafile
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -52,4 +53,21 @@ func (oyafile *Oyafile) importDirs() []string {
 func isValidImportPath(fullImportPath string) bool {
 	f, err := os.Stat(fullImportPath)
 	return err == nil && f.IsDir()
+}
+
+func AddImport(dirPath string, uri string) error {
+	oyafilePath := filepath.Join(dirPath, DefaultName)
+
+	uriArr := strings.Split(uri, "/")
+	packName := uriArr[len(uriArr)-1]
+
+	om, err := NewOyafileRawModifier(oyafilePath)
+	if err != nil {
+		return err
+	}
+	if err := om.addImport(packName, uri); err != nil {
+		return err
+	}
+
+	return nil
 }

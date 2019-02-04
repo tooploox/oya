@@ -1,146 +1,90 @@
-Feature: Running tasks
+Feature: Importing packs
 
 Background:
    Given I'm in project dir
 
-Scenario: Import tasks from vendored packs
+Scenario: Import a pack
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya import github.com/bilus/oya"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Project: project
+    Import:
+      oya: github.com/bilus/oya
+
+    """
+
+Scenario: Import a pack to other already imported
   Given file ./Oyafile containing
     """
     Project: project
     Import:
-      foo: github.com/test/foo
+      other: github.com/bilus/oya/other
+
+    task: |
+      echo "check" 
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
-    """
-    all: |
-      foo=4
-      if [ $$foo -ge 3 ]; then
-        touch OK
-      fi
-      echo "Done"
-    """
-  When I run "oya run foo.all"
+  When I run "oya import github.com/bilus/oya/next"
   Then the command succeeds
-  And the command outputs to stdout
-  """
-  Done
+  And file ./Oyafile contains
+    """
+    Project: project
+    Import:
+      next: github.com/bilus/oya/next
+      other: github.com/bilus/oya/other
+    
+    task: |
+      echo "check" 
+    """
 
-  """
-  And file ./OK exists
+Scenario: Import a pack to empty Oyafile
+  Given file ./Oyafile containing
+    """
+    """
+  When I run "oya import github.com/bilus/oya/next"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Import:
+      next: github.com/bilus/oya/next
 
-Scenario: Import task using pack values
+    """
+
+Scenario: Import a pack to Oyafile with other things
+  Given file ./Oyafile containing
+    """
+    Project: project
+    task: |
+      echo "check" 
+    """
+  When I run "oya import github.com/bilus/oya"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Project: project
+    Import:
+      oya: github.com/bilus/oya
+
+    task: |
+      echo "check" 
+    """
+
+Scenario: Import a pack which is already imported
   Given file ./Oyafile containing
     """
     Project: project
     Import:
-      foo: github.com/test/foo
-    """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
-    """
-    Values:
-      foo: xxx
-    all: |
-      bar=$foo
-      echo $$bar
-    """
-  When I run "oya run foo.all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  xxx
+      oya: github.com/bilus/oya
 
-  """
-
-Scenario: Import task using BasePath
-  Given file ./Oyafile containing
+    task: |
+      echo "check" 
     """
-    Project: project
-    Import:
-      foo: github.com/test/foo
-    """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
-    """
-    Values:
-      foo: xxx
-    all: |
-      bar=$$(basename $BasePath)
-      echo $$bar
-    """
-  When I run "oya run foo.all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  foo
-
-  """
-
-Scenario: Access pack values
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Import:
-      foo: github.com/test/foo
-    all: |
-      echo $foo.bar
-    """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
-    """
-    Values:
-      bar: xxx
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  xxx
-
-  """
-
-Scenario: Access current project values
-  Given file ./Oyafile containing
-    """
-    Project: main
-    Values:
-      foo: main
-    """
-  And file ./project1/Oyafile containing
-    """
-    Values:
-      foo: project1
-    """
-  And file ./project2/Oyafile containing
-    """
-    Import:
-      main: /
-      p1: /project1
-    Values:
-      foo: project2
-    all: |
-      echo $main.foo
-      echo $p1.foo
-      echo $foo
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  main
-  project1
-  project2
-
-  """
-
-Scenario: Invalid import
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Import:
-      foo: github.com/test/foo
-
-    all: echo "OK"
-    """
-  When I run "oya run all"
+  When I run "oya import github.com/bilus/oya"
   Then the command fails with error matching
   """
-  .*missing pack github.com/test/foo$
+  .*Pack already imported: github.com/bilus/oya.*
   """
