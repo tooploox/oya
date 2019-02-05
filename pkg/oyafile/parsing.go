@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
+func parseOyafile(path, rootDir string, of RawOyafileFormat) (*Oyafile, error) {
 	oyafile, err := New(path, rootDir)
 	if err != nil {
 		return nil, err

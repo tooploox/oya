@@ -89,7 +89,7 @@ func (p Project) Vendor(pack pack.Pack) error {
 	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
 }
 
-func isRoot(raw oyafile.RawModifier) (bool, error) {
+func isRoot(raw *oyafile.RawModifier) (bool, error) {
 	return raw.HasKey("Project")
 }
 
@@ -101,7 +101,7 @@ func detectRoot(startDir string) (string, bool, error) {
 	path := startDir
 	maxParts := 256
 	for i := 0; i < maxParts; i++ {
-		raw, found, err := oyafile.LoadRawFromDir(path)
+		raw, found, err := oyafile.LoadRawFromDir(path, path) // "Guess" path is the root dir.
 		if err == nil && found {
 			isRoot, err := isRoot(raw)
 			if err != nil {

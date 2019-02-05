@@ -11,7 +11,6 @@ import (
 
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 const DefaultName = "Oyafile"
@@ -21,8 +20,6 @@ const DefaultName = "Oyafile"
 // When tests are run, the current process executable path points to the test runner
 // so it has to be overridden (with 'go run oya.go', roughly speaking).
 var OyaCmdOverride *string
-
-type OyafileFormat = map[string]interface{}
 
 type Alias string
 type ImportPath string
@@ -74,31 +71,12 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}, nil
 }
 
-func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
-	// YAML parser does not handle files without at least one node.
-	empty, err := isEmptyYAML(oyafilePath)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
+func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
+	raw, found, err := LoadRaw(oyafilePath, rootDir)
+	if err != nil || !found {
+		return nil, found, err
 	}
-	if empty {
-		o, err := New(oyafilePath, rootDir)
-		if err != nil {
-			return nil, false, err
-		}
-		return o, true, nil
-	}
-	file, err := os.Open(oyafilePath)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	defer func() { _ = file.Close() }()
-	decoder := yaml.NewDecoder(file)
-	var of OyafileFormat
-	err = decoder.Decode(&of)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	oyafile, err := parseOyafile(oyafilePath, rootDir, of)
+	oyafile, err := raw.Parse()
 	if err != nil {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
@@ -130,6 +108,7 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 }
 
 func InitDir(dirPath string) error {
+	// BUG(bilus): Use raw access.
 	_, found, err := LoadFromDir(dirPath, dirPath)
 	if err == nil && found {
 		return errors.Errorf("already an Oya project")

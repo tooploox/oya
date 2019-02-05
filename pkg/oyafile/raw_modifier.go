@@ -20,56 +20,79 @@ var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
 var projectRegxp = regexp.MustCompile("^" + projectKey)
 
 type RawModifier struct {
+	rootDir  string
 	filePath string
 	file     []byte
 }
 
 type RawOyafileFormat = map[string]interface{}
 
-func LoadRawFromDir(dirPath string) (RawModifier, bool, error) {
+func LoadRaw(oyafilePath, rootDir string) (*RawModifier, bool, error) {
+	raw, err := NewRawModifier(oyafilePath)
+	if err != nil {
+		return nil, false, nil
+	}
+	raw.rootDir = rootDir // BUG(bilus): NewRawModifier has a broken interface.
+	return raw, true, nil
+}
+
+func LoadRawFromDir(dirPath, rootDir string) (*RawModifier, bool, error) {
 	oyafilePath := fullPath(dirPath, "")
 	fi, err := os.Stat(oyafilePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return RawModifier{}, false, nil
+			return nil, false, nil
 		}
-		return RawModifier{}, false, err
+		return nil, false, err
 	}
 	if fi.IsDir() {
-		return RawModifier{}, false, nil
+		return nil, false, nil
 	}
-	raw, err := NewRawModifier(oyafilePath)
-	if err != nil {
-		return RawModifier{}, false, nil
-	}
-	return raw, true, nil
+	return LoadRaw(oyafilePath, rootDir)
 }
 
-func NewRawModifier(oyafilePath string) (RawModifier, error) {
+func NewRawModifier(oyafilePath string) (*RawModifier, error) {
 	file, err := ioutil.ReadFile(oyafilePath)
 	if err != nil {
-		return RawModifier{}, err
+		return nil, err
 	}
 
-	return RawModifier{
+	return &RawModifier{
 		filePath: oyafilePath,
 		file:     file,
 	}, nil
 }
 
-func (o *RawModifier) HasKey(key string) (bool, error) {
-	// YAML parser does not handle files without at least one node.
-	empty, err := isEmptyYAML(o.filePath)
+func (raw *RawModifier) Parse() (*Oyafile, error) {
+	of, err := raw.decode()
 	if err != nil {
-		return false, err
+		return nil, err
+	}
+
+	return parseOyafile(raw.filePath, raw.rootDir, of)
+}
+
+func (raw *RawModifier) decode() (RawOyafileFormat, error) {
+	// YAML parser does not handle files without at least one node.
+	empty, err := isEmptyYAML(raw.filePath)
+	if err != nil {
+		return nil, err
 	}
 	if empty {
-		return false, nil
+		return make(RawOyafileFormat), nil
 	}
-	reader := bytes.NewReader(o.file)
+	reader := bytes.NewReader(raw.file)
 	decoder := yaml.NewDecoder(reader)
 	var of RawOyafileFormat
 	err = decoder.Decode(&of)
+	if err != nil {
+		return nil, err
+	}
+	return of, nil
+}
+
+func (raw *RawModifier) HasKey(key string) (bool, error) {
+	of, err := raw.decode()
 	if err != nil {
 		return false, err
 	}
@@ -131,6 +154,8 @@ func (o *RawModifier) addImport(name string, uri string) error {
 	if err := writeToFile(o.filePath, output); err != nil {
 		return err
 	}
+
+	// BUG(bilus): Does not update o.file!
 
 	return nil
 }
