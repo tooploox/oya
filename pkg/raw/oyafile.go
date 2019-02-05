@@ -1,4 +1,4 @@
-package oyafile
+package raw
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 
@@ -13,30 +14,32 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const DefaultName = "Oyafile"
+
 var importKey = "Import:"
 var projectKey = "Project:"
 var uriVal = "  %s: %s"
 var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
 var projectRegxp = regexp.MustCompile("^" + projectKey)
 
-type RawModifier struct {
-	rootDir  string
-	filePath string
-	file     []byte
+type Oyafile struct {
+	Path    string
+	RootDir string
+	file    []byte
 }
 
-type RawOyafileFormat = map[string]interface{}
+// DecodedOyafile is an Oyafile that has been loaded from YAML but that hasn't been parsed yet.
+type DecodedOyafile map[string]interface{}
 
-func LoadRaw(oyafilePath, rootDir string) (*RawModifier, bool, error) {
-	raw, err := NewRawModifier(oyafilePath)
+func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
+	raw, err := New(oyafilePath, rootDir)
 	if err != nil {
 		return nil, false, nil
 	}
-	raw.rootDir = rootDir // BUG(bilus): NewRawModifier has a broken interface.
 	return raw, true, nil
 }
 
-func LoadRawFromDir(dirPath, rootDir string) (*RawModifier, bool, error) {
+func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	oyafilePath := fullPath(dirPath, "")
 	fi, err := os.Stat(oyafilePath)
 	if err != nil {
@@ -48,42 +51,34 @@ func LoadRawFromDir(dirPath, rootDir string) (*RawModifier, bool, error) {
 	if fi.IsDir() {
 		return nil, false, nil
 	}
-	return LoadRaw(oyafilePath, rootDir)
+	return Load(oyafilePath, rootDir)
 }
 
-func NewRawModifier(oyafilePath string) (*RawModifier, error) {
+func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	file, err := ioutil.ReadFile(oyafilePath)
 	if err != nil {
 		return nil, err
 	}
 
-	return &RawModifier{
-		filePath: oyafilePath,
-		file:     file,
+	return &Oyafile{
+		RootDir: rootDir,
+		Path:    oyafilePath,
+		file:    file,
 	}, nil
 }
 
-func (raw *RawModifier) Parse() (*Oyafile, error) {
-	of, err := raw.decode()
-	if err != nil {
-		return nil, err
-	}
-
-	return parseOyafile(raw.filePath, raw.rootDir, of)
-}
-
-func (raw *RawModifier) decode() (RawOyafileFormat, error) {
+func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	// YAML parser does not handle files without at least one node.
-	empty, err := isEmptyYAML(raw.filePath)
+	empty, err := isEmptyYAML(raw.Path)
 	if err != nil {
 		return nil, err
 	}
 	if empty {
-		return make(RawOyafileFormat), nil
+		return make(DecodedOyafile), nil
 	}
 	reader := bytes.NewReader(raw.file)
 	decoder := yaml.NewDecoder(reader)
-	var of RawOyafileFormat
+	var of DecodedOyafile
 	err = decoder.Decode(&of)
 	if err != nil {
 		return nil, err
@@ -91,8 +86,8 @@ func (raw *RawModifier) decode() (RawOyafileFormat, error) {
 	return of, nil
 }
 
-func (raw *RawModifier) HasKey(key string) (bool, error) {
-	of, err := raw.decode()
+func (raw *Oyafile) HasKey(key string) (bool, error) {
+	of, err := raw.Decode()
 	if err != nil {
 		return false, err
 	}
@@ -132,9 +127,9 @@ func isNode(line string) bool {
 	return false
 }
 
-func (o *RawModifier) addImport(name string, uri string) error {
+func (o *Oyafile) AddImport(alias string, uri string) error {
 	var output []string
-	uriStr := fmt.Sprintf(uriVal, name, uri)
+	uriStr := fmt.Sprintf(uriVal, alias, uri)
 	fileContent := string(o.file)
 	updated := false
 
@@ -151,7 +146,7 @@ func (o *RawModifier) addImport(name string, uri string) error {
 		}
 	}
 
-	if err := writeToFile(o.filePath, output); err != nil {
+	if err := writeToFile(o.Path, output); err != nil {
 		return err
 	}
 
@@ -160,12 +155,12 @@ func (o *RawModifier) addImport(name string, uri string) error {
 	return nil
 }
 
-func (o *RawModifier) isAlreadyImported(uri string, fileContent string) bool {
+func (o *Oyafile) isAlreadyImported(uri string, fileContent string) bool {
 	find := regexp.MustCompile("(?m)" + uri + "$")
 	return find.MatchString(fileContent)
 }
 
-func (o *RawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
+func (o *Oyafile) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
 	var output []string
 	updated := false
 	fileArr := strings.Split(string(o.file), "\n")
@@ -179,13 +174,20 @@ func (o *RawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string,
 	return output, updated
 }
 
-func writeToFile(filePath string, content []string) error {
-	info, err := os.Stat(filePath)
+func writeToFile(Path string, content []string) error {
+	info, err := os.Stat(Path)
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(filePath, []byte(strings.Join(content, "\n")), info.Mode()); err != nil {
+	if err := ioutil.WriteFile(Path, []byte(strings.Join(content, "\n")), info.Mode()); err != nil {
 		return err
 	}
 	return nil
+}
+
+func fullPath(projectDir, name string) string {
+	if len(name) == 0 {
+		name = DefaultName
+	}
+	return path.Join(projectDir, name)
 }

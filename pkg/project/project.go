@@ -8,6 +8,7 @@ import (
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -89,7 +90,7 @@ func (p Project) Vendor(pack pack.Pack) error {
 	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
 }
 
-func isRoot(raw *oyafile.RawModifier) (bool, error) {
+func isRoot(raw *raw.Oyafile) (bool, error) {
 	return raw.HasKey("Project")
 }
 
@@ -101,7 +102,7 @@ func detectRoot(startDir string) (string, bool, error) {
 	path := startDir
 	maxParts := 256
 	for i := 0; i < maxParts; i++ {
-		raw, found, err := oyafile.LoadRawFromDir(path, path) // "Guess" path is the root dir.
+		raw, found, err := raw.LoadFromDir(path, path) // "Guess" path is the root dir.
 		if err == nil && found {
 			isRoot, err := isRoot(raw)
 			if err != nil {

@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
@@ -71,21 +70,4 @@ func (oyafile *Oyafile) importDirs() []string {
 func isValidImportPath(fullImportPath string) bool {
 	f, err := os.Stat(fullImportPath)
 	return err == nil && f.IsDir()
-}
-
-func AddImport(dirPath string, uri string) error {
-	oyafilePath := filepath.Join(dirPath, DefaultName)
-
-	uriArr := strings.Split(uri, "/")
-	packName := uriArr[len(uriArr)-1]
-
-	om, err := NewRawModifier(oyafilePath)
-	if err != nil {
-		return err
-	}
-	if err := om.addImport(packName, uri); err != nil {
-		return err
-	}
-
-	return nil
 }

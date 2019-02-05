@@ -9,11 +9,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 )
-
-const DefaultName = "Oyafile"
 
 // OyaCmdOverride is used in tests, to override the path to the current oya executable.
 // It is used to invoke other tasks from a task body.
@@ -72,57 +71,27 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 }
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
-	raw, found, err := LoadRaw(oyafilePath, rootDir)
+	raw, found, err := raw.Load(oyafilePath, rootDir)
 	if err != nil || !found {
 		return nil, found, err
 	}
-	oyafile, err := raw.Parse()
+	oyafile, err := Parse(raw)
 	if err != nil {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
-	err = oyafile.resolveImports()
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	err = oyafile.addBuiltIns()
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-
 	return oyafile, true, nil
 }
 
 func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
-	oyafilePath := fullPath(dirPath, "")
-	fi, err := os.Stat(oyafilePath)
+	raw, found, err := raw.LoadFromDir(dirPath, rootDir)
+	if err != nil || !found {
+		return nil, found, err
+	}
+	oyafile, err := Parse(raw)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, false, nil
-		}
-		return nil, false, err
+		return nil, false, wrapLoadErr(err, raw.Path)
 	}
-	if fi.IsDir() {
-		return nil, false, nil
-	}
-	return Load(oyafilePath, rootDir)
-}
-
-func InitDir(dirPath string) error {
-	// BUG(bilus): Use raw access.
-	_, found, err := LoadFromDir(dirPath, dirPath)
-	if err == nil && found {
-		return errors.Errorf("already an Oya project")
-	}
-	f, err := os.Create(fullPath(dirPath, ""))
-	if err != nil {
-		return err
-	}
-	_, err = f.WriteString("Project: project\n")
-	if err != nil {
-		_ = f.Close()
-		return err
-	}
-	return f.Close()
+	return oyafile, true, nil
 }
 
 func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
@@ -153,13 +122,6 @@ func (oyafile Oyafile) IsRoot() bool {
 
 func wrapLoadErr(err error, oyafilePath string) error {
 	return errors.Wrapf(err, "error loading Oyafile %v", oyafilePath)
-}
-
-func fullPath(projectDir, name string) string {
-	if len(name) == 0 {
-		name = DefaultName
-	}
-	return path.Join(projectDir, name)
 }
 
 func (o *Oyafile) Ignores() string {
