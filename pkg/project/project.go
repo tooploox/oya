@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/template"
@@ -73,21 +72,6 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 		}
 	}
 	return nil
-}
-
-func (p Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
-	oyafiles, err := listOyafiles(workDir)
-	if err != nil {
-		return nil, err
-	}
-	for _, o := range oyafiles {
-		log.Println(o.Path)
-	}
-	if len(oyafiles) == 0 {
-		return nil, ErrNoOyafiles{Path: workDir}
-	}
-
-	return changeset.Calculate(oyafiles)
 }
 
 func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
