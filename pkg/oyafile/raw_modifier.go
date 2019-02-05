@@ -16,24 +16,24 @@ var uriVal = "  %s: %s"
 var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
 var projectRegxp = regexp.MustCompile("^" + projectKey)
 
-type OyafileRawModifier struct {
+type RawModifier struct {
 	filePath string
 	file     []byte
 }
 
-func NewOyafileRawModifier(oyafilePath string) (OyafileRawModifier, error) {
+func NewRawModifier(oyafilePath string) (RawModifier, error) {
 	file, err := ioutil.ReadFile(oyafilePath)
 	if err != nil {
-		return OyafileRawModifier{}, err
+		return RawModifier{}, err
 	}
 
-	return OyafileRawModifier{
+	return RawModifier{
 		filePath: oyafilePath,
 		file:     file,
 	}, nil
 }
 
-func (o *OyafileRawModifier) addImport(name string, uri string) error {
+func (o *RawModifier) addImport(name string, uri string) error {
 	var output []string
 	uriStr := fmt.Sprintf(uriVal, name, uri)
 	fileContent := string(o.file)
@@ -59,12 +59,12 @@ func (o *OyafileRawModifier) addImport(name string, uri string) error {
 	return nil
 }
 
-func (o *OyafileRawModifier) isAlreadyImported(uri string, fileContent string) bool {
+func (o *RawModifier) isAlreadyImported(uri string, fileContent string) bool {
 	find := regexp.MustCompile("(?m)" + uri + "$")
 	return find.MatchString(fileContent)
 }
 
-func (o *OyafileRawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
+func (o *RawModifier) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
 	var output []string
 	updated := false
 	fileArr := strings.Split(string(o.file), "\n")

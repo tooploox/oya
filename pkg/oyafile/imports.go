@@ -79,7 +79,7 @@ func AddImport(dirPath string, uri string) error {
 	uriArr := strings.Split(uri, "/")
 	packName := uriArr[len(uriArr)-1]
 
-	om, err := NewOyafileRawModifier(oyafilePath)
+	om, err := NewRawModifier(oyafilePath)
 	if err != nil {
 		return err
 	}
