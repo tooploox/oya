@@ -15,6 +15,7 @@ import (
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
 	"github.com/bilus/oya/cmd"
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -44,6 +45,13 @@ type SuiteContext struct {
 }
 
 func (c *SuiteContext) MustSetUp() {
+	// BUG(bilus): Need to figure out a way to actually run oya in feature tests. The problem:
+	// We need to provide an override to the oya executable path (because the real one is godog). But because we're running the test outside of the oya development directory, it results in an error similar to:
+	// package github.com/bilus/oya: cannot find package "github.com/bilus/oya" in any of:
+	//         /Users/abc/go/src/github.com/bilus/oya (from $GOPATH)
+	oyaCmdOverride := "echo oya "
+	oyafile.OyaCmdOverride = &oyaCmdOverride
+
 	projectDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
 		panic(err)
@@ -183,6 +191,23 @@ func (c *SuiteContext) theCommandOutputs(target string, expected *gherkin.DocStr
 	return nil
 }
 
+func (c *SuiteContext) theCommandOutputsTextMatching(target string, expected *gherkin.DocString) error {
+	var actual string
+	switch target {
+	case "stdout":
+		actual = c.stdout.String()
+	case "stderr":
+		actual = c.stderr.String()
+	default:
+		return fmt.Errorf("Unexpected command output target: %v", target)
+	}
+	rx := regexp.MustCompile(expected.Content)
+	if !rx.MatchString(actual) {
+		return fmt.Errorf("unexpected %v output: %q expected to match: %q", target, actual, expected.Content)
+	}
+	return nil
+}
+
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
@@ -196,6 +221,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
+	s.Step(`^the command outputs to (stdout|stderr) text matching$`, c.theCommandOutputsTextMatching)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
