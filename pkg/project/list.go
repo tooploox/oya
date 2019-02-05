@@ -11,12 +11,12 @@ import (
 )
 
 func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
-	return listOyafiles(p.Root.RootDir)
+	return listOyafiles(p.Root.RootDir, p.Root.RootDir)
 }
 
 // TODO: Cleanup, should probably be Project.List.
-func listOyafiles(startDir string) ([]*oyafile.Oyafile, error) {
-	ignore, err := makeIgnoreFunc(startDir)
+func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
+	ignore, err := makeIgnoreFunc(rootDir)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error setting up ignores in %v", startDir)
 	}
@@ -34,7 +34,7 @@ func listOyafiles(startDir string) ([]*oyafile.Oyafile, error) {
 		if path == vendorDir {
 			return filepath.SkipDir
 		}
-		oyafile, ok, err := oyafile.LoadFromDir(path, startDir)
+		oyafile, ok, err := oyafile.LoadFromDir(path, rootDir)
 		if err != nil {
 			return errors.Wrapf(err, "error loading Oyafile from %v", path)
 		}
@@ -52,13 +52,17 @@ func listOyafiles(startDir string) ([]*oyafile.Oyafile, error) {
 		return nil
 	})
 }
-func makeIgnoreFunc(startDir string) (func(*oyafile.Oyafile) (bool, error), error) {
-	o, ok, err := oyafile.LoadFromDir(startDir, startDir)
-	if !ok {
-		return nil, errors.Errorf("No oyafile found at %v", startDir)
-	}
+
+// makeIgnoreFunc returns a function that given an oyafile returns true if its containing directory tree should be recursively ignored.
+// It uses an array of relative paths under "Ignore:" key in the project's root Oyafile.
+// BUG(bilus): We should probably make it more intuitive by supporting Ignore: directives in nested dirs as well as the root dir.
+func makeIgnoreFunc(rootDir string) (func(*oyafile.Oyafile) (bool, error), error) {
+	o, ok, err := oyafile.LoadFromDir(rootDir, rootDir)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error loading oyafile.Oyafile from %v", startDir)
+		return nil, errors.Wrapf(err, "error looking for Ignore: directive")
+	}
+	if !ok {
+		return nil, errors.Errorf("No oyafile found at %v", rootDir)
 	}
 	ignore, err := ignore.Parse(strings.NewReader(o.Ignores()))
 	if err != nil {
