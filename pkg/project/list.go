@@ -14,6 +14,10 @@ func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
 	return listOyafiles(p.Root.RootDir, p.Root.RootDir)
 }
 
+func (p Project) List(startDir string) ([]*oyafile.Oyafile, error) {
+	return listOyafiles(startDir, p.Root.RootDir)
+}
+
 // TODO: Cleanup, should probably be Project.List.
 func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
 	ignore, err := makeIgnoreFunc(rootDir)
