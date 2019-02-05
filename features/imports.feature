@@ -196,3 +196,29 @@ Scenario: Pack values are overriden form project Oyafile
   broccoli
 
   """
+
+# Regression test for #24
+@xxx
+Scenario: Import tasks in a subdir Oyafile
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  And file ./subdir/Oyafile containing
+    """
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    all: |
+      echo "all"
+    """
+  And I'm in the ./subdir dir
+  When I run "oya run foo.all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  all
+
+  """
