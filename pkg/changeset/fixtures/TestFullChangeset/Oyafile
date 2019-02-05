@@ -1,3 +1,5 @@
+Project: TestFullChangeset
+
 Changeset: |
   echo '+.'
   echo '+./project1'

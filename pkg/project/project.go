@@ -17,17 +17,28 @@ import (
 const VendorDir = ".oya/vendor"
 
 type Project struct {
-	Root *oyafile.Oyafile
+	RootDir string
 }
 
 func Load(rootDir string) (Project, error) {
-	root, ok, err := oyafile.LoadFromDir(rootDir, rootDir)
-	if !ok {
-		err = errors.Errorf("Missing Oyafile at %v", rootDir)
+	o, found, err := detectRoot(rootDir)
+	if err != nil {
+		return Project{}, errors.Wrapf(err, "error when attempting to load Oya project from %v", rootDir)
+	}
+	if !found {
+		return Project{}, errors.Errorf("missing Oyafile at %v", rootDir)
+	}
+
+	rel, err := filepath.Rel(rootDir, o.RootDir)
+	if err != nil {
+		return Project{}, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, o.RootDir)
+	}
+	if rel != "." {
+		return Project{}, errors.Errorf("%v is not an Oya project root directory", rootDir)
 	}
 	return Project{
-		Root: root,
-	}, err
+		RootDir: o.RootDir,
+	}, nil
 }
 
 func Detect(workDir string) (Project, error) {
@@ -39,7 +50,7 @@ func Detect(workDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		Root: o,
+		RootDir: o.RootDir,
 	}, nil
 }
 
@@ -75,11 +86,11 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 }
 
 func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.Load(oyafilePath, p.Root.RootDir)
+	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
 func (p Project) Vendor(pack pack.Pack) error {
-	return pack.Vendor(filepath.Join(p.Root.RootDir, VendorDir))
+	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
 }
 
 func isRoot(o *oyafile.Oyafile) bool {
