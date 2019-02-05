@@ -21,28 +21,24 @@ type Project struct {
 }
 
 func Load(rootDir string) (Project, error) {
-	o, found, err := detectRoot(rootDir)
+	prj, err := Detect(rootDir)
 	if err != nil {
-		return Project{}, errors.Wrapf(err, "error when attempting to load Oya project from %v", rootDir)
-	}
-	if !found {
-		return Project{}, errors.Errorf("missing Oyafile at %v", rootDir)
+		return prj, err
 	}
 
-	rel, err := filepath.Rel(rootDir, o.RootDir)
+	rel, err := filepath.Rel(rootDir, prj.RootDir)
 	if err != nil {
-		return Project{}, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, o.RootDir)
+		return prj, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, prj.RootDir)
 	}
 	if rel != "." {
-		return Project{}, errors.Errorf("%v is not an Oya project root directory", rootDir)
+		return prj, errors.Errorf("%v is not an Oya project root directory", rootDir)
 	}
-	return Project{
-		RootDir: o.RootDir,
-	}, nil
+
+	return prj, nil
 }
 
 func Detect(workDir string) (Project, error) {
-	o, found, err := detectRoot(workDir)
+	detectedRootDir, found, err := detectRoot(workDir)
 	if err != nil {
 		return Project{}, err
 	}
@@ -50,7 +46,7 @@ func Detect(workDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		RootDir: o.RootDir,
+		RootDir: detectedRootDir,
 	}, nil
 }
 
@@ -100,19 +96,18 @@ func isRoot(o *oyafile.Oyafile) bool {
 // detectRoot attempts to detect the root project directory marked by
 // root Oyafile, i.e. one containing Project: directive.
 // It walks the directory tree, starting from startDir, going upwards,
-// loading Oyafiles in each dir. It stops when it encounters the root
-// Oyafile.
-func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
+// looking for root.
+func detectRoot(startDir string) (string, bool, error) {
 	path := startDir
 	maxParts := 256
 	var lastErr error
 	for i := 0; i < maxParts; i++ {
 		o, found, err := oyafile.LoadFromDir(path, path)
 		if err != nil {
-			lastErr = err
+			return "", false, err
 		}
 		if err == nil && found && isRoot(o) {
-			return o, true, nil
+			return o.RootDir, true, nil
 		}
 		if path == "/" {
 			break
@@ -120,7 +115,7 @@ func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 		path = filepath.Dir(path)
 	}
 
-	return nil, false, lastErr
+	return "", false, nil
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {

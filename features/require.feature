@@ -3,26 +3,26 @@ Feature: Dependency management
 Background:
    Given I'm in project dir
 
-@xxx
-Scenario: Get a specific pack version
-  Given file ./Oyafile containing
-    """
-    Project: project
-    """
-  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
-  Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
-    """
-    1.0.0
+# @xxx
+# Scenario: Get a specific pack version
+#   Given file ./Oyafile containing
+#     """
+#     Project: project
+#     """
+#   When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
+#   Then the command succeeds
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
+#     """
+#     1.0.0
 
-    """
-  And file ./Oyafile contains
-    """
-    Project: project
-    Require:
-      github.com/tooploox/oya-fixtures: v1.0.0
-    """
+#     """
+#   And file ./Oyafile contains
+#     """
+#     Project: project
+#     Require:
+#       github.com/tooploox/oya-fixtures: v1.0.0
+#     """
 
 # TODO: Fetches only the package.
 
