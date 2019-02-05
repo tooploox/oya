@@ -198,7 +198,6 @@ Scenario: Pack values are overriden form project Oyafile
   """
 
 # Regression test for #24
-@xxx
 Scenario: Import tasks in a subdir Oyafile
   Given file ./Oyafile containing
     """
