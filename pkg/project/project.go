@@ -86,13 +86,19 @@ func isRoot(o *oyafile.Oyafile) bool {
 	return len(o.Project) > 0
 }
 
+// detectRoot attempts to detect the root project directory marked by
+// root Oyafile, i.e. one containing Project: directive.
+// It walks the directory tree, starting from startDir, going upwards,
+// loading Oyafiles in each dir. It stops when it encounters the root
+// Oyafile.
 func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 	path := startDir
 	maxParts := 256
+	var lastErr error
 	for i := 0; i < maxParts; i++ {
 		o, found, err := oyafile.LoadFromDir(path, path)
 		if err != nil {
-			return nil, false, err
+			lastErr = err
 		}
 		if err == nil && found && isRoot(o) {
 			return o, true, nil
@@ -103,7 +109,7 @@ func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
 		path = filepath.Dir(path)
 	}
 
-	return nil, false, nil
+	return nil, false, lastErr
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {
