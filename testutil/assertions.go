@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"regexp"
 	"sort"
 	"testing"
 
@@ -51,6 +52,14 @@ func AssertStringsMatch(t *testing.T, expected []string, actual []string, msg st
 
 	if !reflect.DeepEqual(expSorted, actSorted) {
 		t.Errorf(msg, args...)
+	}
+}
+
+// AssertRegexpMatch checks if string matches the regexp.
+func AssertRegexpMatch(t *testing.T, expectedRegexp, actual string) {
+	rx := regexp.MustCompile(expectedRegexp)
+	if !rx.MatchString(actual) {
+		t.Errorf("Expected regexp %q to match %q", expectedRegexp, actual)
 	}
 }
 
