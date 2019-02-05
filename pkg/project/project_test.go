@@ -27,7 +27,7 @@ func TestProject_Detect_InRootDir(t *testing.T) {
 }
 
 func TestProject_Detect_InSubDir(t *testing.T) {
-	workDir := "./fixtures/project//subdir"
+	workDir := "./fixtures/project/subdir"
 	_, err := project.Detect(workDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 }

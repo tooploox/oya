@@ -32,7 +32,7 @@ func (p Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
 
 	rootOyafile := oyafiles[0]
 
-	if !rootOyafile.Equals(*p.Root) {
+	if rel, err := filepath.Rel(rootOyafile.Dir, p.RootDir); err != nil || rel != "." {
 		panic("Internal error: expecting root Oyafile to be the first item in array returned from project.Project#Oyafiles method")
 	}
 

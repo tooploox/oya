@@ -1,7 +1,6 @@
 package oyafile
 
 import (
-	"bufio"
 	"io"
 	"os"
 	"path"
@@ -182,38 +181,6 @@ func fullPath(projectDir, name string) string {
 		name = DefaultName
 	}
 	return path.Join(projectDir, name)
-}
-
-// isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
-func isEmptyYAML(oyafilePath string) (bool, error) {
-	file, err := os.Open(oyafilePath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		if isNode(scanner.Text()) {
-			return false, nil
-		}
-	}
-
-	return true, scanner.Err()
-}
-
-func isNode(line string) bool {
-	for _, c := range line {
-		switch c {
-		case '#':
-			return false
-		case ' ', '\t', '\n', '\f', '\r':
-			continue
-		default:
-			return true
-		}
-	}
-	return false
 }
 
 func (o *Oyafile) Ignores() string {
