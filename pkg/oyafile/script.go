@@ -41,6 +41,6 @@ func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Wr
 	if err != nil {
 		return err
 	}
-	_, err = sh.Exec(nil, stdout, stderr, "bash", scriptFile.Name())
+	_, err = sh.Exec(nil, stdout, stderr, shell, scriptFile.Name())
 	return err
 }

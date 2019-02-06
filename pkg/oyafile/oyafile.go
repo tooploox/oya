@@ -63,7 +63,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		Dir:     filepath.Clean(dir),
 		Path:    filepath.Clean(oyafilePath),
 		RootDir: filepath.Clean(rootDir),
-		Shell:   "/bin/sh",
+		Shell:   "/bin/bash",
 		Imports: make(map[Alias]ImportPath),
 		Tasks:   newTaskTable(),
 		Values:  template.Scope{},
