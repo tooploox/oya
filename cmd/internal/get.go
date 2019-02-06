@@ -26,6 +26,10 @@ func Get(workDir, uri string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return wrapErr(err, uri)
 	}
+	err = prj.Require(pack)
+	if err != nil {
+		return wrapErr(err, uri)
+	}
 	return nil
 }
 

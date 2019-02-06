@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+// flatMap maps each line of Oyafile to possibly multiple lines flattening the result. Does not write to the file.
 func (raw *Oyafile) flatMap(f func(line string) []string) error {
 	scanner := bufio.NewScanner(bytes.NewReader(raw.file))
 
@@ -25,6 +26,7 @@ func (raw *Oyafile) flatMap(f func(line string) []string) error {
 	return nil
 }
 
+// insertAfter inserts one or more lines after the first line matching the regular expression. Does not write to the file.
 func (raw *Oyafile) insertAfter(rx *regexp.Regexp, lines ...string) (bool, error) {
 	found := false
 	err := raw.flatMap(func(line string) []string {
@@ -38,6 +40,7 @@ func (raw *Oyafile) insertAfter(rx *regexp.Regexp, lines ...string) (bool, error
 	return found, err
 }
 
+// concat appends one or more lines to the Oyafile. Does not write to the file.
 func (raw *Oyafile) concat(lines ...string) error {
 	output := bytes.NewBuffer(raw.file)
 	for _, l := range lines {
@@ -49,6 +52,7 @@ func (raw *Oyafile) concat(lines ...string) error {
 	return nil
 }
 
+// write flushes in-memory Oyafile contents to disk.
 func (raw *Oyafile) write() error {
 	info, err := os.Stat(raw.Path)
 	if err != nil {

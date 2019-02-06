@@ -13,8 +13,8 @@ import (
 var importKey = "Import:"
 var projectKey = "Project:"
 var uriVal = "  %s: %s"
-var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
-var projectRegxp = regexp.MustCompile("^" + projectKey)
+var importRegexp = regexp.MustCompile("(?m)^" + importKey + "$")
+var projectRegexp = regexp.MustCompile("^" + projectKey)
 
 func (o *Oyafile) AddImport(alias string, uri string) error {
 	var output []string
@@ -26,9 +26,9 @@ func (o *Oyafile) AddImport(alias string, uri string) error {
 		return errors.Errorf("Pack already imported: %v", uri)
 	}
 
-	output, updated = o.appendAfter(importRegxp, []string{uriStr})
+	output, updated = o.appendAfter(importRegexp, []string{uriStr})
 	if !updated {
-		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr})
+		output, updated = o.appendAfter(projectRegexp, []string{importKey, uriStr})
 		if !updated {
 			output = []string{importKey, uriStr}
 			output = append(output, strings.Split(fileContent, "\n")...)
