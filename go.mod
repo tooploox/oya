@@ -1,9 +1,11 @@
 module github.com/bilus/oya
 
 require (
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/DATA-DOG/godog v0.7.9
-	github.com/aws/aws-sdk-go v0.0.0-20181102201158-43cb5e999812
+	github.com/aws/aws-sdk-go v1.16.28
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+	github.com/cheggaaa/pb v2.0.6+incompatible // indirect
 	github.com/cosiner/argv v0.0.1 // indirect
 	github.com/derekparker/delve v1.1.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
@@ -12,17 +14,19 @@ require (
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/hashicorp/go-cleanhttp v0.5.0
-	github.com/hashicorp/go-getter v0.0.0-20180809191950-4bda8fa99001
+	github.com/hashicorp/go-getter v1.0.2
 	github.com/hashicorp/go-safetemp v1.0.0
-	github.com/hashicorp/go-version v1.0.0
+	github.com/hashicorp/go-version v1.1.0
 	github.com/hashicorp/hcl v1.0.0
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
 	github.com/magiconair/properties v1.8.0
-	github.com/mattn/go-isatty v0.0.4 // indirect
+	github.com/mattn/go-colorable v0.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.0
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/onsi/ginkgo v1.7.0 // indirect
+	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.2.0
 	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pkg/errors v0.8.1
@@ -43,13 +47,15 @@ require (
 	github.com/ziutek/kasia.go v0.0.0-20150722135753-be46c452e867
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
-	golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3 // indirect
-	golang.org/x/sys v0.0.0-20190124100055-b90733256f2e
+	golang.org/x/net v0.0.0-20190206173232-65e2d4e15006 // indirect
+	golang.org/x/sys v0.0.0-20190204203706-41f3e6584952
 	golang.org/x/text v0.3.0
+	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
+	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect
 	gopkg.in/src-d/go-git-fixtures.v3 v3.3.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.8.1
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
-	k8s.io/helm v0.0.0-20180618142140-99f20d82bb2a
+	k8s.io/helm v2.12.3+incompatible
 )

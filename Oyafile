@@ -3,18 +3,15 @@ Project: project
 Ignore:
 - pkg/*
 
-build: |
-  go build oya.go
+develop.Doc: Install development prerequisites.
+develop: |
+  go get github.com/DATA-DOG/godog/cmd/godog
+
+install.Doc: Install oya.
+install: |
   go install .
 
-
-installPrerequsites: |
-  go get github.com/kardianos/govendor
-  govendor sync
-  go get github.com/DATA-DOG/godog/cmd/godog
-  printenv
-
-
+test.Doc: Run tests.
 test: |
-  go test -v ./...
+  go test -v ./... && \
   godog
