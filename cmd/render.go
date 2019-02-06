@@ -41,11 +41,13 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, outputPath, cmd.OutOrStdout(), cmd.OutOrStderr())
+		alias, _ := cmd.Flags().GetString("alias")
+		return internal.Render(fullOyafilePath, templatePath, outputPath, alias, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(renderCmd)
 	renderCmd.Flags().StringP("file", "f", "Oyafile", "Read FILE as Oyafile")
+	renderCmd.Flags().StringP("alias", "a", "", "Render template in alias context")
 }
