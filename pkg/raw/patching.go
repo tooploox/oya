@@ -113,13 +113,43 @@ func (raw *Oyafile) insertBeforeWithin(key string, rx *regexp.Regexp, lines ...s
 // concat appends one or more lines to the Oyafile. Does not write to the file.
 func (raw *Oyafile) concat(lines ...string) error {
 	output := bytes.NewBuffer(raw.file)
-	for _, l := range lines {
-		output.WriteString(l)
-		output.WriteString("\n")
+	if err := writeLines(lines, output); err != nil {
+		return err
 	}
-
 	raw.file = output.Bytes()
 	return nil
+}
+
+// prepend takes an Oyafile and prepends its content with one or more lines.
+// Does not write to the file.
+func (raw *Oyafile) prepend(lines ...string) error {
+	output := bytes.NewBuffer(nil)
+	if err := writeLines(lines, output); err != nil {
+		return err
+	}
+	if _, err := output.Write(raw.file); err != nil {
+		return err
+	}
+	raw.file = output.Bytes()
+	return nil
+}
+
+func writeLines(lines []string, output *bytes.Buffer) error {
+	for _, l := range lines {
+		if _, err := output.WriteString(l); err != nil {
+			return err
+		}
+		if _, err := output.WriteString("\n"); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// containsLineMatching returns true if Oyafile matches the regular expression.
+// (?m) directive may be used to match file line by line
+func (raw *Oyafile) matches(rx *regexp.Regexp) bool {
+	return rx.MatchString(string(raw.file))
 }
 
 // write flushes in-memory Oyafile contents to disk.
