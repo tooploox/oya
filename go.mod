@@ -4,9 +4,12 @@ require (
 	github.com/DATA-DOG/godog v0.7.9
 	github.com/aws/aws-sdk-go v0.0.0-20181102201158-43cb5e999812
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+	github.com/cosiner/argv v0.0.1 // indirect
+	github.com/derekparker/delve v1.1.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fako1024/topo v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
+	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/hashicorp/go-cleanhttp v0.5.0
 	github.com/hashicorp/go-getter v0.0.0-20180809191950-4bda8fa99001
@@ -16,10 +19,12 @@ require (
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
 	github.com/magiconair/properties v1.8.0
+	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pelletier/go-toml v1.2.0
+	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/sanity-io/litter v0.0.0-20181009143221-cdb60d0035dc
 	github.com/satori/go.uuid v1.2.0 // indirect
@@ -36,6 +41,7 @@ require (
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ulikunitz/xz v0.5.5
 	github.com/ziutek/kasia.go v0.0.0-20150722135753-be46c452e867
+	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 	golang.org/x/net v0.0.0-20190125091013-d26f9f9a57f3 // indirect
 	golang.org/x/sys v0.0.0-20190124100055-b90733256f2e
