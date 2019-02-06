@@ -81,7 +81,7 @@ Values:
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
 }
 
-func TestOyafile_AddImport_Twice(t *testing.T) {
+func TestOyafile_AddImport_TwoPacks(t *testing.T) {
 	outputDir, err := ioutil.TempDir("", "oya")
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
@@ -101,6 +101,29 @@ func TestOyafile_AddImport_Twice(t *testing.T) {
 	expectedContent := `Project: AddImport
 Import:
   bar: github.com/tooploox/bar
+  foo: github.com/tooploox/foo
+`
+	tu.AssertFileContains(t, oyafilePath, expectedContent)
+}
+
+func TestOyafile_AddImport_AlreadyImported(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	oyafilePath := filepath.Join(outputDir, "Oyafile")
+	tu.MustCopyFile(t, "./fixtures/AddImport_ToExisting/Oyafile", oyafilePath)
+
+	raw, found, err := raw.Load(oyafilePath, oyafilePath)
+	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
+	tu.AssertTrue(t, found, "No Oyafile found")
+
+	err = raw.AddImport("foo", "github.com/tooploox/foo")
+	tu.AssertErr(t, err, "Expected an error trying to import the same pack twice")
+
+	expectedContent := `Project: AddImport_ToExisting
+
+Import:
   foo: github.com/tooploox/foo
 `
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
