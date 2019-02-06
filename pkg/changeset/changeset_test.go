@@ -7,57 +7,57 @@ import (
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/project"
 	tu "github.com/bilus/oya/testutil"
 )
 
-// TestEmptyOyafile
-
-func TestOneOyafile(t *testing.T) {
-	rootDir := fullPath("./fixtures/TestOneOyafile")
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
-	tu.AssertNoErr(t, err, "Error calculating changeset")
-	tu.AssertEqual(t, 1, len(actual))
-}
-
 func TestNoChangesetTask(t *testing.T) {
-	rootDir := fullPath("./fixtures/TestNoChangesetTask")
-	allOyafiles := mustListOyafiles(t, rootDir)
-	expected := allOyafiles
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
+	// No Changeset: directive means no changeset at this level.
+	// project.Changeset takes care of adding a default changeset task
+	// to root Oyafile if it's missing but here we don't worry about it.
+	rootDir := fullPath("./fixtures/TestOneOyafile")
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
-	tu.AssertObjectsEqual(t, expected, actual)
+	tu.AssertEqual(t, 0, len(actual))
 }
 
 func TestEmptyChangeset(t *testing.T) {
 	rootDir := fullPath("./fixtures/TestEmptyChangeset")
-	var expected []*oyafile.Oyafile
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
+	expected := make([]*oyafile.Oyafile, 0)
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
 }
 
 func TestMinimalChangeset(t *testing.T) {
 	rootDir := fullPath("./fixtures/TestMinimalChangeset")
-	expected := []*oyafile.Oyafile{mustLoadOyafile(t, rootDir, rootDir)}
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
+	expected := []*oyafile.Oyafile{tu.MustLoadOyafile(t, rootDir, rootDir)}
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
 }
 
 func TestFullChangeset(t *testing.T) {
 	rootDir := fullPath("./fixtures/TestFullChangeset")
-	allOyafiles := mustListOyafiles(t, rootDir)
+	allOyafiles := tu.MustListOyafiles(t, rootDir)
 	expected := allOyafiles
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
 }
 
 func TestLocalOverride(t *testing.T) {
 	rootDir := fullPath("./fixtures/TestLocalOverride")
-	expected := []*oyafile.Oyafile{mustLoadOyafile(t, filepath.Join(rootDir, "./project1"), rootDir)}
-	actual, err := changeset.Calculate(mustListOyafiles(t, rootDir))
+	expected := []*oyafile.Oyafile{tu.MustLoadOyafile(t, filepath.Join(rootDir, "./project1"), rootDir)}
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
+	tu.AssertNoErr(t, err, "Error calculating changeset")
+	tu.AssertObjectsEqual(t, expected, actual)
+}
+
+func TestUniqueness(t *testing.T) {
+	rootDir := fullPath("./fixtures/TestUniqueness")
+	allOyafiles := tu.MustListOyafiles(t, rootDir)
+	expected := allOyafiles
+	actual, err := changeset.Calculate(tu.MustListOyafiles(t, rootDir))
 	tu.AssertNoErr(t, err, "Error calculating changeset")
 	tu.AssertObjectsEqual(t, expected, actual)
 }
@@ -65,20 +65,4 @@ func TestLocalOverride(t *testing.T) {
 func fullPath(relPath string) string {
 	_, filename, _, _ := runtime.Caller(1)
 	return filepath.Join(filepath.Dir(filename), relPath)
-}
-
-func mustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
-	project, err := project.Load(rootDir)
-	tu.AssertNoErr(t, err, "Error detecting project")
-	oyafiles, err := project.Oyafiles()
-	tu.AssertNoErr(t, err, "Error listing Oyafiles")
-	tu.AssertTrue(t, len(oyafiles) > 0, "No Oyafiles found")
-	return oyafiles
-}
-
-func mustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
-	o, found, err := oyafile.LoadFromDir(dir, rootDir)
-	tu.AssertNoErr(t, err, "Error loading root Oyafile")
-	tu.AssertTrue(t, found, "Root Oyafile not found")
-	return o
 }

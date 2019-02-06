@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
@@ -55,6 +57,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}
 
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
+	log.Debug("Oyafile at", oyafilePath)
 	if err != nil {
 		return nil, err
 	}

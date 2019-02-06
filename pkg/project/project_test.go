@@ -38,14 +38,6 @@ func TestProject_Detect_InEmptySubDir(t *testing.T) {
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 }
 
-func TestProject_Run_NoOyafile(t *testing.T) {
-	workDir := "./fixtures/project/empty_subdir"
-	project, err := project.Detect(workDir)
-	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
-	err = project.Run(workDir, "build", noArgs, noFlags, ioutil.Discard, ioutil.Discard)
-	tu.AssertErr(t, err, "Expected error trying to run without Oyafile")
-}
-
 func TestProject_Run_NoTask(t *testing.T) {
 	workDir := "./fixtures/project"
 	project, err := project.Detect(workDir)
