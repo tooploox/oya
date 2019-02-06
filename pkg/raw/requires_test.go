@@ -156,4 +156,31 @@ Values:
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
 }
 
-// BUG(bilus): When adding new line under Requires, assumes indentation is two spaces. Should detect it.
+func TestOyafile_AddRequire_DifferentVersionMoreKeys(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	oyafilePath := filepath.Join(outputDir, "Oyafile")
+	tu.MustCopyFile(t, "./fixtures/AddRequire_ExistingMoreKeys/Oyafile", oyafilePath)
+
+	raw, found, err := raw.Load(oyafilePath, oyafilePath)
+	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
+	tu.AssertTrue(t, found, "No Oyafile found")
+
+	pack := tu.MustMakeMockPack(t, "github.com/tooploox/bar", "v1.5.0")
+	err = raw.AddRequire(pack)
+	tu.AssertNoErr(t, err, "Error adding require")
+
+	expectedContent := `Project: AddRequire_ExistingMoreKeys
+
+# It's before Require on purpose; we want to test whether matching
+# for require entries is effective only under the Require: key.
+Values:
+  foo: bar
+
+Require:
+  github.com/tooploox/bar: v1.5.0
+`
+	tu.AssertFileContains(t, oyafilePath, expectedContent)
+}
