@@ -7,7 +7,7 @@ import (
 	"github.com/bilus/oya/pkg/template"
 )
 
-func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
 	proj, err := project.Detect(outputPath)
 	if err != nil {
 		return err
@@ -20,7 +20,11 @@ func Render(oyafilePath, templatePath, outputPath string, stdout, stderr io.Writ
 
 	var values template.Scope
 	if found {
-		values = o.Values
+		if alias != "" {
+			values = o.Values[alias].(template.Scope)
+		} else {
+			values = o.Values
+		}
 	}
 
 	return template.RenderAll(templatePath, outputPath, values)
