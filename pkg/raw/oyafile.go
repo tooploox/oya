@@ -6,16 +6,18 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 const DefaultName = "Oyafile"
 
+// Oyafile represents an unparsed Oyafile.
 type Oyafile struct {
-	Path    string
-	RootDir string
-	file    []byte
+	Path    string // Path contains normalized absolute path.
+	RootDir string // RootDir is the absolute, normalized path to the project root directory.
+	file    []byte // file contains Oyafile contents.
 }
 
 // DecodedOyafile is an Oyafile that has been loaded from YAML
@@ -52,8 +54,8 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	}
 
 	return &Oyafile{
-		RootDir: rootDir,
 		Path:    oyafilePath,
+		RootDir: rootDir,
 		file:    file,
 	}, nil
 }
@@ -77,16 +79,30 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	return of, nil
 }
 
-func (raw *Oyafile) HasKey(key string) (bool, error) {
+func (raw *Oyafile) LookupKey(key string) (interface{}, bool, error) {
 	of, err := raw.Decode()
+	if err != nil {
+		return nil, false, err
+	}
+	val, ok := of[key]
+	return val, ok, nil
+}
+
+func (raw *Oyafile) IsRoot() (bool, error) {
+	_, hasProject, err := raw.LookupKey("Project")
 	if err != nil {
 		return false, err
 	}
-	_, ok := of[key]
-	return ok, nil
+
+	rel, err := filepath.Rel(raw.RootDir, raw.Path)
+	if err != nil {
+		return false, err
+	}
+	return hasProject && rel == DefaultName, nil
 }
 
-// isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
+// isEmptyYAML returns true if the Oyafile contains only blank characters
+// or YAML comments.
 func isEmptyYAML(oyafilePath string) (bool, error) {
 	file, err := os.Open(oyafilePath)
 	if err != nil {

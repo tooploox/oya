@@ -1,13 +1,12 @@
 package internal
 
 import (
+	"io"
 	"regexp"
 	"strings"
-	"io"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
-
 )
 
 func Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
