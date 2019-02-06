@@ -5,6 +5,7 @@ require (
 	github.com/DATA-DOG/godog v0.7.9
 	github.com/aws/aws-sdk-go v1.16.28
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/cheggaaa/pb v2.0.6+incompatible // indirect
 	github.com/cosiner/argv v0.0.1 // indirect
 	github.com/derekparker/delve v1.1.0 // indirect
@@ -40,21 +41,20 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/pflag v1.0.2
 	github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e
-	github.com/src-d/go-git v4.7.0+incompatible
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ulikunitz/xz v0.5.5
 	github.com/ziutek/kasia.go v0.0.0-20150722135753-be46c452e867
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
-	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
+	golang.org/x/crypto v0.0.0-20190131182504-b8fe1690c613
 	golang.org/x/net v0.0.0-20190206173232-65e2d4e15006 // indirect
 	golang.org/x/sys v0.0.0-20190204203706-41f3e6584952
 	golang.org/x/text v0.3.0
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
-	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect
+	gopkg.in/src-d/go-billy.v4 v4.3.0
 	gopkg.in/src-d/go-git-fixtures.v3 v3.3.0 // indirect
-	gopkg.in/src-d/go-git.v4 v4.8.1
+	gopkg.in/src-d/go-git.v4 v4.9.1
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
 	k8s.io/helm v2.12.3+incompatible

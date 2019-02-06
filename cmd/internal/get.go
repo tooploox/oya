@@ -14,15 +14,25 @@ func Get(workDir, uri string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	pack, err := pack.NewFromUri(repoUri, ref)
+	pack, err := pack.New(repoUri, ref)
 	if err != nil {
 		return wrapErr(err, uri)
+	}
+	if len(pack.Version()) == 0 {
+		err := pack.Update()
+		if err != nil {
+			return err
+		}
 	}
 	prj, err := project.Detect(workDir)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
 	err = prj.Vendor(pack)
+	if err != nil {
+		return wrapErr(err, uri)
+	}
+	err = prj.Require(pack)
 	if err != nil {
 		return wrapErr(err, uri)
 	}

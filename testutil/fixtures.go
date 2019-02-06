@@ -54,6 +54,10 @@ func (p mockPack) Vendor(vendorDir string) error {
 	return errors.Errorf("mockPack#Vendor is not implemented")
 }
 
+func (p mockPack) Update() error {
+	return errors.Errorf("mockPack#Update is not implemented")
+}
+
 func MustMakeMockPack(t *testing.T, importUrl, version string) pack.Pack {
 	return mockPack{
 		importUrl: importUrl,
