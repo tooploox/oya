@@ -28,7 +28,8 @@ type Oyafile struct {
 	file    []byte
 }
 
-// DecodedOyafile is an Oyafile that has been loaded from YAML but that hasn't been parsed yet.
+// DecodedOyafile is an Oyafile that has been loaded from YAML
+// but hasn't been parsed yet.
 type DecodedOyafile map[string]interface{}
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
@@ -150,7 +151,12 @@ func (o *Oyafile) AddImport(alias string, uri string) error {
 		return err
 	}
 
-	// BUG(bilus): Does not update o.file!
+	file, err := ioutil.ReadFile(o.Path)
+	if err != nil {
+		return err
+	}
+
+	o.file = file
 
 	return nil
 }
