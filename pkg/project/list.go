@@ -11,11 +11,11 @@ import (
 )
 
 func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
-	return listOyafiles(p.Root.RootDir, p.Root.RootDir)
+	return listOyafiles(p.RootDir, p.RootDir)
 }
 
 func (p Project) List(startDir string) ([]*oyafile.Oyafile, error) {
-	return listOyafiles(startDir, p.Root.RootDir)
+	return listOyafiles(startDir, p.RootDir)
 }
 
 // TODO: Cleanup, should probably be Project.List.

@@ -3,11 +3,10 @@ package project
 import (
 	"io"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -17,21 +16,28 @@ import (
 const VendorDir = ".oya/vendor"
 
 type Project struct {
-	Root *oyafile.Oyafile
+	RootDir string
 }
 
 func Load(rootDir string) (Project, error) {
-	root, ok, err := oyafile.LoadFromDir(rootDir, rootDir)
-	if !ok {
-		err = errors.Errorf("Missing Oyafile at %v", rootDir)
+	prj, err := Detect(rootDir)
+	if err != nil {
+		return prj, err
 	}
-	return Project{
-		Root: root,
-	}, err
+
+	rel, err := filepath.Rel(rootDir, prj.RootDir)
+	if err != nil {
+		return prj, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, prj.RootDir)
+	}
+	if rel != "." {
+		return prj, errors.Errorf("%v is not an Oya project root directory", rootDir)
+	}
+
+	return prj, nil
 }
 
 func Detect(workDir string) (Project, error) {
-	o, found, err := detectRoot(workDir)
+	detectedRootDir, found, err := detectRoot(workDir)
 	if err != nil {
 		return Project{}, err
 	}
@@ -39,11 +45,11 @@ func Detect(workDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		Root: o,
+		RootDir: detectedRootDir,
 	}, nil
 }
 
-func (p Project) Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir, taskName string, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)
@@ -57,7 +63,7 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 
 	foundAtLeastOneTask := false
 	for _, o := range changes {
-		found, err := o.RunTask(taskName, toScope(positionalArgs, flags), stdout, stderr)
+		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
@@ -65,7 +71,6 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 			foundAtLeastOneTask = found
 		}
 	}
-
 	if !foundAtLeastOneTask {
 		return ErrNoTask{
 			Task: taskName,
@@ -75,65 +80,56 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 }
 
 func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.Load(oyafilePath, p.Root.RootDir)
+	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
 func (p Project) Vendor(pack pack.Pack) error {
-	return pack.Vendor(filepath.Join(p.Root.RootDir, VendorDir))
+	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
 }
 
-func isRoot(o *oyafile.Oyafile) bool {
-	return len(o.Project) > 0
+func (p Project) Values() (template.Scope, error) {
+	oyafilePath := filepath.Join(p.RootDir, "Oyafile")
+	o, found, err := p.Oyafile(oyafilePath)
+	if err != nil {
+		return template.Scope{}, err
+	}
+	if !found {
+		return template.Scope{}, ErrNoOyafile{Path: oyafilePath} 
+	}
+	return template.Scope {
+		"Project": o.Project,
+	}, nil
+}
+
+func isRoot(raw *raw.Oyafile) (bool, error) {
+	return raw.HasKey("Project")
 }
 
 // detectRoot attempts to detect the root project directory marked by
 // root Oyafile, i.e. one containing Project: directive.
 // It walks the directory tree, starting from startDir, going upwards,
-// loading Oyafiles in each dir. It stops when it encounters the root
-// Oyafile.
-func detectRoot(startDir string) (*oyafile.Oyafile, bool, error) {
+// looking for root.
+func detectRoot(startDir string) (string, bool, error) {
 	path := startDir
 	maxParts := 256
-	var lastErr error
 	for i := 0; i < maxParts; i++ {
-		o, found, err := oyafile.LoadFromDir(path, path)
-		if err != nil {
-			lastErr = err
+		raw, found, err := raw.LoadFromDir(path, path) // "Guess" path is the root dir.
+		if err == nil && found {
+			isRoot, err := isRoot(raw)
+			if err != nil {
+				return "", false, err
+			}
+			if isRoot {
+				return path, true, nil
+			}
 		}
-		if err == nil && found && isRoot(o) {
-			return o, true, nil
-		}
+
 		if path == "/" {
 			break
 		}
 		path = filepath.Dir(path)
 	}
 
-	return nil, false, lastErr
+	return "", false, nil
 }
 
-func toScope(positionalArgs []string, flags map[string]string) template.Scope {
-	return template.Scope{
-		"Args":  positionalArgs,
-		"Flags": camelizeFlags(flags),
-	}
-}
-
-func camelizeFlags(flags map[string]string) map[string]string {
-	result := make(map[string]string)
-	for k, v := range flags {
-		result[camelize(k)] = v
-	}
-	return result
-}
-
-var sepRx = regexp.MustCompile("(-|_).")
-
-// camelize turns - or _ separated identifiers into camel case.
-// Example: "aa-bb" becomes "aaBb".
-func camelize(s string) string {
-	return sepRx.ReplaceAllStringFunc(s, func(match string) string {
-		return strings.ToUpper(match[1:])
-	})
-
-}
