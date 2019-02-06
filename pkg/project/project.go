@@ -3,8 +3,6 @@ package project
 import (
 	"io"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
@@ -51,7 +49,7 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir, taskName string, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)
@@ -65,7 +63,7 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 
 	foundAtLeastOneTask := false
 	for _, o := range changes {
-		found, err := o.RunTask(taskName, toScope(positionalArgs, flags), stdout, stderr)
+		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
@@ -73,7 +71,6 @@ func (p Project) Run(workDir, taskName string, positionalArgs []string, flags ma
 			foundAtLeastOneTask = found
 		}
 	}
-
 	if !foundAtLeastOneTask {
 		return ErrNoTask{
 			Task: taskName,
@@ -88,6 +85,20 @@ func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
 
 func (p Project) Vendor(pack pack.Pack) error {
 	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
+}
+
+func (p Project) Values() (template.Scope, error) {
+	oyafilePath := filepath.Join(p.RootDir, "Oyafile")
+	o, found, err := p.Oyafile(oyafilePath)
+	if err != nil {
+		return template.Scope{}, err
+	}
+	if !found {
+		return template.Scope{}, ErrNoOyafile{Path: oyafilePath} 
+	}
+	return template.Scope {
+		"Project": o.Project,
+	}, nil
 }
 
 func isRoot(raw *raw.Oyafile) (bool, error) {
@@ -122,28 +133,3 @@ func detectRoot(startDir string) (string, bool, error) {
 	return "", false, nil
 }
 
-func toScope(positionalArgs []string, flags map[string]string) template.Scope {
-	return template.Scope{
-		"Args":  positionalArgs,
-		"Flags": camelizeFlags(flags),
-	}
-}
-
-func camelizeFlags(flags map[string]string) map[string]string {
-	result := make(map[string]string)
-	for k, v := range flags {
-		result[camelize(k)] = v
-	}
-	return result
-}
-
-var sepRx = regexp.MustCompile("(-|_).")
-
-// camelize turns - or _ separated identifiers into camel case.
-// Example: "aa-bb" becomes "aaBb".
-func camelize(s string) string {
-	return sepRx.ReplaceAllStringFunc(s, func(match string) string {
-		return strings.ToUpper(match[1:])
-	})
-
-}
