@@ -29,7 +29,6 @@ func TestOyafile_AddImport_NoImport(t *testing.T) {
 	expectedContent := `Project: AddImport
 Import:
   foo: github.com/tooploox/foo
-
 `
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
 }
@@ -76,11 +75,9 @@ func TestOyafile_AddImport_MoreKeys(t *testing.T) {
 	expectedContent := `Project: AddImport_MoreKeys
 Import:
   bar: github.com/tooploox/bar
-  foo: github.com/tooploox/foo
 
 Values:
   baz: qux
-
 `
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
 }
@@ -106,7 +103,6 @@ func TestOyafile_AddImport_Twice(t *testing.T) {
 Import:
   bar: github.com/tooploox/bar
   foo: github.com/tooploox/foo
-
 `
 	tu.AssertFileContains(t, oyafilePath, expectedContent)
 }

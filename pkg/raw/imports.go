@@ -28,7 +28,7 @@ func (o *Oyafile) AddImport(alias string, uri string) error {
 
 	output, updated = o.appendAfter(importRegxp, []string{uriStr})
 	if !updated {
-		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
+		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr})
 		if !updated {
 			output = []string{importKey, uriStr}
 			output = append(output, strings.Split(fileContent, "\n")...)
