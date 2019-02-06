@@ -8,9 +8,9 @@ Scenario: Get a pack
     """
     Project: project
     """
-  When I run "oya get github.com/bilus/oya@fixtures"
+  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/bilus/oya/fixtures/features/get.feature/example/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
 
 Scenario: Get a pack with invalid import
   Given file ./Oyafile containing
@@ -20,6 +20,6 @@ Scenario: Get a pack with invalid import
     Import:
       invalidPack: foo.com/fooba/fooba
     """
-  When I run "oya get github.com/bilus/oya@fixtures"
+  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/bilus/oya/fixtures/features/get.feature/example/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists

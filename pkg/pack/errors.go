@@ -8,7 +8,7 @@ type ErrNotGithub struct {
 }
 
 func (err ErrNotGithub) Error() string {
-	return fmt.Sprintf("not Github.com import path %q (must start with \"github.com\")", err.ImportPath)
+	return fmt.Sprintf("incorrect Github.com import path %q; expected to start with \"github.com/<user>/<repository>\"", err.ImportPath)
 }
 
 // ErrNoTaggedVersions indicates there are no available remote versions of the pack.

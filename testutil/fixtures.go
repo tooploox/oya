@@ -46,7 +46,7 @@ func (p mockPack) Version() string {
 	return p.version
 }
 
-func (p mockPack) ImportUrl() string {
+func (p mockPack) ImportPath() string {
 	return p.importUrl
 }
 

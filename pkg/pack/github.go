@@ -2,16 +2,18 @@ package pack
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/blang/semver"
-	getter "github.com/hashicorp/go-getter"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
@@ -39,8 +41,8 @@ func New(importPath, ref string) (Pack, error) {
 
 func (p *GithubPack) Vendor(vendorDir string) error {
 	fullPath := filepath.Join(vendorDir, p.importPath)
-	log.Debugf("Getting %q into %q", p.src(), fullPath)
-	err := getter.GetAny(fullPath, p.src())
+	log.Debugf("Getting %q %v from repository %q into %q", p.importPath, p.Version(), p.repoUri, fullPath)
+	err := p.extractTo(fullPath)
 	if err != nil {
 		return errors.Wrapf(err, "error vendoring pack %v", p.importPath)
 	}
@@ -51,7 +53,7 @@ func (p *GithubPack) Version() string {
 	return p.ref
 }
 
-func (p *GithubPack) ImportUrl() string {
+func (p *GithubPack) ImportPath() string {
 	return p.importPath
 }
 
@@ -118,13 +120,63 @@ func makeVersionTag(version semver.Version) string {
 }
 
 func githubRepoUri(importPath string) (string, error) {
-	return fmt.Sprintf("https://%v.git", importPath), nil
+	parts := strings.Split(importPath, "/")
+	if len(parts) < 3 {
+		return "", ErrNotGithub{ImportPath: importPath}
+	}
+	return fmt.Sprintf("https://%v.git", strings.Join(parts[0:3], "/")), nil
 }
 
-func (p *GithubPack) src() string {
-	if len(p.ref) > 0 {
-		return fmt.Sprintf("%v?ref=%v", p.importPath, p.ref)
-
+func (p *GithubPack) extractTo(path string) error {
+	fs := memfs.New()
+	storer := memory.NewStorage()
+	r, err := git.Clone(storer, fs, &git.CloneOptions{
+		URL: p.repoUri,
+	})
+	if err != nil {
+		return err
 	}
-	return p.repoUri
+	tree, err := r.Worktree()
+	if err != nil {
+		return err
+	}
+	err = tree.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.NewTagReferenceName(p.ref),
+	})
+	if err != nil {
+		return err
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return err
+	}
+	commit, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		return err
+	}
+
+	fIter, err := commit.Files()
+	if err != nil {
+		return err
+	}
+
+	return fIter.ForEach(func(f *object.File) error {
+		targetPath := filepath.Join(path, f.Name)
+		err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
+		if err != nil {
+			return err
+		}
+		reader, err := f.Reader()
+		if err != nil {
+			return err
+		}
+		// BUG(bilus): Copy permissions.
+		writer, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(writer, reader)
+		return err
+	})
 }

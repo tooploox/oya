@@ -41,6 +41,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/pflag v1.0.2
 	github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e
+	github.com/src-d/go-git v4.7.0+incompatible
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ulikunitz/xz v0.5.5

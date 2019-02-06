@@ -63,7 +63,7 @@ func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
 	return raw.replaceAllWhen(
 		func(line string) bool {
 			if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
-				return matches[2] == pack.ImportUrl()
+				return matches[2] == pack.ImportPath()
 			}
 			return false
 
@@ -77,6 +77,6 @@ func (raw *Oyafile) insertBeforeExistingEntry(pack pack.Pack) (bool, error) {
 func formatRequire(indent int, pack pack.Pack) string {
 	return fmt.Sprintf("%v%v: %v",
 		strings.Repeat(" ", indent),
-		pack.ImportUrl(),
+		pack.ImportPath(),
 		pack.Version())
 }
