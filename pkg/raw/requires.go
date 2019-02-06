@@ -44,7 +44,7 @@ func (raw *Oyafile) addRequire(pack pack.Pack) error {
 	if found, err := raw.insertBeforeExistingEntry(pack); err != nil || found {
 		return err // nil if found
 	}
-	if found, err := raw.insertAfter(requireKeyRegxp, formatRequire(2, pack)); err != nil || found {
+	if found, err := raw.insertAfter(requireKeyRegxp, formatRequire(defaultIndent, pack)); err != nil || found {
 		return err // nil if found
 	}
 
@@ -60,52 +60,18 @@ func (raw *Oyafile) addRequire(pack pack.Pack) error {
 }
 
 func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
-	found := false
-	err := raw.flatMap(func(line string) []string {
-		if found {
-			return []string{line}
-		}
-
-		if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
-			if matches[2] == pack.ImportUrl() {
-				found = true
-				indent := len(matches[1])
-				return []string{formatRequire(indent, pack)}
+	return raw.replaceAllWhen(
+		func(line string) bool {
+			if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
+				return matches[2] == pack.ImportUrl()
 			}
-		}
+			return false
 
-		return []string{line}
-	})
-	return found, err
+		}, []string{formatRequire(0, pack)}...)
 }
 
 func (raw *Oyafile) insertBeforeExistingEntry(pack pack.Pack) (bool, error) {
-	found := false
-	insideRequire := false
-	err := raw.flatMap(func(line string) []string {
-		if found {
-			return []string{line}
-		}
-		if insideRequire {
-			if topLevelKeyRegexp.MatchString(line) {
-				insideRequire = false
-			}
-
-			if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
-				found = true
-				indent := len(matches[1])
-				return []string{formatRequire(indent, pack), line}
-			}
-
-		} else {
-			if requireKeyRegxp.MatchString(line) {
-				insideRequire = true
-			}
-		}
-
-		return []string{line}
-	})
-	return found, err
+	return raw.insertBeforeWithin("Require", requireEntryRegexp, formatRequire(0, pack))
 }
 
 func formatRequire(indent int, pack pack.Pack) string {
