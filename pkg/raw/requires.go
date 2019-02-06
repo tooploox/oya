@@ -11,8 +11,27 @@ var requireKeyRegxp = regexp.MustCompile("^Require:\\s*$")
 var requireEntryRegexp = regexp.MustCompile("^\\s*([^:]+)\\:\\s*(.+)$")
 
 func (raw *Oyafile) AddRequire(pack pack.Pack) error {
-	found := false
+	if err := raw.addRequire(pack); err != nil {
+		return err
+	}
+	return raw.write()
+}
 
+func (raw *Oyafile) addRequire(pack pack.Pack) error {
+	if found, err := raw.updateExistingEntry(pack); err != nil || found {
+		return err // nil if found
+	}
+	if found, err := raw.addToRequire(pack); err != nil || found {
+		return err // nil if found
+	}
+	if err := raw.concat("Require:", formatRequire(pack)); err != nil {
+		return err // never nil
+	}
+	return raw.write()
+}
+
+func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
+	found := false
 	err := raw.flatMap(func(line string) []string {
 		if found {
 			return []string{line}
@@ -27,35 +46,11 @@ func (raw *Oyafile) AddRequire(pack pack.Pack) error {
 
 		return []string{line}
 	})
+	return found, err
+}
 
-	if err != nil {
-		return err
-	}
-
-	if found {
-		return nil
-	}
-
-	err = raw.flatMap(func(line string) []string {
-		if !found && requireKeyRegxp.MatchString(line) {
-			found = true
-			return []string{line, formatRequire(pack)}
-		} else {
-			return []string{line}
-		}
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if found {
-		return nil
-	}
-
-	return raw.concat(
-		"Require:",
-		formatRequire(pack))
+func (raw *Oyafile) addToRequire(pack pack.Pack) (bool, error) {
+	return raw.insertAfter(requireKeyRegxp, formatRequire(pack))
 }
 
 func formatRequire(pack pack.Pack) string {

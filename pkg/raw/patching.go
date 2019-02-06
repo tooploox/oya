@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"regexp"
 )
 
 func (raw *Oyafile) flatMap(f func(line string) []string) error {
@@ -21,7 +22,20 @@ func (raw *Oyafile) flatMap(f func(line string) []string) error {
 	}
 
 	raw.file = output.Bytes()
-	return raw.write()
+	return nil
+}
+
+func (raw *Oyafile) insertAfter(rx *regexp.Regexp, lines ...string) (bool, error) {
+	found := false
+	err := raw.flatMap(func(line string) []string {
+		if !found && rx.MatchString(line) {
+			found = true
+			return append([]string{line}, lines...)
+		} else {
+			return []string{line}
+		}
+	})
+	return found, err
 }
 
 func (raw *Oyafile) concat(lines ...string) error {
@@ -32,7 +46,7 @@ func (raw *Oyafile) concat(lines ...string) error {
 	}
 
 	raw.file = output.Bytes()
-	return raw.write()
+	return nil
 }
 
 func (raw *Oyafile) write() error {
