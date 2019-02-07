@@ -45,6 +45,7 @@ func Parse(source string) (Template, error) {
 		return nil, err
 	}
 	kt.Strict = true
+	kt.EscapeFunc = nil
 	return kasiaTemplate{impl: kt}, nil
 }
 
