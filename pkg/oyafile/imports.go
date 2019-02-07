@@ -22,7 +22,7 @@ func (oyafile *Oyafile) resolveImports() error {
 		}
 
 		oyafile.Values[string(alias)] = pack.Values
-		for key, val := range valuesForPack(alias, oyafile.Values) {
+		for key, val := range collectPackValueOverrides(alias, oyafile.Values) {
 			pack.Values[key] = val
 		}
 
@@ -31,7 +31,9 @@ func (oyafile *Oyafile) resolveImports() error {
 	return nil
 }
 
-func valuesForPack(alias types.Alias, values template.Scope) template.Scope {
+// collectPackValueOverrides collects all <alias>.xxx values, overriding values
+// in the pack imported under the alias. Example: docker.image.
+func collectPackValueOverrides(alias types.Alias, values template.Scope) template.Scope {
 	// BUG(bilus): Extract aliased key syntax (dot-separation) from here and other places.
 	packValues := template.Scope{}
 	find := regexp.MustCompile("^" + string(alias) + "\\.(.*)$")
