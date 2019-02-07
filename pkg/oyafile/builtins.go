@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 )
 
@@ -20,16 +21,16 @@ func (o *Oyafile) defaultValues() template.Scope {
 
 // bindTasks returns a map of functions allowing invoking other tasks via $Tasks.xyz().
 // It makes invokable only tasks defined in the same Oyafile, stripping away any aliases, so the tasks are accessible names exactly as they appear in a given Oyafile.
-func (o *Oyafile) bindTasks(taskName TaskName, task Task, stdout, stderr io.Writer) (map[string]func() string, error) {
+func (o *Oyafile) bindTasks(taskName task.Name, t task.Task, stdout, stderr io.Writer) (map[string]func() string, error) {
 	tasks := make(map[string]func() string)
 
 	importAlias, _ := taskName.Split()
 
-	o.Tasks.ForEach(func(taskName TaskName, task Task, _ Meta) error {
-		alias, baseName := taskName.Split()
+	o.Tasks.ForEach(func(tn task.Name, _ task.Task, _ task.Meta) error {
+		alias, baseName := tn.Split()
 		if alias == importAlias {
 			tasks[baseName] = func() string {
-				return fmt.Sprintf("%s run %s\n", o.OyaCmd, taskName)
+				return fmt.Sprintf("%s run %s\n", o.OyaCmd, tn)
 			}
 		}
 		return nil

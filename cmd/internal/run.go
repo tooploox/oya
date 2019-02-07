@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/project"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 )
 
@@ -19,7 +19,7 @@ func Run(workDir, taskName string, positionalArgs []string, flags map[string]str
 	if err != nil {
 		return err
 	}
-	return p.Run(workDir, oyafile.TaskName(taskName), toScope(positionalArgs, flags).Merge(values), stdout, stderr)
+	return p.Run(workDir, task.Name(taskName), toScope(positionalArgs, flags).Merge(values), stdout, stderr)
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {

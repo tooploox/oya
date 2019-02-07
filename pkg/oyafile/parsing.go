@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/task"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -58,9 +60,9 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	return oyafile, nil
 }
 
-func parseMeta(metaName, key string) (TaskName, bool) {
+func parseMeta(metaName, key string) (task.Name, bool) {
 	taskName := strings.TrimSuffix(key, "."+metaName)
-	return TaskName(taskName), taskName != key
+	return task.Name(taskName), taskName != key
 }
 
 func parseImports(value interface{}, o *Oyafile) error {
@@ -77,7 +79,7 @@ func parseImports(value interface{}, o *Oyafile) error {
 		if !ok {
 			return fmt.Errorf("expected import path")
 		}
-		o.Imports[Alias(alias)] = ImportPath(path)
+		o.Imports[types.Alias(alias)] = types.ImportPath(path)
 	}
 	return nil
 }
@@ -131,8 +133,8 @@ func parseUserTask(name string, value interface{}, o *Oyafile) error {
 	if taskName, ok := parseMeta("Doc", name); ok {
 		o.Tasks.AddDoc(taskName, s)
 	} else {
-		o.Tasks.AddTask(TaskName(name), ScriptedTask{
-			Script: Script(s),
+		o.Tasks.AddTask(task.Name(name), task.Script{
+			Script: s,
 			Shell:  o.Shell,
 			Scope:  &o.Values,
 		})

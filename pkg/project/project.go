@@ -7,6 +7,7 @@ import (
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -49,7 +50,7 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir string, taskName oyafile.TaskName, scope template.Scope, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)

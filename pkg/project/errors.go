@@ -3,7 +3,7 @@ package project
 import (
 	"fmt"
 
-	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/task"
 )
 
 type ErrNoOyafile struct {
@@ -31,7 +31,7 @@ func (e ErrNoProject) Error() string {
 }
 
 type ErrNoTask struct {
-	Task oyafile.TaskName
+	Task task.Name
 }
 
 func (e ErrNoTask) Error() string {

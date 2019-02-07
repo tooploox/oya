@@ -10,7 +10,9 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -20,15 +22,12 @@ import (
 // so it has to be overridden (with 'go run oya.go', roughly speaking).
 var OyaCmdOverride *string
 
-type Alias string
-type ImportPath string
-
 type Oyafile struct {
 	Dir     string
 	Path    string
 	RootDir string
 	Shell   string
-	Imports map[Alias]ImportPath
+	Imports map[types.Alias]types.ImportPath
 	Tasks   TaskTable
 	Values  template.Scope
 	Project string   // Project is set for root Oyafile.
@@ -62,7 +61,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		Path:    filepath.Clean(oyafilePath),
 		RootDir: filepath.Clean(rootDir),
 		Shell:   "/bin/bash",
-		Imports: make(map[Alias]ImportPath),
+		Imports: make(map[types.Alias]types.ImportPath),
 		Tasks:   newTaskTable(),
 		Values:  template.Scope{},
 		relPath: relPath,
@@ -94,7 +93,7 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	return oyafile, true, nil
 }
 
-func (oyafile Oyafile) RunTask(taskName TaskName, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil
