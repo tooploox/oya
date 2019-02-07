@@ -148,26 +148,44 @@ func (l *GithubLibrary) Install(version semver.Version, outputDir string) error 
 		if outside, err := l.isOutsidePack(f.Name); outside || err != nil {
 			return err // May be nil if outside true.
 		}
-
 		targetPath := filepath.Join(path, f.Name)
-		err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
-		if err != nil {
-			return err
-		}
-		reader, err := f.Reader()
-		if err != nil {
-			return err
-		}
-		// BUG(bilus): Copy permissions.
-		writer, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0666)
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(writer, reader)
-		return err
+		return copyFile(f, targetPath)
 	})
 }
+
+func copyFile(f *object.File, targetPath string) error {
+	err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
+	if err != nil {
+		return err
+	}
+	reader, err := f.Reader()
+	if err != nil {
+		return err
+	}
+	// BUG(bilus): Copy permissions.
+	writer, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(writer, reader)
+	if err != nil {
+		return err
+	}
+	err = writer.Sync()
+	if err != nil {
+		return err
+	}
+	mode, err := f.Mode.ToOSFileMode()
+	if err != nil {
+		return err
+	}
+	err = os.Chmod(targetPath, mode)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
 func parseImportPath(importPath string) (string, string, string, error) {
 	parts := strings.Split(importPath, "/")
 	if len(parts) < 3 {
