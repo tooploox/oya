@@ -94,12 +94,12 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	return oyafile, true, nil
 }
 
-func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName TaskName, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil
 	}
-	tasks, err := oyafile.bindTasks(task, stdout, stderr)
+	tasks, err := oyafile.bindTasks(taskName, task, stdout, stderr)
 	if err != nil {
 		return true, err
 	}

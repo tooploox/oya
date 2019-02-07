@@ -49,7 +49,7 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir, taskName string, scope template.Scope, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir string, taskName oyafile.TaskName, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)

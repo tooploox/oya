@@ -67,7 +67,6 @@ func isInside(dir string, o *oyafile.Oyafile) bool {
 
 func defaultRootChangesetTask(oyafiles []*oyafile.Oyafile) oyafile.Task {
 	return oyafile.BuiltinTask{
-		Name: "Changeset",
 		OnExec: func(stdout, stderr io.Writer) error {
 			for _, o := range oyafiles {
 				relPath := filepath.Dir(o.RelPath())

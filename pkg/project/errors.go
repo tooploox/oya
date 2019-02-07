@@ -1,6 +1,10 @@
 package project
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bilus/oya/pkg/oyafile"
+)
 
 type ErrNoOyafile struct {
 	Path string
@@ -27,7 +31,7 @@ func (e ErrNoProject) Error() string {
 }
 
 type ErrNoTask struct {
-	Task string
+	Task oyafile.TaskName
 }
 
 func (e ErrNoTask) Error() string {

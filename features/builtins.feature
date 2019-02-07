@@ -49,30 +49,29 @@ Scenario: Run pack's tasks
 
   """
 
-Scenario: Run pack's tasks
+Scenario: Pack can only run its own tasks
   Given file ./Oyafile containing
     """
     Project: project
     Import:
       foo: github.com/test/foo
+      bar: github.com/test/bar
     """
   And file ./.oya/vendor/github.com/test/foo/Oyafile containing
     """
-    bar: |
-      echo "bar"
-      $Tasks.baz()
-
-    baz: |
-      echo "baz"
+    foo: |
+      echo "foo"
     """
-  When I run "oya run foo.bar"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  bar
-  baz
-
-  """
+  And file ./.oya/vendor/github.com/test/bar/Oyafile containing
+    """
+    bar: |
+      $Tasks.foo()
+    """
+  When I run "oya run bar.bar"
+  Then the command fails with error matching
+    """"
+    .*variable not found.*
+    """"
 
 Scenario: Access Oyafile base directory
   Given file ./Oyafile containing

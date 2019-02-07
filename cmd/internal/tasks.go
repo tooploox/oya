@@ -38,8 +38,8 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 
 		fmt.Fprintf(w, "# in ./%s\n", relPath)
 
-		err = o.Tasks.ForEachSorted(func(taskName string, task oyafile.Task, meta oyafile.Meta) error {
-			if !task.IsBuiltIn() {
+		err = o.Tasks.ForEachSorted(func(taskName oyafile.TaskName, task oyafile.Task, meta oyafile.Meta) error {
+			if !taskName.IsBuiltIn() {
 				if len(meta.Doc) > 0 {
 					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
 				} else {

@@ -58,9 +58,9 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	return oyafile, nil
 }
 
-func parseMeta(metaName, key string) (string, bool) {
+func parseMeta(metaName, key string) (TaskName, bool) {
 	taskName := strings.TrimSuffix(key, "."+metaName)
-	return taskName, taskName != key
+	return TaskName(taskName), taskName != key
 }
 
 func parseImports(value interface{}, o *Oyafile) error {
@@ -131,8 +131,7 @@ func parseUserTask(name string, value interface{}, o *Oyafile) error {
 	if taskName, ok := parseMeta("Doc", name); ok {
 		o.Tasks.AddDoc(taskName, s)
 	} else {
-		o.Tasks.AddTask(name, ScriptedTask{
-			Name:   name,
+		o.Tasks.AddTask(TaskName(name), ScriptedTask{
 			Script: Script(s),
 			Shell:  o.Shell,
 			Scope:  &o.Values,

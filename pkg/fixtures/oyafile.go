@@ -15,8 +15,7 @@ func Oyafile(dirPath string, kvs ...string) *oyafile.Oyafile {
 	for i := 0; i < len(kvs); i = i + 2 {
 		task := kvs[i]
 		script := kvs[i+1]
-		o.Tasks.AddTask(task, oyafile.ScriptedTask{
-			Name:   task,
+		o.Tasks.AddTask(oyafile.TaskName(task), oyafile.ScriptedTask{
 			Script: oyafile.Script(script),
 		})
 	}
