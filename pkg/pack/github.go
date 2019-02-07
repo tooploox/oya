@@ -1,8 +1,6 @@
 package pack
 
 import (
-	"path/filepath"
-
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/pkg/errors"
 )
@@ -14,8 +12,7 @@ type GithubPack struct {
 }
 
 func (p *GithubPack) Vendor(vendorDir string) error {
-	fullPath := filepath.Join(vendorDir, p.ImportPath())
-	err := p.library.Install(p.version, fullPath)
+	err := p.library.Install(p.version, vendorDir)
 	if err != nil {
 		return errors.Wrapf(err, "error vendoring pack %v", p.ImportPath())
 	}

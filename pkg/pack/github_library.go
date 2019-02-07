@@ -19,22 +19,24 @@ import (
 // GithubLibrary represents all versions of an Oya pack stored in a git repository on Github.com.
 type GithubLibrary struct {
 	repoUri    string
+	basePath   string
 	packPath   string
 	importPath string
 }
 
+// OpenLibrary opens a library containing all versions of a single Oya pack.
 func OpenLibrary(importPath string) (*GithubLibrary, error) {
-	// BUG(bilus): New can return an invalid pack (missing a version). Not good.
 	if !strings.HasPrefix(importPath, "github.com/") {
 		return nil, ErrNotGithub{ImportPath: importPath}
 	}
-	repoUri, packPath, err := parseImportPath(importPath)
+	repoUri, basePath, packPath, err := parseImportPath(importPath)
 	if err != nil {
 		return nil, err
 	}
 	return &GithubLibrary{
 		repoUri:    repoUri,
 		packPath:   packPath,
+		basePath:   basePath,
 		importPath: importPath,
 	}, nil
 }
@@ -88,6 +90,8 @@ func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
 	return l.Version(latestVersion)
 }
 
+// Version returns the specified version of the pack.
+// NOTE: It doesn't check if it's available remotely. This may change.
 func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
 	// BUG(bilus): Check if version exists?
 	return &GithubPack{
@@ -96,38 +100,17 @@ func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
 	}, nil
 }
 
+// ImportPath returns the pack's import path, e.g. github.com/tooploox/oya-packs/docker.
 func (l *GithubLibrary) ImportPath() string {
 	return l.importPath
 }
 
-func parseImportPath(importPath string) (string, string, error) {
-	parts := strings.Split(importPath, "/")
-	if len(parts) < 3 {
-		return "", "", ErrNotGithub{ImportPath: importPath}
-	}
-	repoUri := fmt.Sprintf("https://%v.git", strings.Join(parts[0:3], "/"))
-	packPath := strings.Join(parts[3:], "/")
-	return repoUri, packPath, nil
-}
-
-func (l *GithubLibrary) parseRef(tag string) (semver.Version, bool) {
-	if len(l.packPath) > 0 && strings.HasPrefix(tag, l.packPath) {
-		tag = tag[len(l.packPath)+1:] // e.g. "pack1/v1.0.0" => v1.0.0
-	}
-	version, err := semver.Parse(tag)
-	return version, err == nil
-}
-
-func (l *GithubLibrary) makeRef(version semver.Version) string {
-	if len(l.packPath) > 0 {
-		return fmt.Sprintf("%v/%v", l.packPath, version.String())
-
-	} else {
-		return fmt.Sprintf("%v", version.String())
-	}
-}
-
-func (l *GithubLibrary) Install(version semver.Version, path string) error {
+// Install downloads & copies the specified version of the path to the output directory,
+// preserving its import path.
+// For example, for /home/bilus/.oya output directory and import path github.com/bilus/foo,
+// the pack will be extracted to /home/bilus/.oya/github.com/bilus/foo.
+func (l *GithubLibrary) Install(version semver.Version, outputDir string) error {
+	path := filepath.Join(outputDir, l.basePath)
 	log.Debugf("Getting %q version %v into %q (tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
 	fs := memfs.New()
 	storer := memory.NewStorage()
@@ -162,6 +145,10 @@ func (l *GithubLibrary) Install(version semver.Version, path string) error {
 	}
 
 	return fIter.ForEach(func(f *object.File) error {
+		if outside, err := l.isOutsidePack(f.Name); outside || err != nil {
+			return err // May be nil if outside true.
+		}
+
 		targetPath := filepath.Join(path, f.Name)
 		err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
 		if err != nil {
@@ -180,4 +167,39 @@ func (l *GithubLibrary) Install(version semver.Version, path string) error {
 		_, err = io.Copy(writer, reader)
 		return err
 	})
+}
+func parseImportPath(importPath string) (string, string, string, error) {
+	parts := strings.Split(importPath, "/")
+	if len(parts) < 3 {
+		return "", "", "", ErrNotGithub{ImportPath: importPath}
+	}
+	basePath := strings.Join(parts[0:3], "/")
+	repoUri := fmt.Sprintf("https://%v.git", basePath)
+	packPath := strings.Join(parts[3:], "/")
+	return repoUri, basePath, packPath, nil
+}
+
+func (l *GithubLibrary) parseRef(tag string) (semver.Version, bool) {
+	if len(l.packPath) > 0 && strings.HasPrefix(tag, l.packPath) {
+		tag = tag[len(l.packPath)+1:] // e.g. "pack1/v1.0.0" => v1.0.0
+	}
+	version, err := semver.Parse(tag)
+	return version, err == nil
+}
+
+func (l *GithubLibrary) makeRef(version semver.Version) string {
+	if len(l.packPath) > 0 {
+		return fmt.Sprintf("%v/%v", l.packPath, version.String())
+
+	} else {
+		return fmt.Sprintf("%v", version.String())
+	}
+}
+
+func (l *GithubLibrary) isOutsidePack(relPath string) (bool, error) {
+	r, err := filepath.Rel(l.packPath, relPath)
+	if err != nil {
+		return false, err
+	}
+	return strings.Contains(r, ".."), nil
 }
