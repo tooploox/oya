@@ -81,21 +81,22 @@ Scenario: Fetch only the package, not the entire repo
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION does not exist
 
 
-# Scenario: Require pack
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
-#     """
-#     v1.0.0
-#     """
+@yyy
+Scenario: Require pack
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
+    """
+    v1.0.0
+    """
 
 # Scenario: Require pack from multi-pack repo
 #   Given file ./Oyafile containing
