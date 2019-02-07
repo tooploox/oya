@@ -28,7 +28,7 @@ type Oyafile struct {
 	RootDir string
 	Shell   string
 	Imports map[types.Alias]types.ImportPath
-	Tasks   TaskTable
+	Tasks   task.Table
 	Values  template.Scope
 	Project string   // Project is set for root Oyafile.
 	Ignore  []string // Ignore contains directory exclusion rules.
@@ -62,7 +62,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		RootDir: filepath.Clean(rootDir),
 		Shell:   "/bin/bash",
 		Imports: make(map[types.Alias]types.ImportPath),
-		Tasks:   newTaskTable(),
+		Tasks:   task.NewTable(),
 		Values:  template.Scope{},
 		relPath: relPath,
 		OyaCmd:  oyaCmd,
