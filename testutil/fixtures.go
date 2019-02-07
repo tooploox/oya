@@ -4,7 +4,9 @@ import (
 	"testing"
 
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/project"
+	"github.com/pkg/errors"
 )
 
 func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
@@ -33,4 +35,28 @@ func MustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
 	AssertNoErr(t, err, "Error loading root Oyafile")
 	AssertTrue(t, found, "Root Oyafile not found")
 	return o
+}
+
+type mockPack struct {
+	importUrl string
+	version   string
+}
+
+func (p mockPack) Version() string {
+	return p.version
+}
+
+func (p mockPack) ImportUrl() string {
+	return p.importUrl
+}
+
+func (p mockPack) Vendor(vendorDir string) error {
+	return errors.Errorf("mockPack#Vendor is not implemented")
+}
+
+func MustMakeMockPack(t *testing.T, importUrl, version string) pack.Pack {
+	return mockPack{
+		importUrl: importUrl,
+		version:   version,
+	}
 }

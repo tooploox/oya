@@ -1,0 +1,4 @@
+Project: AddImport_ToExisting
+
+Import:
+  foo: github.com/tooploox/foo

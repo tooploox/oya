@@ -94,15 +94,11 @@ func (p Project) Values() (template.Scope, error) {
 		return template.Scope{}, err
 	}
 	if !found {
-		return template.Scope{}, ErrNoOyafile{Path: oyafilePath} 
+		return template.Scope{}, ErrNoOyafile{Path: oyafilePath}
 	}
-	return template.Scope {
+	return template.Scope{
 		"Project": o.Project,
 	}, nil
-}
-
-func isRoot(raw *raw.Oyafile) (bool, error) {
-	return raw.HasKey("Project")
 }
 
 // detectRoot attempts to detect the root project directory marked by
@@ -115,7 +111,7 @@ func detectRoot(startDir string) (string, bool, error) {
 	for i := 0; i < maxParts; i++ {
 		raw, found, err := raw.LoadFromDir(path, path) // "Guess" path is the root dir.
 		if err == nil && found {
-			isRoot, err := isRoot(raw)
+			isRoot, err := raw.IsRoot()
 			if err != nil {
 				return "", false, err
 			}
@@ -132,4 +128,3 @@ func detectRoot(startDir string) (string, bool, error) {
 
 	return "", false, nil
 }
-

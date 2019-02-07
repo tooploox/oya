@@ -39,6 +39,7 @@ Scenario: Import a pack to other already imported
 
     task: |
       echo "check"
+
     """
 
 Scenario: Import a pack to empty Oyafile
@@ -63,6 +64,7 @@ Scenario: Import a pack to Oyafile with other things
   Given file ./Oyafile containing
     """
     Project: project
+
     task: |
       echo "check"
     """
@@ -76,6 +78,7 @@ Scenario: Import a pack to Oyafile with other things
 
     task: |
       echo "check"
+
     """
 
 Scenario: Import a pack which is already imported

@@ -8,9 +8,8 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
-	"testing"
-	"time"
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
@@ -19,21 +18,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
-
-func TestMain(m *testing.M) {
-	status := godog.RunWithOptions("oya", func(s *godog.Suite) {
-		FeatureContext(s)
-	}, godog.Options{
-		Format:    "progress",
-		Paths:     []string{"features"},
-		Randomize: time.Now().UTC().UnixNano(), // randomize scenario execution order
-	})
-
-	if st := m.Run(); st > status {
-		status = st
-	}
-	os.Exit(status)
-}
 
 type SuiteContext struct {
 	projectDir string
@@ -49,13 +33,14 @@ func (c *SuiteContext) MustSetUp() {
 	// We need to provide an override to the oya executable path (because the real one is godog). But because we're running the test outside of the oya development directory, it results in an error similar to:
 	// package github.com/bilus/oya: cannot find package "github.com/bilus/oya" in any of:
 	//         /Users/abc/go/src/github.com/bilus/oya (from $GOPATH)
-	oyaCmdOverride := "echo oya "
-	oyafile.OyaCmdOverride = &oyaCmdOverride
 
 	projectDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
 		panic(err)
 	}
+
+	overrideOyaCmd(projectDir)
+
 	vendorDir := filepath.Join(projectDir, "oya/vendor")
 	err = os.MkdirAll(vendorDir, 0700)
 	if err != nil {
@@ -68,19 +53,30 @@ func (c *SuiteContext) MustSetUp() {
 	c.stderr = bytes.NewBuffer(nil)
 }
 
+// overrideOyaCmd overrides `oya` command used by $Tasks in templates
+// to run oya tasks.
+// It builds oya to a temporary directory and use it to launch Oya in scripts.
+func overrideOyaCmd(projectDir string) {
+	executablePath := filepath.Join(projectDir, "_bin/oya")
+	oyaCmdOverride := fmt.Sprintf(
+		"(cd %v && go build -o %v oya.go); %v",
+		sourceFileDirectory(), executablePath, executablePath)
+	oyafile.OyaCmdOverride = &oyaCmdOverride
+}
+
 func (c *SuiteContext) writeFile(relPath, contents string) error {
-	fullPath := path.Join(c.projectDir, relPath)
-	dir := path.Dir(fullPath)
+	sourceFileDirectory := path.Join(c.projectDir, relPath)
+	dir := path.Dir(sourceFileDirectory)
 	err := os.MkdirAll(dir, 0700)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(fullPath, []byte(contents), 0600)
+	return ioutil.WriteFile(sourceFileDirectory, []byte(contents), 0600)
 }
 
 func (c *SuiteContext) readFile(relPath string) (string, error) {
-	fullPath := path.Join(c.projectDir, relPath)
-	contents, err := ioutil.ReadFile(fullPath)
+	sourceFileDirectory := path.Join(c.projectDir, relPath)
+	contents, err := ioutil.ReadFile(sourceFileDirectory)
 	if err != nil {
 		return "", err
 	}
@@ -223,4 +219,10 @@ func FeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
+}
+
+// sourceFileDirectory returns the current .go source file directory.
+func sourceFileDirectory() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return filepath.Dir(filename)
 }
