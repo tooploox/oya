@@ -31,6 +31,7 @@ func (oyafile *Oyafile) resolveImports() error {
 }
 
 func valuesForPack(alias Alias, values template.Scope) template.Scope {
+	// BUG(bilus): Extract aliased key syntax (dot-separation) from here and other places.
 	packValues := template.Scope{}
 	find := regexp.MustCompile("^" + string(alias) + "\\.(.*)$")
 	for key, val := range values {

@@ -3,32 +3,25 @@ package raw
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
-	"regexp"
-	"strings"
+	"path/filepath"
 
-	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
 const DefaultName = "Oyafile"
 
-var importKey = "Import:"
-var projectKey = "Project:"
-var uriVal = "  %s: %s"
-var importRegxp = regexp.MustCompile("(?m)^" + importKey + "$")
-var projectRegxp = regexp.MustCompile("^" + projectKey)
-
+// Oyafile represents an unparsed Oyafile.
 type Oyafile struct {
-	Path    string
-	RootDir string
-	file    []byte
+	Path    string // Path contains normalized absolute path.
+	RootDir string // RootDir is the absolute, normalized path to the project root directory.
+	file    []byte // file contains Oyafile contents.
 }
 
-// DecodedOyafile is an Oyafile that has been loaded from YAML but that hasn't been parsed yet.
+// DecodedOyafile is an Oyafile that has been loaded from YAML
+// but hasn't been parsed yet.
 type DecodedOyafile map[string]interface{}
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
@@ -61,8 +54,8 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	}
 
 	return &Oyafile{
-		RootDir: rootDir,
 		Path:    oyafilePath,
+		RootDir: rootDir,
 		file:    file,
 	}, nil
 }
@@ -86,16 +79,30 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	return of, nil
 }
 
-func (raw *Oyafile) HasKey(key string) (bool, error) {
+func (raw *Oyafile) LookupKey(key string) (interface{}, bool, error) {
 	of, err := raw.Decode()
+	if err != nil {
+		return nil, false, err
+	}
+	val, ok := of[key]
+	return val, ok, nil
+}
+
+func (raw *Oyafile) IsRoot() (bool, error) {
+	_, hasProject, err := raw.LookupKey("Project")
 	if err != nil {
 		return false, err
 	}
-	_, ok := of[key]
-	return ok, nil
+
+	rel, err := filepath.Rel(raw.RootDir, raw.Path)
+	if err != nil {
+		return false, err
+	}
+	return hasProject && rel == DefaultName, nil
 }
 
-// isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
+// isEmptyYAML returns true if the Oyafile contains only blank characters
+// or YAML comments.
 func isEmptyYAML(oyafilePath string) (bool, error) {
 	file, err := os.Open(oyafilePath)
 	if err != nil {
@@ -125,64 +132,6 @@ func isNode(line string) bool {
 		}
 	}
 	return false
-}
-
-func (o *Oyafile) AddImport(alias string, uri string) error {
-	var output []string
-	uriStr := fmt.Sprintf(uriVal, alias, uri)
-	fileContent := string(o.file)
-	updated := false
-
-	if gotIt := o.isAlreadyImported(uri, fileContent); gotIt {
-		return errors.Errorf("Pack already imported: %v", uri)
-	}
-
-	output, updated = o.appendAfter(importRegxp, []string{uriStr})
-	if !updated {
-		output, updated = o.appendAfter(projectRegxp, []string{importKey, uriStr, ""})
-		if !updated {
-			output = []string{importKey, uriStr}
-			output = append(output, strings.Split(fileContent, "\n")...)
-		}
-	}
-
-	if err := writeToFile(o.Path, output); err != nil {
-		return err
-	}
-
-	// BUG(bilus): Does not update o.file!
-
-	return nil
-}
-
-func (o *Oyafile) isAlreadyImported(uri string, fileContent string) bool {
-	find := regexp.MustCompile("(?m)" + uri + "$")
-	return find.MatchString(fileContent)
-}
-
-func (o *Oyafile) appendAfter(find *regexp.Regexp, data []string) ([]string, bool) {
-	var output []string
-	updated := false
-	fileArr := strings.Split(string(o.file), "\n")
-	for _, line := range fileArr {
-		output = append(output, line)
-		if find.MatchString(line) {
-			updated = true
-			output = append(output, data...)
-		}
-	}
-	return output, updated
-}
-
-func writeToFile(Path string, content []string) error {
-	info, err := os.Stat(Path)
-	if err != nil {
-		return err
-	}
-	if err := ioutil.WriteFile(Path, []byte(strings.Join(content, "\n")), info.Mode()); err != nil {
-		return err
-	}
-	return nil
 }
 
 func fullPath(projectDir, name string) string {

@@ -116,10 +116,6 @@ func (oyafile Oyafile) Equals(other Oyafile) bool {
 	return filepath.Clean(oyafile.Dir) == filepath.Clean(other.Dir)
 }
 
-func (oyafile Oyafile) IsRoot() bool {
-	return oyafile.Project != "" && filepath.Clean(oyafile.Dir) == filepath.Clean(oyafile.RootDir)
-}
-
 func wrapLoadErr(err error, oyafilePath string) error {
 	return errors.Wrapf(err, "error loading Oyafile %v", oyafilePath)
 }
