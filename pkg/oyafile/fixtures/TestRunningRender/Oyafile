@@ -1,0 +1,8 @@
+Project: project
+
+Values:
+  foo: foo
+
+bar: |
+  $Render(template.txt)
+  echo "bar"
