@@ -6,6 +6,8 @@ import (
 	"github.com/bilus/oya/pkg/pack"
 )
 
+const VendorDir = ".oya/vendor"
+
 func (p Project) Require(pack pack.Pack) error {
 	raw, err := p.rootRawOyafile()
 	if err != nil {
@@ -16,7 +18,11 @@ func (p Project) Require(pack pack.Pack) error {
 }
 
 func (p Project) Vendor(pack pack.Pack) error {
-	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
+	return pack.Vendor(p.vendorDir())
+}
+
+func (p Project) IsVendored(pack pack.Pack) (bool, error) {
+	return pack.IsVendored(p.vendorDir())
 }
 
 func (p Project) InstallPacks() error {
@@ -25,11 +31,32 @@ func (p Project) InstallPacks() error {
 		return err
 	}
 	for _, pack := range o.Require {
-		err := p.Vendor(pack)
+		installed, err := p.IsInstalled(pack)
+		if err != nil {
+			return err
+		}
+		if installed {
+			continue
+		}
+		err = p.Install(pack)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+// Currently vendoring is the only supported installation method but lets have these functions for clarity.
+
+func (p Project) Install(pack pack.Pack) error {
+	return p.Vendor(pack)
+}
+
+func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
+	return p.IsVendored(pack)
+}
+
+func (p Project) vendorDir() string {
+	return filepath.Join(p.RootDir, VendorDir)
 }

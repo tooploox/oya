@@ -112,7 +112,7 @@ func (l *GithubLibrary) ImportPath() string {
 // the pack will be extracted to /home/bilus/.oya/github.com/bilus/foo.
 func (l *GithubLibrary) Install(version semver.Version, outputDir string) error {
 	path := filepath.Join(outputDir, l.basePath)
-	log.Debugf("Getting %q version %v into %q (tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
+	log.Printf("Getting %q version %v into %q (git tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
 	fs := memfs.New()
 	storer := memory.NewStorage()
 	r, err := git.Clone(storer, fs, &git.CloneOptions{
@@ -152,6 +152,18 @@ func (l *GithubLibrary) Install(version semver.Version, outputDir string) error 
 		targetPath := filepath.Join(path, f.Name)
 		return copyFile(f, targetPath)
 	})
+}
+
+func (l *GithubLibrary) IsInstalled(version semver.Version, outputDir string) (bool, error) {
+	fullPath := filepath.Join(outputDir, l.basePath)
+	_, err := os.Stat(fullPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func copyFile(f *object.File, targetPath string) error {
