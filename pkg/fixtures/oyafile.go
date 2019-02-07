@@ -4,10 +4,11 @@ import (
 	"path/filepath"
 
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/raw"
 )
 
 func Oyafile(dirPath string, kvs ...string) *oyafile.Oyafile {
-	o, err := oyafile.New(filepath.Join(dirPath, oyafile.DefaultName), filepath.Join(dirPath, "oya/vendor"))
+	o, err := oyafile.New(filepath.Join(dirPath, raw.DefaultName), filepath.Join(dirPath, "oya/vendor"))
 	if err != nil {
 		panic(err)
 	}

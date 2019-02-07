@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -73,7 +74,16 @@ func AssertEqual(t *testing.T, expected, actual interface{}) {
 func AssertObjectsEqual(t *testing.T, expected, actual interface{}) {
 	t.Helper()
 	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("Objects are not equal. Diff:\n %v", diff.ObjectGoPrintSideBySide(expected, actual))
+		t.Errorf("Objects are not equal.\n\nDiff: expected\tactual\n %v", diff.ObjectGoPrintSideBySide(expected, actual))
+	}
+}
+
+func AssertObjectsEqualMsg(t *testing.T, expected, actual interface{}, msg string, args ...interface{}) {
+	t.Helper()
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("%v: %v",
+			fmt.Sprintf(msg, args...),
+			fmt.Sprintf("objects are not equal.\n\nDiff: expected\tactual\n %v", diff.ObjectGoPrintSideBySide(expected, actual)))
 	}
 }
 

@@ -74,3 +74,52 @@ Scenario: Render templated paths
   """
   yyy
   """
+
+Scenario: Render templated values in alias scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      fruit: orange
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya render -f ./Oyafile -a foo ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  orange
+  """
+
+Scenario: Render templated values in alias scope can be overridden
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      foo.fruit: banana
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      fruit: orange
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya render -f ./Oyafile -a foo ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  banana
+  """

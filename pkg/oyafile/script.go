@@ -3,6 +3,7 @@ package oyafile
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/bilus/oya/pkg/template"
@@ -41,6 +42,7 @@ func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Wr
 	if err != nil {
 		return err
 	}
-	_, err = sh.Exec(nil, stdout, stderr, shell, scriptFile.Name())
+	log.SetOutput(ioutil.Discard) // BUG(bilus): Suppress logging from the library. This prevents using standard logger anywhere else.
+  _, err = sh.Exec(nil, stdout, stderr, shell, scriptFile.Name())
 	return err
 }
