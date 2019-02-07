@@ -36,7 +36,7 @@ Scenario: Show only user-defined
 
   """
 
-Scenario: SUbdirectories
+Scenario: Subdirectories
   Given file ./Oyafile containing
     """
     Project: project

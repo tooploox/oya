@@ -43,6 +43,6 @@ func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Wr
 		return err
 	}
 	log.SetOutput(ioutil.Discard) // BUG(bilus): Suppress logging from the library. This prevents using standard logger anywhere else.
-	_, err = sh.Exec(nil, stdout, stderr, "sh", scriptFile.Name())
+  _, err = sh.Exec(nil, stdout, stderr, shell, scriptFile.Name())
 	return err
 }

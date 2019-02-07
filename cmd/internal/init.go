@@ -3,12 +3,12 @@ package internal
 import (
 	"io"
 
-	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/pkg/errors"
 )
 
 func Init(rootDir string, stdout, stderr io.Writer) error {
-	err := oyafile.InitDir(rootDir)
+	err := raw.InitDir(rootDir)
 	if err != nil {
 		return errors.Wrapf(err, "Error while initializing %v", rootDir)
 	}

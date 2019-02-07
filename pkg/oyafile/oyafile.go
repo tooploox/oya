@@ -1,7 +1,6 @@
 package oyafile
 
 import (
-	"bufio"
 	"io"
 	"os"
 	"path"
@@ -10,20 +9,16 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
-
-const DefaultName = "Oyafile"
 
 // OyaCmdOverride is used in tests, to override the path to the current oya executable.
 // It is used to invoke other tasks from a task body.
 // When tests are run, the current process executable path points to the test runner
 // so it has to be overridden (with 'go run oya.go', roughly speaking).
 var OyaCmdOverride *string
-
-type OyafileFormat = map[string]interface{}
 
 type Alias string
 type ImportPath string
@@ -66,7 +61,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		Dir:     filepath.Clean(dir),
 		Path:    filepath.Clean(oyafilePath),
 		RootDir: filepath.Clean(rootDir),
-		Shell:   "/bin/sh",
+		Shell:   "/bin/bash",
 		Imports: make(map[Alias]ImportPath),
 		Tasks:   newTaskTable(),
 		Values:  template.Scope{},
@@ -75,76 +70,28 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}, nil
 }
 
-func Load(oyafilePath string, rootDir string) (*Oyafile, bool, error) {
-	// YAML parser does not handle files without at least one node.
-	empty, err := isEmptyYAML(oyafilePath)
+func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
+	raw, found, err := raw.Load(oyafilePath, rootDir)
+	if err != nil || !found {
+		return nil, found, err
+	}
+	oyafile, err := Parse(raw)
 	if err != nil {
 		return nil, false, wrapLoadErr(err, oyafilePath)
 	}
-	if empty {
-		o, err := New(oyafilePath, rootDir)
-		if err != nil {
-			return nil, false, err
-		}
-		return o, true, nil
-	}
-	file, err := os.Open(oyafilePath)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	defer func() { _ = file.Close() }()
-	decoder := yaml.NewDecoder(file)
-	var of OyafileFormat
-	err = decoder.Decode(&of)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	oyafile, err := parseOyafile(oyafilePath, rootDir, of)
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	err = oyafile.resolveImports()
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-	err = oyafile.addBuiltIns()
-	if err != nil {
-		return nil, false, wrapLoadErr(err, oyafilePath)
-	}
-
 	return oyafile, true, nil
 }
 
 func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
-	oyafilePath := fullPath(dirPath, "")
-	fi, err := os.Stat(oyafilePath)
+	raw, found, err := raw.LoadFromDir(dirPath, rootDir)
+	if err != nil || !found {
+		return nil, found, err
+	}
+	oyafile, err := Parse(raw)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, false, nil
-		}
-		return nil, false, err
+		return nil, false, wrapLoadErr(err, raw.Path)
 	}
-	if fi.IsDir() {
-		return nil, false, nil
-	}
-	return Load(oyafilePath, rootDir)
-}
-
-func InitDir(dirPath string) error {
-	_, found, err := LoadFromDir(dirPath, dirPath)
-	if err == nil && found {
-		return errors.Errorf("already an Oya project")
-	}
-	f, err := os.Create(fullPath(dirPath, ""))
-	if err != nil {
-		return err
-	}
-	_, err = f.WriteString("Project: project\n")
-	if err != nil {
-		_ = f.Close()
-		return err
-	}
-	return f.Close()
+	return oyafile, true, nil
 }
 
 func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
@@ -169,51 +116,8 @@ func (oyafile Oyafile) Equals(other Oyafile) bool {
 	return filepath.Clean(oyafile.Dir) == filepath.Clean(other.Dir)
 }
 
-func (oyafile Oyafile) IsRoot() bool {
-	return oyafile.Project != "" && filepath.Clean(oyafile.Dir) == filepath.Clean(oyafile.RootDir)
-}
-
 func wrapLoadErr(err error, oyafilePath string) error {
 	return errors.Wrapf(err, "error loading Oyafile %v", oyafilePath)
-}
-
-func fullPath(projectDir, name string) string {
-	if len(name) == 0 {
-		name = DefaultName
-	}
-	return path.Join(projectDir, name)
-}
-
-// isEmptyYAML returns true if the Oyafile contains only blank characters or YAML comments.
-func isEmptyYAML(oyafilePath string) (bool, error) {
-	file, err := os.Open(oyafilePath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		if isNode(scanner.Text()) {
-			return false, nil
-		}
-	}
-
-	return true, scanner.Err()
-}
-
-func isNode(line string) bool {
-	for _, c := range line {
-		switch c {
-		case '#':
-			return false
-		case ' ', '\t', '\n', '\f', '\r':
-			continue
-		default:
-			return true
-		}
-	}
-	return false
 }
 
 func (o *Oyafile) Ignores() string {

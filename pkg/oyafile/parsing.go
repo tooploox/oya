@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/pkg/errors"
 )
 
-func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
-	oyafile, err := New(path, rootDir)
+func Parse(raw *raw.Oyafile) (*Oyafile, error) {
+	of, err := raw.Decode()
+	if err != nil {
+		return nil, err
+	}
+	oyafile, err := New(raw.Path, raw.RootDir)
 	if err != nil {
 		return nil, err
 	}
@@ -42,6 +47,14 @@ func parseOyafile(path, rootDir string, of OyafileFormat) (*Oyafile, error) {
 		}
 	}
 
+	err = oyafile.resolveImports()
+	if err != nil {
+		return nil, err
+	}
+	err = oyafile.addBuiltIns()
+	if err != nil {
+		return nil, err
+	}
 	return oyafile, nil
 }
 

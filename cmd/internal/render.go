@@ -1,11 +1,21 @@
 package internal
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
 )
+
+type ErrNoAlias struct {
+	Alias       string
+	OyafilePath string
+}
+
+func (err ErrNoAlias) Error() string {
+	return fmt.Sprintf("Unknown import alias %q in %v", err.Alias, err.OyafilePath)
+}
 
 func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
 	proj, err := project.Detect(outputPath)
@@ -21,7 +31,15 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 	var values template.Scope
 	if found {
 		if alias != "" {
-			values = o.Values[alias].(template.Scope)
+			av, ok := o.Values[alias]
+			if !ok {
+				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
+			}
+			aliasScope, ok := av.(template.Scope)
+			if !ok {
+				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
+			}
+			values = aliasScope
 		} else {
 			values = o.Values
 		}

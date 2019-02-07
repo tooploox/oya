@@ -219,6 +219,27 @@ Scenario: Ignore projects inside current project
 
   """
 
+Scenario: Ignore errors in projects inside current project
+  Given file ./Oyafile containing
+    """
+    Project: main
+    all: echo "main"
+    """
+  And file ./foo/Oyafile containing
+    """
+    Project: foo
+    Import:
+       xxx: does not exist
+    all: echo "foo"
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  main
+
+  """
+
 Scenario: Running in subdir
   Given file ./Oyafile containing
     """
