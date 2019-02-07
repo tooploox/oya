@@ -9,6 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
@@ -32,6 +33,7 @@ type Oyafile struct {
 	Values  template.Scope
 	Project string   // Project is set for root Oyafile.
 	Ignore  []string // Ignore contains directory exclusion rules.
+	Require []pack.Pack
 
 	relPath string
 

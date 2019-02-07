@@ -92,6 +92,7 @@ func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
 
 // Version returns the specified version of the pack.
 // NOTE: It doesn't check if it's available remotely. This may change.
+// It is used when loading Oyafiles so we probably shouldn't do it or use a different function there.
 func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
 	// BUG(bilus): Check if version exists?
 	return &GithubPack{

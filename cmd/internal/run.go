@@ -15,6 +15,10 @@ func Run(workDir, taskName string, positionalArgs []string, flags map[string]str
 	if err != nil {
 		return err
 	}
+	err = p.InstallPacks()
+	if err != nil {
+		return err
+	}
 	values, err := p.Values()
 	if err != nil {
 		return err

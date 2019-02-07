@@ -95,7 +95,8 @@ Scenario: Require pack
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
     """
-    v1.0.0
+    1.0.0
+
     """
 
 # Scenario: Require pack from multi-pack repo
