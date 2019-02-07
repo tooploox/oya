@@ -155,7 +155,7 @@ func (l *GithubLibrary) Install(version semver.Version, outputDir string) error 
 }
 
 func (l *GithubLibrary) IsInstalled(version semver.Version, outputDir string) (bool, error) {
-	fullPath := filepath.Join(outputDir, l.basePath)
+	fullPath := filepath.Join(outputDir, l.basePath, l.packPath)
 	_, err := os.Stat(fullPath)
 	if err != nil {
 		if os.IsNotExist(err) {
