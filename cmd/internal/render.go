@@ -5,6 +5,7 @@ import (
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
+	"github.com/pkg/errors"
 )
 
 func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
@@ -21,7 +22,15 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 	var values template.Scope
 	if found {
 		if alias != "" {
-			values = o.Values[alias].(template.Scope)
+			av, found := o.Values[alias]
+			if !found {
+				return errors.Errorf("Alias %s not found in project", alias)
+			}
+			aliasScope, found := av.(template.Scope)
+			if !found {
+				return errors.Errorf("Alias %s not found in project", alias)
+			}
+			values = aliasScope
 		} else {
 			values = o.Values
 		}
