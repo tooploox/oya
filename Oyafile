@@ -1,4 +1,6 @@
 Project: project
+Require:
+  github.com/tooploox/oya-fixtures: v1.1.0
 
 Ignore:
 - pkg/*
