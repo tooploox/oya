@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"text/tabwriter"
 
-	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/project"
+	"github.com/bilus/oya/pkg/task"
 )
 
 func Tasks(workDir string, stdout, stderr io.Writer) error {
@@ -38,8 +38,8 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 
 		fmt.Fprintf(w, "# in ./%s\n", relPath)
 
-		err = o.Tasks.ForEachSorted(func(taskName string, task oyafile.Task, meta oyafile.Meta) error {
-			if !task.IsBuiltIn() {
+		err = o.Tasks.ForEachSorted(func(taskName task.Name, task task.Task, meta task.Meta) error {
+			if !taskName.IsBuiltIn() {
 				if len(meta.Doc) > 0 {
 					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
 				} else {

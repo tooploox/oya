@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/bilus/oya/pkg/template"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,7 +31,7 @@ func (oyafile *Oyafile) resolveImports() error {
 	return nil
 }
 
-func valuesForPack(alias Alias, values template.Scope) template.Scope {
+func valuesForPack(alias types.Alias, values template.Scope) template.Scope {
 	// BUG(bilus): Extract aliased key syntax (dot-separation) from here and other places.
 	packValues := template.Scope{}
 	find := regexp.MustCompile("^" + string(alias) + "\\.(.*)$")
@@ -42,7 +43,7 @@ func valuesForPack(alias Alias, values template.Scope) template.Scope {
 	return packValues
 }
 
-func (oyafile *Oyafile) loadPack(path ImportPath) (*Oyafile, error) {
+func (oyafile *Oyafile) loadPack(path types.ImportPath) (*Oyafile, error) {
 	for _, importDir := range oyafile.importDirs() {
 		fullPath := filepath.Join(importDir, string(path))
 		if !isValidImportPath(fullPath) {
