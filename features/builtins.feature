@@ -164,3 +164,55 @@ Scenario: Access Oyafile Project name inside pack
   project
 
   """
+
+Scenario: Run render
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo: bar
+
+    all: |
+      $Render("./templates/file.txt")
+    """
+  And file ./templates/file.txt containing
+    """
+    $foo
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  bar
+  """
+
+Scenario: Run render in alias scope can access variables directly
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      foo.other: banana
+    """
+  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+    """
+    Values:
+      foo: bar
+
+    all: |
+      $Render("$BasePath/templates/file.txt")
+    """
+  And file ./.oya/vendor/github.com/test/foo/templates/file.txt containing
+    """
+    $foo
+    $other
+    """
+  When I run "oya run foo.all"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  bar
+  banana
+  """
