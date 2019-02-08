@@ -18,6 +18,10 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
+	err = p.InstallPacks()
+	if err != nil {
+		return err
+	}
 	oyafiles, err := p.Changeset(workDir)
 	if err != nil {
 		return err
