@@ -18,12 +18,12 @@ func (p Project) Require(pack pack.Pack) error {
 	return raw.AddRequire(pack)
 }
 
-func (p Project) Vendor(pack pack.Pack) error {
-	return pack.Vendor(p.vendorDir())
+func (p Project) Install(pack pack.Pack) error {
+	return pack.Install(p.vendorDir())
 }
 
-func (p Project) IsVendored(pack pack.Pack) (bool, error) {
-	return pack.IsVendored(p.vendorDir())
+func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
+	return pack.IsInstalled(p.vendorDir())
 }
 
 func (p Project) InstallPacks() error {
@@ -47,16 +47,6 @@ func (p Project) InstallPacks() error {
 	}
 
 	return nil
-}
-
-// Currently vendoring is the only supported installation method but lets have these functions for clarity.
-
-func (p Project) Install(pack pack.Pack) error {
-	return p.Vendor(pack)
-}
-
-func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
-	return p.IsVendored(pack)
 }
 
 func (p Project) vendorDir() string {

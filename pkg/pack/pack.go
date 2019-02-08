@@ -6,9 +6,9 @@ import (
 )
 
 type Pack interface {
-	Vendor(vendorDir string) error
-	IsVendored(vendorDir string) (bool, error)
 	Version() semver.Version
 	ImportPath() types.ImportPath
-	InstallPath(installPath string) string
+	Install(installDir string) error
+	IsInstalled(installDir string) (bool, error)
+	InstallPath(installDir string) string
 }

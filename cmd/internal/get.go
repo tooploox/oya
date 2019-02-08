@@ -59,7 +59,7 @@ func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 			return wrapErr(err, uri)
 		}
 	}
-	err = prj.Vendor(pack)
+	err = prj.Install(pack)
 	if err != nil {
 		return wrapErr(err, uri)
 	}

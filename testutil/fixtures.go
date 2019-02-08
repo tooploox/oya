@@ -52,12 +52,12 @@ func (p mockPack) ImportPath() types.ImportPath {
 	return p.importPath
 }
 
-func (p mockPack) Vendor(vendorDir string) error {
-	return errors.Errorf("mockPack#Vendor is not implemented")
+func (p mockPack) Install(installPath string) error {
+	return errors.Errorf("mockPack#Install is not implemented")
 }
 
-func (p mockPack) IsVendored(vendorDir string) (bool, error) {
-	return false, errors.Errorf("mockPack#IsVendored is not implemented")
+func (p mockPack) IsInstalled(installPath string) (bool, error) {
+	return false, errors.Errorf("mockPack#IsInstalled is not implemented")
 }
 
 func (p mockPack) InstallPath(installPath string) string {

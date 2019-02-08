@@ -12,16 +12,16 @@ type GithubPack struct {
 	version semver.Version
 }
 
-func (p *GithubPack) Vendor(vendorDir string) error {
-	err := p.library.Install(p.version, vendorDir)
+func (p *GithubPack) Install(installDir string) error {
+	err := p.library.Install(p.version, installDir)
 	if err != nil {
-		return errors.Wrapf(err, "error vendoring pack %v", p.ImportPath())
+		return errors.Wrapf(err, "error installing pack %v", p.ImportPath())
 	}
 	return nil
 }
 
-func (p *GithubPack) IsVendored(vendorDir string) (bool, error) {
-	return p.library.IsInstalled(p.version, vendorDir)
+func (p *GithubPack) IsInstalled(installDir string) (bool, error) {
+	return p.library.IsInstalled(p.version, installDir)
 }
 
 func (p *GithubPack) Version() semver.Version {

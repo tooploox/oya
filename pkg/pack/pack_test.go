@@ -19,7 +19,7 @@ func TestGithubPack_Vendor(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error opening pack library")
 	p, err := l.Version(semver.MustParse("v1.0.0"))
 	tu.AssertNoErr(t, err, "Error getting pack")
-	err = p.Vendor(vendorDir)
+	err = p.Install(vendorDir)
 	tu.AssertNoErr(t, err, "Error vendoring pack")
 	tu.AssertPathExists(t, filepath.Join(vendorDir, "github.com/tooploox/oya-fixtures@v1.0.0/Oyafile"))
 }
