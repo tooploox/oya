@@ -31,10 +31,18 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Get(cwd, args[0], cmd.OutOrStdout(), cmd.OutOrStderr())
+
+		update, err := cmd.Flags().GetBool("update")
+		if err != nil {
+			return err
+		}
+		return internal.Get(cwd, args[0], update, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
+	getCmd.Flags().BoolP("update", "u", false,
+		"Update the package to the latest available version")
+	// NOTE: --update flag mentioned in one of the error messages
 }

@@ -10,12 +10,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-func Get(workDir, uri string, stdout, stderr io.Writer) error {
+func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 	repoUri, versionStr, err := parseUri(uri)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
 	library, err := pack.OpenLibrary(repoUri)
+
+	prj, err := project.Detect(workDir)
+	if err != nil {
+		return wrapErr(err, uri)
+	}
 
 	var pack pack.Pack
 	if len(versionStr) == 0 {
@@ -23,7 +28,19 @@ func Get(workDir, uri string, stdout, stderr io.Writer) error {
 		if err != nil {
 			return wrapErr(err, uri)
 		}
+		if !update {
+			installed, err := prj.IsInstalled(pack)
+			if err != nil {
+				return wrapErr(err, uri)
+			}
+			if installed {
+				return nil
+			}
+		}
 	} else {
+		if update {
+			return errors.Errorf("Cannot request a specific pack version and use the -u (--update) flag at the same time")
+		}
 		version, err := semver.Parse(versionStr)
 		if err != nil {
 			return wrapErr(err, uri)
@@ -33,10 +50,6 @@ func Get(workDir, uri string, stdout, stderr io.Writer) error {
 		if err != nil {
 			return wrapErr(err, uri)
 		}
-	}
-	prj, err := project.Detect(workDir)
-	if err != nil {
-		return wrapErr(err, uri)
 	}
 	err = prj.Vendor(pack)
 	if err != nil {
