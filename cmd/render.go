@@ -41,7 +41,10 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		alias, _ := cmd.Flags().GetString("alias")
+		alias, err := cmd.Flags().GetString("alias")
+		if err != nil {
+			return err
+		}
 		return internal.Render(fullOyafilePath, templatePath, outputPath, alias, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }

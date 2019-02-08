@@ -3,7 +3,6 @@ Feature: Dependency management
 Background:
    Given I'm in project dir
 
-@xxx
 Scenario: Get a specific pack version
   Given file ./Oyafile containing
     """
@@ -25,7 +24,6 @@ Scenario: Get a specific pack version
 
     """
 
-@xxx
 Scenario: Get the latest pack version
   Given file ./Oyafile containing
     """
@@ -47,7 +45,6 @@ Scenario: Get the latest pack version
 
     """
 
-@xxx
 Scenario: Get pack from a multi-pack repo
   Given file ./Oyafile containing
     """
@@ -69,7 +66,6 @@ Scenario: Get pack from a multi-pack repo
 
     """
 
-@xxx
 Scenario: Fetch only the package, not the entire repo
   Given file ./Oyafile containing
     """
@@ -80,8 +76,6 @@ Scenario: Fetch only the package, not the entire repo
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile does not exist
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION does not exist
 
-
-@yyy
 Scenario: Require pack
   Given file ./Oyafile containing
     """
@@ -139,6 +133,97 @@ Scenario: Require two packs from multi-pack repo
     1.1.2
 
     """
+
+Scenario: Get command does not upgrade pack by default
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+      github.com/tooploox/oya-fixtures/pack2: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  And I run "oya get github.com/tooploox/oya-fixtures/pack1"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+    """
+    1.0.0
+
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+      github.com/tooploox/oya-fixtures/pack2: v1.0.0
+    foo: echo "bar"
+    """
+
+Scenario: Upgrade single pack using get command
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+      github.com/tooploox/oya-fixtures/pack2: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  And I run "oya get -u github.com/tooploox/oya-fixtures/pack1"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+    """
+    1.1.1
+
+    """
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+    """
+    1.0.0
+
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+      github.com/tooploox/oya-fixtures/pack2: v1.0.0
+    foo: echo "bar"
+
+    """
+
+# Scenario: Upgrade pack by editing the Require section
+#   Given file ./Oyafile containing
+#     """
+#     Project: project
+#     Require:
+#       github.com/tooploox/oya-fixtures/pack1: v1.2.0
+#       github.com/tooploox/oya-fixtures/pack2: v1.0.0
+#     foo: echo "bar"
+#     """
+#   When I run "oya run foo"
+#   Then the command succeeds
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#     """
+#     v1.2.0
+#     """
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+#     """
+#     v1.0.0
+#     """
+#   And file ./Oyafile contains
+#     """
+#     Project: project
+#     Require:
+#       github.com/tooploox/oya-fixtures/pack1: v1.2.0
+#       github.com/tooploox/oya-fixtures/pack2: v1.0.0
+#     foo: echo "bar"
+#     """
 
 # Not supported yet (?)
 # Scenario: Require two packs from multi-pack repo by git sha
@@ -198,67 +283,6 @@ Scenario: Require two packs from multi-pack repo
 #     Require:
 #       github.com/tooploox/oya-fixtures/pack1: v1.2.0
 #       github.com/tooploox/oya-fixtures/pack2: v1.3.0
-#     foo: echo "bar"
-#     """
-
-# Scenario: Upgrade pack using get command
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.0.0
-#       github.com/tooploox/oya-fixtures/pack2: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   And I run "oya get -u github.com/tooploox/oya-fixtures/pack1"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.3.0
-#     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
-#     """
-#     v1.0.0
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.0.0
-#       github.com/tooploox/oya-fixtures/pack2: v1.3.0
-#     foo: echo "bar"
-#     """
-
-# Scenario: Upgrade pack by editing the Require section
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.2.0
-#       github.com/tooploox/oya-fixtures/pack2: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.2.0
-#     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
-#     """
-#     v1.0.0
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.2.0
-#       github.com/tooploox/oya-fixtures/pack2: v1.0.0
 #     foo: echo "bar"
 #     """
 
