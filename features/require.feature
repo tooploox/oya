@@ -3,47 +3,83 @@ Feature: Dependency management
 Background:
    Given I'm in project dir
 
-# @xxx
-# Scenario: Get a specific pack version
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     """
-#   When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
-#     """
-#     1.0.0
+@xxx
+Scenario: Get a specific pack version
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
+    """
+    1.0.0
 
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures: v1.0.0
-#     """
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures: v1.0.0
 
-# TODO: Fetches only the package.
+    """
 
-# Scenario: Get the latest pack version
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     """
-#   When I run "oya get github.com/tooploox/oya-fixtures"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
-#     """
-#     v1.1.1
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures: v1.1.1
-#     """
+@xxx
+Scenario: Get the latest pack version
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya get github.com/tooploox/oya-fixtures"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
+    """
+    1.1.0
+
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures: v1.1.0
+
+    """
+
+@xxx
+Scenario: Get pack from a multi-pack repo
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+    """
+    1.1.1
+
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+
+    """
+
+@xxx
+Scenario: Fetch only the package, not the entire repo
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile does not exist
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION does not exist
+
 
 # Scenario: Require pack
 #   Given file ./Oyafile containing
