@@ -19,6 +19,10 @@ func (p *GithubPack) Vendor(vendorDir string) error {
 	return nil
 }
 
+func (p *GithubPack) IsVendored(vendorDir string) (bool, error) {
+	return p.library.IsInstalled(p.version, vendorDir)
+}
+
 func (p *GithubPack) Version() semver.Version {
 	return p.version
 }

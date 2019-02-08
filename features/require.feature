@@ -81,61 +81,67 @@ Scenario: Fetch only the package, not the entire repo
   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION does not exist
 
 
-# Scenario: Require pack
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
-#     """
-#     v1.0.0
-#     """
+@yyy
+Scenario: Require pack
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/VERSION contains
+    """
+    1.0.0
 
-# Scenario: Require pack from multi-pack repo
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.0.0
-#     """
+    """
 
-# Scenario: Require two packs from multi-pack repo
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: v1.0.0
-#       github.com/tooploox/oya-fixtures/pack2: v1.1.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.0.0
-#     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
-#     """
-#     v1.1.0
-#     """
+Scenario: Require pack from multi-pack repo
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+    """
+    1.0.0
 
-# Scenario: Require two packs from multi-pack repo
+    """
+
+Scenario: Require two packs from multi-pack repo
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+      github.com/tooploox/oya-fixtures/pack2: v1.1.2
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+    """
+    1.1.1
+
+    """
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+    """
+    1.1.2
+
+    """
+
+# Not supported yet (?)
+# Scenario: Require two packs from multi-pack repo by git sha
 #   Given file ./Oyafile containing
 #     """
 #     Project: project
@@ -149,12 +155,14 @@ Scenario: Fetch only the package, not the entire repo
 #   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
 #   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
-#     v1.0.0
+#     1.0.0
+
 #     """
 #   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
 #   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
 #     """
-#     v1.1.0
+#     1.1.0
+
 #     """
 
 # Scenario: Generate requires from imports

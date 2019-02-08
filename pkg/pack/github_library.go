@@ -92,6 +92,7 @@ func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
 
 // Version returns the specified version of the pack.
 // NOTE: It doesn't check if it's available remotely. This may change.
+// It is used when loading Oyafiles so we probably shouldn't do it or use a different function there.
 func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
 	// BUG(bilus): Check if version exists?
 	return &GithubPack{
@@ -111,7 +112,7 @@ func (l *GithubLibrary) ImportPath() string {
 // the pack will be extracted to /home/bilus/.oya/github.com/bilus/foo.
 func (l *GithubLibrary) Install(version semver.Version, outputDir string) error {
 	path := filepath.Join(outputDir, l.basePath)
-	log.Debugf("Getting %q version %v into %q (tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
+	log.Printf("Getting %q version %v into %q (git tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
 	fs := memfs.New()
 	storer := memory.NewStorage()
 	r, err := git.Clone(storer, fs, &git.CloneOptions{
@@ -151,6 +152,18 @@ func (l *GithubLibrary) Install(version semver.Version, outputDir string) error 
 		targetPath := filepath.Join(path, f.Name)
 		return copyFile(f, targetPath)
 	})
+}
+
+func (l *GithubLibrary) IsInstalled(version semver.Version, outputDir string) (bool, error) {
+	fullPath := filepath.Join(outputDir, l.basePath, l.packPath)
+	_, err := os.Stat(fullPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 func copyFile(f *object.File, targetPath string) error {
