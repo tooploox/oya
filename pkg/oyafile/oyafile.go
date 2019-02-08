@@ -104,9 +104,13 @@ func (oyafile Oyafile) RunTask(taskName string, scope template.Scope, stdout, st
 		return true, err
 	}
 	scope["Tasks"] = tasks
+
+	render, err := oyafile.bindRender(task, stdout, stderr)
 	if err != nil {
 		return true, err
 	}
+	scope["Render"] = render
+
 	return true, task.Exec(oyafile.Dir, scope, stdout, stderr)
 }
 
