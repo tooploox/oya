@@ -21,5 +21,5 @@ func TestGithubPack_Vendor(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error getting pack")
 	err = p.Vendor(vendorDir)
 	tu.AssertNoErr(t, err, "Error vendoring pack")
-	tu.AssertPathExists(t, filepath.Join(vendorDir, "github.com/tooploox/oya-fixtures/Oyafile"))
+	tu.AssertPathExists(t, filepath.Join(vendorDir, "github.com/tooploox/oya-fixtures@v1.0.0/Oyafile"))
 }

@@ -60,6 +60,10 @@ func (p mockPack) IsVendored(vendorDir string) (bool, error) {
 	return false, errors.Errorf("mockPack#IsVendored is not implemented")
 }
 
+func (p mockPack) InstallPath(installPath string) string {
+	panic(errors.Errorf("mockPack#InstallPath is not implemented"))
+}
+
 func MustMakeMockPack(t *testing.T, importPath string, version string) pack.Pack {
 	return mockPack{
 		importPath: types.ImportPath(importPath),

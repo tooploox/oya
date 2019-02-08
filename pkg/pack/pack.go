@@ -10,4 +10,5 @@ type Pack interface {
 	IsVendored(vendorDir string) (bool, error)
 	Version() semver.Version
 	ImportPath() types.ImportPath
+	InstallPath(installPath string) string
 }

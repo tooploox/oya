@@ -87,7 +87,6 @@ func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
 		return nil, ErrNoTaggedVersions{ImportPath: l.importPath}
 	}
 	latestVersion := versions[len(versions)-1]
-	log.Debugf("Updating pack %q to version %v", l.importPath, latestVersion)
 	return l.Version(latestVersion)
 }
 
@@ -107,13 +106,17 @@ func (l *GithubLibrary) ImportPath() types.ImportPath {
 	return l.importPath
 }
 
+// InstallPath returns the local path for the specific pack version.
+func (l *GithubLibrary) InstallPath(version semver.Version, installDir string) string {
+	path := filepath.Join(installDir, l.basePath, l.packPath)
+	return fmt.Sprintf("%v@%v", path, version.String())
+}
+
 // Install downloads & copies the specified version of the path to the output directory,
 // preserving its import path.
 // For example, for /home/bilus/.oya output directory and import path github.com/bilus/foo,
 // the pack will be extracted to /home/bilus/.oya/github.com/bilus/foo.
-func (l *GithubLibrary) Install(version semver.Version, outputDir string) error {
-	path := filepath.Join(outputDir, l.basePath)
-	log.Printf("Getting %q version %v into %q (git tag: %v)", l.ImportPath(), version, path, l.makeRef(version))
+func (l *GithubLibrary) Install(version semver.Version, installDir string) error {
 	fs := memfs.New()
 	storer := memory.NewStorage()
 	r, err := git.Clone(storer, fs, &git.CloneOptions{
@@ -146,17 +149,26 @@ func (l *GithubLibrary) Install(version semver.Version, outputDir string) error 
 		return err
 	}
 
+	sourceBasePath := l.packPath
+	targetPath := l.InstallPath(version, installDir)
+	log.Printf("Installing pack %v version %v into %q (git tag: %v)", l.ImportPath(), version, targetPath, l.makeRef(version))
+
 	return fIter.ForEach(func(f *object.File) error {
 		if outside, err := l.isOutsidePack(f.Name); outside || err != nil {
 			return err // May be nil if outside true.
 		}
-		targetPath := filepath.Join(path, f.Name)
+		relPath, err := filepath.Rel(sourceBasePath, f.Name)
+		if err != nil {
+			return err
+		}
+		targetPath := filepath.Join(targetPath, relPath)
+		log.Println("Copying", f.Name, "to", targetPath)
 		return copyFile(f, targetPath)
 	})
 }
 
-func (l *GithubLibrary) IsInstalled(version semver.Version, outputDir string) (bool, error) {
-	fullPath := filepath.Join(outputDir, l.basePath, l.packPath)
+func (l *GithubLibrary) IsInstalled(version semver.Version, installDir string) (bool, error) {
+	fullPath := l.InstallPath(version, installDir)
 	_, err := os.Stat(fullPath)
 	if err != nil {
 		if os.IsNotExist(err) {

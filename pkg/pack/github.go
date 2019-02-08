@@ -31,3 +31,7 @@ func (p *GithubPack) Version() semver.Version {
 func (p *GithubPack) ImportPath() types.ImportPath {
 	return p.library.ImportPath()
 }
+
+func (p *GithubPack) InstallPath(installPath string) string {
+	return p.library.InstallPath(p.version, installPath)
+}

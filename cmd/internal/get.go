@@ -12,11 +12,12 @@ import (
 )
 
 func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
-	importPath, versionStr, err := parseUri(uri)
+	importPathStr, versionStr, err := parseUri(uri)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	library, err := pack.OpenLibrary(types.ImportPath(importPath))
+	importPath := types.ImportPath(importPathStr)
+	library, err := pack.OpenLibrary(importPath)
 
 	prj, err := project.Detect(workDir)
 	if err != nil {
@@ -25,18 +26,24 @@ func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 
 	var pack pack.Pack
 	if len(versionStr) == 0 {
-		pack, err = library.LatestVersion()
-		if err != nil {
-			return wrapErr(err, uri)
-		}
 		if !update {
-			installed, err := prj.IsInstalled(pack)
+			currentPack, found, err := prj.FindRequiredPack(importPath)
 			if err != nil {
 				return wrapErr(err, uri)
 			}
-			if installed {
-				return nil
+			if found {
+				installed, err := prj.IsInstalled(currentPack)
+				if err != nil {
+					return wrapErr(err, uri)
+				}
+				if installed {
+					return nil
+				}
 			}
+		}
+		pack, err = library.LatestVersion()
+		if err != nil {
+			return wrapErr(err, uri)
 		}
 	} else {
 		if update {
