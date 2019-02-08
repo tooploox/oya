@@ -29,11 +29,6 @@ type SuiteContext struct {
 }
 
 func (c *SuiteContext) MustSetUp() {
-	// BUG(bilus): Need to figure out a way to actually run oya in feature tests. The problem:
-	// We need to provide an override to the oya executable path (because the real one is godog). But because we're running the test outside of the oya development directory, it results in an error similar to:
-	// package github.com/bilus/oya: cannot find package "github.com/bilus/oya" in any of:
-	//         /Users/abc/go/src/github.com/bilus/oya (from $GOPATH)
-
 	projectDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
 		panic(err)
@@ -130,6 +125,9 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 }
 
 func (c *SuiteContext) execute(command string) error {
+	c.stdout.Reset()
+	c.stderr.Reset()
+
 	oldArgs := os.Args
 	os.Args = strings.Fields(command)
 	defer func() {

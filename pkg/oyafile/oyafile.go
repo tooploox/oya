@@ -54,7 +54,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}
 
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
-	log.Debug("Oyafile at", oyafilePath)
+	log.Debug("Oyafile at ", oyafilePath)
 	if err != nil {
 		return nil, err
 	}
