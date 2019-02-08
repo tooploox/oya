@@ -186,7 +186,7 @@ Scenario: Run render
   bar
   """
 
-Scenario: Run render in alias scope
+Scenario: Run render in alias scope can access variables directly
   Given file ./Oyafile containing
     """
     Project: project
@@ -207,10 +207,12 @@ Scenario: Run render in alias scope
   And file ./.oya/vendor/github.com/test/foo/templates/file.txt containing
     """
     $foo
+    $other
     """
   When I run "oya run foo.all"
   Then the command succeeds
   And file ./file.txt contains
   """
   bar
+  banana
   """

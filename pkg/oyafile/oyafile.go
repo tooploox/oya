@@ -106,7 +106,7 @@ func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout,
 	}
 	scope["Tasks"] = tasks
 
-	render, err := oyafile.bindRender(task, stdout, stderr)
+	render, err := oyafile.bindRender(taskName, stdout, stderr)
 	if err != nil {
 		return true, err
 	}
