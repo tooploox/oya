@@ -24,6 +24,8 @@ func TestRunningTasks(t *testing.T) {
 	tu.AssertTrue(t, found, "Oyafile not found")
 	tu.AssertNoErr(t, err, "Error loading Oyafile")
 	out := strings.Builder{}
+	err = o.Build()
+	tu.AssertNoErr(t, err, "Error building Oyafile")
 	found, err = o.RunTask("bar", template.Scope{}, &out, &out)
 	tu.AssertTrue(t, found, "Task 'bar' not found")
 	tu.AssertNoErr(t, err, "Error running task 'bar'")

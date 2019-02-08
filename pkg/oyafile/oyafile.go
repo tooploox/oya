@@ -97,9 +97,8 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 }
 
 func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (bool, error) {
-	err := oyafile.Build()
-	if err != nil {
-		return false, err
+	if !oyafile.IsBuilt {
+		return false, errors.Errorf("Internal error: Oyafile has not been built")
 	}
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {

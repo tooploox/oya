@@ -21,7 +21,7 @@ import (
 
 type SuiteContext struct {
 	projectDir string
-	vendorDir  string
+	installDir string
 
 	lastCommandErr error
 	stdout         *bytes.Buffer
@@ -36,14 +36,14 @@ func (c *SuiteContext) MustSetUp() {
 
 	overrideOyaCmd(projectDir)
 
-	vendorDir := filepath.Join(projectDir, "oya/vendor")
-	err = os.MkdirAll(vendorDir, 0700)
+	installDir := filepath.Join(projectDir, ".oya/packs")
+	err = os.MkdirAll(installDir, 0700)
 	if err != nil {
 		panic(err)
 	}
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
-	c.vendorDir = vendorDir
+	c.installDir = installDir
 	c.stdout = bytes.NewBuffer(nil)
 	c.stderr = bytes.NewBuffer(nil)
 }

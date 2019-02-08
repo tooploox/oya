@@ -61,6 +61,10 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 
 	foundAtLeastOneTask := false
 	for _, o := range changes {
+		err := o.Build()
+		if err != nil {
+			return errors.Wrapf(err, "error in %v", o.Path)
+		}
 		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
