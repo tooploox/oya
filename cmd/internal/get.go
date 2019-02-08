@@ -7,15 +7,16 @@ import (
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
 func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
-	repoUri, versionStr, err := parseUri(uri)
+	importPath, versionStr, err := parseUri(uri)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	library, err := pack.OpenLibrary(repoUri)
+	library, err := pack.OpenLibrary(types.ImportPath(importPath))
 
 	prj, err := project.Detect(workDir)
 	if err != nil {

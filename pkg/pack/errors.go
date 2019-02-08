@@ -1,10 +1,14 @@
 package pack
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bilus/oya/pkg/types"
+)
 
 // ErrNotGithub indicates that the import path doesn't start with github.com.
 type ErrNotGithub struct {
-	ImportPath string
+	ImportPath types.ImportPath
 }
 
 func (err ErrNotGithub) Error() string {
@@ -13,7 +17,7 @@ func (err ErrNotGithub) Error() string {
 
 // ErrNoTaggedVersions indicates there are no available remote versions of the pack.
 type ErrNoTaggedVersions struct {
-	ImportPath string
+	ImportPath types.ImportPath
 }
 
 func (err ErrNoTaggedVersions) Error() string {

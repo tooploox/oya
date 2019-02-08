@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/types"
 )
 
 type ErrNotRootOyafile struct {
@@ -63,7 +64,7 @@ func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
 	return raw.replaceAllWhen(
 		func(line string) bool {
 			if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
-				return matches[2] == pack.ImportPath()
+				return types.ImportPath(matches[2]) == pack.ImportPath()
 			}
 			return false
 

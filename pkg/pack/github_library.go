@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
@@ -21,12 +22,12 @@ type GithubLibrary struct {
 	repoUri    string
 	basePath   string
 	packPath   string
-	importPath string
+	importPath types.ImportPath
 }
 
 // OpenLibrary opens a library containing all versions of a single Oya pack.
-func OpenLibrary(importPath string) (*GithubLibrary, error) {
-	if !strings.HasPrefix(importPath, "github.com/") {
+func OpenLibrary(importPath types.ImportPath) (*GithubLibrary, error) {
+	if importPath.Host() != types.HostGithub {
 		return nil, ErrNotGithub{ImportPath: importPath}
 	}
 	repoUri, basePath, packPath, err := parseImportPath(importPath)
@@ -102,7 +103,7 @@ func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
 }
 
 // ImportPath returns the pack's import path, e.g. github.com/tooploox/oya-packs/docker.
-func (l *GithubLibrary) ImportPath() string {
+func (l *GithubLibrary) ImportPath() types.ImportPath {
 	return l.importPath
 }
 
@@ -199,8 +200,8 @@ func copyFile(f *object.File, targetPath string) error {
 	return err
 }
 
-func parseImportPath(importPath string) (string, string, string, error) {
-	parts := strings.Split(importPath, "/")
+func parseImportPath(importPath types.ImportPath) (string, string, string, error) {
+	parts := strings.Split(string(importPath), "/")
 	if len(parts) < 3 {
 		return "", "", "", ErrNotGithub{ImportPath: importPath}
 	}

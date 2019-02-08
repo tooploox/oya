@@ -176,7 +176,7 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 		if !ok {
 			return defaultErr
 		}
-		l, err := pack.OpenLibrary(importPath)
+		l, err := pack.OpenLibrary(types.ImportPath(importPath))
 		if err != nil {
 			return err
 		}

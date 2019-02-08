@@ -7,6 +7,7 @@ import (
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -39,16 +40,16 @@ func MustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
 }
 
 type mockPack struct {
-	importUrl string
-	version   semver.Version
+	importPath types.ImportPath
+	version    semver.Version
 }
 
 func (p mockPack) Version() semver.Version {
 	return p.version
 }
 
-func (p mockPack) ImportPath() string {
-	return p.importUrl
+func (p mockPack) ImportPath() types.ImportPath {
+	return p.importPath
 }
 
 func (p mockPack) Vendor(vendorDir string) error {
@@ -59,9 +60,9 @@ func (p mockPack) IsVendored(vendorDir string) (bool, error) {
 	return false, errors.Errorf("mockPack#IsVendored is not implemented")
 }
 
-func MustMakeMockPack(t *testing.T, importUrl, version string) pack.Pack {
+func MustMakeMockPack(t *testing.T, importPath string, version string) pack.Pack {
 	return mockPack{
-		importUrl: importUrl,
-		version:   semver.MustParse(version),
+		importPath: types.ImportPath(importPath),
+		version:    semver.MustParse(version),
 	}
 }

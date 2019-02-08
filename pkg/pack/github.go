@@ -2,6 +2,7 @@ package pack
 
 import (
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
@@ -27,6 +28,6 @@ func (p *GithubPack) Version() semver.Version {
 	return p.version
 }
 
-func (p *GithubPack) ImportPath() string {
+func (p *GithubPack) ImportPath() types.ImportPath {
 	return p.library.ImportPath()
 }
