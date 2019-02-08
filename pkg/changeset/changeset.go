@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,7 +31,7 @@ func Calculate(candidates []*oyafile.Oyafile) ([]*oyafile.Oyafile, error) {
 	return unique(changeset), nil
 }
 
-func execChangesetTask(workDir string, changesetTask oyafile.Task) ([]string, error) {
+func execChangesetTask(workDir string, changesetTask task.Task) ([]string, error) {
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 

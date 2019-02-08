@@ -1,0 +1,5 @@
+Project: github.com/tooploox/oya-fixtures
+
+help: |
+  echo "This is an example pack used in Oya tests."
+  echo "It resides in the root directory of the repository, using non-namespaced git tags for versioning. Example: @1.0.0."

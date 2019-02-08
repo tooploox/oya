@@ -8,6 +8,7 @@ import (
 
 	"github.com/bilus/oya/pkg/changeset"
 	"github.com/bilus/oya/pkg/oyafile"
+	"github.com/bilus/oya/pkg/task"
 )
 
 // Changeset returns the list of Oyafiles for the changed directories, based on the
@@ -65,9 +66,8 @@ func isInside(dir string, o *oyafile.Oyafile) bool {
 	return err == nil && !strings.Contains(r, "..")
 }
 
-func defaultRootChangesetTask(oyafiles []*oyafile.Oyafile) oyafile.Task {
-	return oyafile.BuiltinTask{
-		Name: "Changeset",
+func defaultRootChangesetTask(oyafiles []*oyafile.Oyafile) task.Task {
+	return task.Builtin{
 		OnExec: func(stdout, stderr io.Writer) error {
 			for _, o := range oyafiles {
 				relPath := filepath.Dir(o.RelPath())

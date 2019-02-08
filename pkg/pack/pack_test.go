@@ -7,16 +7,19 @@ import (
 	"testing"
 
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/semver"
 	tu "github.com/bilus/oya/testutil"
 )
 
-func TestGitPack_Vendor(t *testing.T) {
+func TestGithubPack_Vendor(t *testing.T) {
 	vendorDir, err := ioutil.TempDir("", "oya")
 	tu.AssertNoErr(t, err, "Error creating temp dir")
 	defer os.RemoveAll(vendorDir)
-	p, err := pack.NewFromUri("github.com/bilus/oya", "fixtures")
-	tu.AssertNoErr(t, err, "Error creating pack from uri")
+	l, err := pack.OpenLibrary("github.com/tooploox/oya-fixtures")
+	tu.AssertNoErr(t, err, "Error opening pack library")
+	p, err := l.Version(semver.MustParse("v1.0.0"))
+	tu.AssertNoErr(t, err, "Error getting pack")
 	err = p.Vendor(vendorDir)
 	tu.AssertNoErr(t, err, "Error vendoring pack")
-	tu.AssertPathExists(t, filepath.Join(vendorDir, "github.com/bilus/oya/fixtures/ExampleGitPack_Vendor/Oyafile"))
+	tu.AssertPathExists(t, filepath.Join(vendorDir, "github.com/tooploox/oya-fixtures/Oyafile"))
 }

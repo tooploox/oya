@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 )
 
@@ -21,16 +22,16 @@ func (o *Oyafile) defaultValues() template.Scope {
 
 // bindTasks returns a map of functions allowing invoking other tasks via $Tasks.xyz().
 // It makes invokable only tasks defined in the same Oyafile, stripping away any aliases, so the tasks are accessible names exactly as they appear in a given Oyafile.
-func (o *Oyafile) bindTasks(task Task, stdout, stderr io.Writer) (map[string]func() string, error) {
+func (o *Oyafile) bindTasks(taskName task.Name, t task.Task, stdout, stderr io.Writer) (map[string]func() string, error) {
 	tasks := make(map[string]func() string)
 
-	importAlias, _ := task.SplitName()
+	importAlias, _ := taskName.Split()
 
-	o.Tasks.ForEach(func(taskName string, task Task, _ Meta) error {
-		alias, baseName := task.SplitName()
+	o.Tasks.ForEach(func(tn task.Name, _ task.Task, _ task.Meta) error {
+		alias, baseName := tn.Split()
 		if alias == importAlias {
 			tasks[baseName] = func() string {
-				return fmt.Sprintf("%s run %s\n", o.OyaCmd, taskName)
+				return fmt.Sprintf("%s run %s\n", o.OyaCmd, tn)
 			}
 		}
 		return nil
@@ -39,10 +40,10 @@ func (o *Oyafile) bindTasks(task Task, stdout, stderr io.Writer) (map[string]fun
 	return tasks, nil
 }
 
-func (o *Oyafile) bindRender(task Task, stdout, stderr io.Writer) (func(string) string, error) {
-	alias, _ := task.SplitName()
+func (o *Oyafile) bindRender(taskName task.Name, stdout, stderr io.Writer) (func(string) string, error) {
+	alias, _ := taskName.Split()
 	return func(templatePath string) string {
-		// fmt.Printf("%s render -f ./%s -a %q %s\n", o.OyaCmd, raw.DefaultName, alias, templatePath)
+		fmt.Printf("%s render -f ./%s -a %q %s\n", o.OyaCmd, raw.DefaultName, alias, templatePath)
 		return fmt.Sprintf("%s render -f ./%s -a %q %s\n", o.OyaCmd, raw.DefaultName, alias, templatePath)
 	}, nil
 }

@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/task"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 func Parse(raw *raw.Oyafile) (*Oyafile, error) {
@@ -39,8 +44,25 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
+		case "Changeset":
+			err := parseTask(name, value, oyafile)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing key %q", name)
+			}
+		case "Require":
+			err := parseRequire(name, value, oyafile)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing key %q", name)
+			}
+
 		default:
-			err := parseUserTask(name, value, oyafile)
+			taskName := task.Name(name)
+			if taskName.IsBuiltIn() {
+				log.Debugf("WARNING: Unrecognized built-in task or directive %q; skipping.", name)
+				continue
+			}
+
+			err := parseTask(name, value, oyafile)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
@@ -58,9 +80,9 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	return oyafile, nil
 }
 
-func parseMeta(metaName, key string) (string, bool) {
+func parseMeta(metaName, key string) (task.Name, bool) {
 	taskName := strings.TrimSuffix(key, "."+metaName)
-	return taskName, taskName != key
+	return task.Name(taskName), taskName != key
 }
 
 func parseImports(value interface{}, o *Oyafile) error {
@@ -77,7 +99,7 @@ func parseImports(value interface{}, o *Oyafile) error {
 		if !ok {
 			return fmt.Errorf("expected import path")
 		}
-		o.Imports[Alias(alias)] = ImportPath(path)
+		o.Imports[types.Alias(alias)] = types.ImportPath(path)
 	}
 	return nil
 }
@@ -123,7 +145,7 @@ func parseIgnore(value interface{}, o *Oyafile) error {
 	return nil
 }
 
-func parseUserTask(name string, value interface{}, o *Oyafile) error {
+func parseTask(name string, value interface{}, o *Oyafile) error {
 	s, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("expected a script, actual: %v", name)
@@ -131,12 +153,49 @@ func parseUserTask(name string, value interface{}, o *Oyafile) error {
 	if taskName, ok := parseMeta("Doc", name); ok {
 		o.Tasks.AddDoc(taskName, s)
 	} else {
-		o.Tasks.AddTask(name, ScriptedTask{
-			Name:   name,
-			Script: Script(s),
+		o.Tasks.AddTask(task.Name(name), task.Script{
+			Script: s,
 			Shell:  o.Shell,
 			Scope:  &o.Values,
 		})
 	}
+	return nil
+}
+
+func parseRequire(name string, value interface{}, o *Oyafile) error {
+	defaultErr := fmt.Errorf("expected entries mapping pack import paths to their version, example: \"github.com/tooploox/oya-packs/docker: v1.0.0\"")
+
+	requires, ok := value.(map[interface{}]interface{})
+	if !ok {
+		return defaultErr
+	}
+
+	packs := make([]pack.Pack, 0, len(requires))
+	for importPathI, versionI := range requires {
+		importPath, ok := importPathI.(string)
+		if !ok {
+			return defaultErr
+		}
+		version, ok := versionI.(string)
+		if !ok {
+			return defaultErr
+		}
+		l, err := pack.OpenLibrary(importPath)
+		if err != nil {
+			return err
+		}
+
+		ver, err := semver.Parse(version)
+		if err != nil {
+			return err
+		}
+		pack, err := l.Version(ver)
+		if err != nil {
+			return err
+		}
+		packs = append(packs, pack)
+	}
+
+	o.Require = packs
 	return nil
 }

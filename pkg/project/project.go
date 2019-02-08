@@ -5,16 +5,14 @@ import (
 	"path/filepath"
 
 	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 // TODO: Duplicated in oyafile module.
-const VendorDir = ".oya/vendor"
-
 type Project struct {
 	RootDir string
 }
@@ -49,7 +47,7 @@ func Detect(workDir string) (Project, error) {
 	}, nil
 }
 
-func (p Project) Run(workDir, taskName string, scope template.Scope, stdout, stderr io.Writer) error {
+func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)
@@ -79,12 +77,32 @@ func (p Project) Run(workDir, taskName string, scope template.Scope, stdout, std
 	return nil
 }
 
-func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.Load(oyafilePath, p.RootDir)
+func (p Project) rootOyafile() (*oyafile.Oyafile, error) {
+	o, found, err := oyafile.LoadFromDir(p.RootDir, p.RootDir)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ErrNoOyafile{Path: p.RootDir}
+	}
+
+	return o, nil
 }
 
-func (p Project) Vendor(pack pack.Pack) error {
-	return pack.Vendor(filepath.Join(p.RootDir, VendorDir))
+func (p Project) rootRawOyafile() (*raw.Oyafile, error) {
+	o, found, err := raw.LoadFromDir(p.RootDir, p.RootDir)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ErrNoOyafile{Path: p.RootDir}
+	}
+
+	return o, nil
+}
+
+func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
+	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
 func (p Project) Values() (template.Scope, error) {
