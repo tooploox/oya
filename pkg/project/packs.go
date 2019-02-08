@@ -36,6 +36,7 @@ func (p Project) InstallPacks() error {
 			return err
 		}
 		if installed {
+
 			continue
 		}
 		err = p.Install(pack)

@@ -28,6 +28,11 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 		return err
 	}
 
+	err = o.Build()
+	if err != nil {
+		return err
+	}
+
 	var values template.Scope
 	if found {
 		if alias != "" {

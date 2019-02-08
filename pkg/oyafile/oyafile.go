@@ -34,6 +34,7 @@ type Oyafile struct {
 	Project string   // Project is set for root Oyafile.
 	Ignore  []string // Ignore contains directory exclusion rules.
 	Require []pack.Pack
+	IsBuilt bool
 
 	relPath string
 
@@ -95,7 +96,11 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	return oyafile, true, nil
 }
 
-func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (bool, error) {
+	err := oyafile.Build()
+	if err != nil {
+		return false, err
+	}
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil
@@ -131,4 +136,16 @@ func (o *Oyafile) Ignores() string {
 
 func (o *Oyafile) RelPath() string {
 	return o.relPath
+}
+
+func (o *Oyafile) Build() error {
+	// Do not resolve imports when loading Oyafile. Sometimes, we need to load Oyafile before packs are ready to be imported.
+	if !o.IsBuilt {
+		err := o.resolveImports()
+		if err != nil {
+			return err
+		}
+		o.IsBuilt = true
+	}
+	return nil
 }
