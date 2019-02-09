@@ -18,31 +18,36 @@ var (
 
 func TestProject_Detect_NoOya(t *testing.T) {
 	workDir := "./fixtures/empty_project"
-	_, err := project.Detect(workDir)
+	installDir := "" // Unused
+	_, err := project.Detect(workDir, installDir)
 	tu.AssertErr(t, err, "Expected error trying to detect Oya project in empty dir")
 }
 
 func TestProject_Detect_InRootDir(t *testing.T) {
 	workDir := "./fixtures/project"
-	_, err := project.Detect(workDir)
+	installDir := "" // Unused
+	_, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 }
 
 func TestProject_Detect_InSubDir(t *testing.T) {
 	workDir := "./fixtures/project/subdir"
-	_, err := project.Detect(workDir)
+	installDir := "" // Unused
+	_, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 }
 
 func TestProject_Detect_InEmptySubDir(t *testing.T) {
 	workDir := "./fixtures/project/empty_subdir"
-	_, err := project.Detect(workDir)
+	installDir := "" // Unused
+	_, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 }
 
 func TestProject_Run_NoTask(t *testing.T) {
 	workDir := "./fixtures/project"
-	project, err := project.Detect(workDir)
+	installDir := "" // Unused
+	project, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	err = project.Run(workDir, "noSuchTask", noScope, ioutil.Discard, ioutil.Discard)
 	tu.AssertErr(t, err, "Expected error when trying to run without matching task")
@@ -50,7 +55,8 @@ func TestProject_Run_NoTask(t *testing.T) {
 
 func TestProject_Run_NoChanges(t *testing.T) {
 	workDir := "./fixtures/empty_changeset_project"
-	project, err := project.Detect(workDir)
+	installDir := "" // Unused
+	project, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
@@ -62,7 +68,8 @@ func TestProject_Run_NoChanges(t *testing.T) {
 
 func TestProject_Run_WithChanges(t *testing.T) {
 	workDir := "./fixtures/project"
-	project, err := project.Detect(workDir)
+	installDir := "" // Unused
+	project, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
@@ -73,7 +80,8 @@ func TestProject_Run_WithChanges(t *testing.T) {
 
 func TestProject_Run_WithArgs(t *testing.T) {
 	workDir := "./fixtures/project"
-	project, err := project.Detect(workDir)
+	installDir := "" // Unused
+	project, err := project.Detect(workDir, installDir)
 	tu.AssertNoErr(t, err, "Expected no error trying to detect Oya project in its root dir")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
@@ -83,7 +91,7 @@ func TestProject_Run_WithArgs(t *testing.T) {
 			"Flags": map[string]string{
 				"flag1": "flag1",
 				"flag2": "flag2",
-		  },
+			},
 		},
 		stdout, stderr)
 	tu.AssertNoErr(t, err, "Expected no error running non-empty changeset")

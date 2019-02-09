@@ -13,10 +13,22 @@ import (
 
 const VendorDir = ".oya/vendor"
 
-func (oyafile *Oyafile) resolveImports() error {
-	for alias, path := range oyafile.Imports {
-		log.Debugf("Importing pack %v as %v", path, alias)
-		pack, err := oyafile.loadPack(path)
+func (o *Oyafile) Build(packInstallDir string) error {
+	// Do not resolve imports when loading Oyafile. Sometimes, we need to load Oyafile before packs are ready to be imported.
+	if !o.IsBuilt {
+		err := o.resolveImports(packInstallDir)
+		if err != nil {
+			return err
+		}
+		o.IsBuilt = true
+	}
+	return nil
+}
+
+func (oyafile *Oyafile) resolveImports(packInstallDir string) error {
+	for alias, importPath := range oyafile.Imports {
+		log.Debugf("Importing pack %v as %v", importPath, alias)
+		pack, err := oyafile.loadPack(packInstallDir, importPath)
 		if err != nil {
 			return err
 		}
@@ -46,13 +58,11 @@ func collectPackValueOverrides(alias types.Alias, values template.Scope) templat
 }
 
 // BUG(bilus): Move it to GithubLibrary (but extract it to its own package first to avoid cyclic dependencies).
-func (o *Oyafile) loadPack(importPath types.ImportPath) (*Oyafile, error) {
+func (o *Oyafile) loadPack(installDir string, importPath types.ImportPath) (*Oyafile, error) {
 	// Attempt to load packs listed in the Require: section.
-	vendorDir := filepath.Join(o.RootDir, VendorDir) // BUG(bilus): This will become a path to ~/.oya/packs
 	for _, pack := range o.Require {
-		log.Println(pack.ImportPath())
 		if pack.ImportPath() == importPath {
-			po, found, err := LoadFromDir(pack.InstallPath(vendorDir), o.RootDir)
+			po, found, err := LoadFromDir(pack.InstallPath(installDir), o.RootDir)
 			if err != nil {
 				return nil, err
 			}

@@ -136,15 +136,3 @@ func (o *Oyafile) Ignores() string {
 func (o *Oyafile) RelPath() string {
 	return o.relPath
 }
-
-func (o *Oyafile) Build() error {
-	// Do not resolve imports when loading Oyafile. Sometimes, we need to load Oyafile before packs are ready to be imported.
-	if !o.IsBuilt {
-		err := o.resolveImports()
-		if err != nil {
-			return err
-		}
-		o.IsBuilt = true
-	}
-	return nil
-}

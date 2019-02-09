@@ -1,13 +1,9 @@
 package project
 
 import (
-	"path/filepath"
-
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/types"
 )
-
-const VendorDir = ".oya/vendor"
 
 func (p Project) Require(pack pack.Pack) error {
 	raw, err := p.rootRawOyafile()
@@ -19,11 +15,11 @@ func (p Project) Require(pack pack.Pack) error {
 }
 
 func (p Project) Install(pack pack.Pack) error {
-	return pack.Install(p.vendorDir())
+	return pack.Install(p.installDir)
 }
 
 func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
-	return pack.IsInstalled(p.vendorDir())
+	return pack.IsInstalled(p.installDir)
 }
 
 func (p Project) InstallPacks() error {
@@ -47,10 +43,6 @@ func (p Project) InstallPacks() error {
 	}
 
 	return nil
-}
-
-func (p Project) vendorDir() string {
-	return filepath.Join(p.RootDir, VendorDir)
 }
 
 func (p Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {

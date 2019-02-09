@@ -3,14 +3,18 @@ Feature: Running tasks
 Background:
    Given I'm in project dir
 
-Scenario: Import tasks from vendored packs
+Scenario: Import tasks from installed packs
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
       foo=4
@@ -32,10 +36,14 @@ Scenario: Import task using pack values
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       foo: xxx
@@ -55,10 +63,14 @@ Scenario: Import task using BasePath
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       foo: xxx
@@ -70,7 +82,7 @@ Scenario: Import task using BasePath
   Then the command succeeds
   And the command outputs to stdout
   """
-  foo
+  foo@v0.0.1
 
   """
 
@@ -78,12 +90,16 @@ Scenario: Access pack values
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     all: |
       echo $foo.bar
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       bar: xxx
@@ -130,7 +146,7 @@ Scenario: Access current project values
 
   """
 
-Scenario: Invalid import
+Scenario: Invalid import (missing require)
   Given file ./Oyafile containing
     """
     Project: project
@@ -149,13 +165,17 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
 
     Values:
       foo.fruit: banana
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
       echo $fruit
@@ -172,13 +192,17 @@ Scenario: Pack values are overriden form project Oyafile
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
 
     Values:
       foo.wege: broccoli
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       fruit: banana
@@ -202,13 +226,17 @@ Scenario: Import tasks in a subdir Oyafile
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     """
   And file ./subdir/Oyafile containing
     """
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
       echo "all"

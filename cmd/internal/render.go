@@ -18,7 +18,11 @@ func (err ErrNoAlias) Error() string {
 }
 
 func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
-	proj, err := project.Detect(outputPath)
+	installDir, err := installDir()
+	if err != nil {
+		return err
+	}
+	proj, err := project.Detect(outputPath, installDir)
 	if err != nil {
 		return err
 	}
@@ -28,7 +32,7 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 		return err
 	}
 
-	err = o.Build()
+	err = o.Build(installDir)
 	if err != nil {
 		return err
 	}

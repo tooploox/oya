@@ -20,11 +20,12 @@ func init() {
 
 func TestRunningTasks(t *testing.T) {
 	rootDir := fullPath("./fixtures/TestRunningTasks")
+	installDir := filepath.Join(rootDir, ".packs")
 	o, found, err := oyafile.LoadFromDir(rootDir, rootDir)
 	tu.AssertTrue(t, found, "Oyafile not found")
 	tu.AssertNoErr(t, err, "Error loading Oyafile")
 	out := strings.Builder{}
-	err = o.Build()
+	err = o.Build(installDir)
 	tu.AssertNoErr(t, err, "Error building Oyafile")
 	found, err = o.RunTask("bar", template.Scope{}, &out, &out)
 	tu.AssertTrue(t, found, "Task 'bar' not found")

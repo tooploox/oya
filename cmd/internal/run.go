@@ -11,7 +11,11 @@ import (
 )
 
 func Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
-	p, err := project.Detect(workDir)
+	installDir, err := installDir()
+	if err != nil {
+		return err
+	}
+	p, err := project.Detect(workDir, installDir)
 	if err != nil {
 		return err
 	}

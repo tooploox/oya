@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/bilus/oya/pkg/oyafile"
@@ -13,7 +14,7 @@ import (
 
 func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
 	t.Helper()
-	project, err := project.Load(rootDir)
+	project, err := project.Detect(rootDir, filepath.Join(rootDir, ".packs"))
 	AssertNoErr(t, err, "Error detecting project")
 	oyafiles, err := project.Oyafiles()
 	AssertNoErr(t, err, "Error listing Oyafiles")
@@ -23,7 +24,7 @@ func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
 
 func MustListOyafilesSubdir(t *testing.T, rootDir, subDir string) []*oyafile.Oyafile {
 	t.Helper()
-	project, err := project.Load(rootDir)
+	project, err := project.Detect(rootDir, filepath.Join(rootDir, ".packs"))
 	AssertNoErr(t, err, "Error detecting project")
 	oyafiles, err := project.List(subDir)
 	AssertNoErr(t, err, "Error listing Oyafiles")

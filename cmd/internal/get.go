@@ -19,7 +19,11 @@ func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 	importPath := types.ImportPath(importPathStr)
 	library, err := pack.OpenLibrary(importPath)
 
-	prj, err := project.Detect(workDir)
+	installDir, err := installDir()
+	if err != nil {
+		return wrapErr(err, uri)
+	}
+	prj, err := project.Detect(workDir, installDir)
 	if err != nil {
 		return wrapErr(err, uri)
 	}

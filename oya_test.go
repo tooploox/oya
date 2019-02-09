@@ -21,7 +21,6 @@ import (
 
 type SuiteContext struct {
 	projectDir string
-	installDir string
 
 	lastCommandErr error
 	stdout         *bytes.Buffer
@@ -36,16 +35,22 @@ func (c *SuiteContext) MustSetUp() {
 
 	overrideOyaCmd(projectDir)
 
-	installDir := filepath.Join(projectDir, ".oya/packs")
-	err = os.MkdirAll(installDir, 0700)
+	err = os.Setenv("OYA_HOME", projectDir)
 	if err != nil {
 		panic(err)
 	}
+
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
-	c.installDir = installDir
 	c.stdout = bytes.NewBuffer(nil)
 	c.stderr = bytes.NewBuffer(nil)
+}
+
+func (c *SuiteContext) MustTearDown() {
+	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // overrideOyaCmd overrides `oya` command used by $Tasks in templates
@@ -78,13 +83,6 @@ func (c *SuiteContext) readFile(relPath string) (string, error) {
 	return string(contents), err
 }
 
-func (c *SuiteContext) MustTearDown() {
-	err := os.RemoveAll(c.projectDir)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (c *SuiteContext) iAmInProjectDir() error {
 	return os.Chdir(c.projectDir)
 }
@@ -95,6 +93,10 @@ func (c *SuiteContext) imInDir(subdir string) error {
 
 func (c *SuiteContext) fileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
+}
+
+func (c *SuiteContext) environmentVariableSet(name, value string) error {
+	return os.Setenv(name, value)
 }
 
 func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) error {
@@ -144,6 +146,8 @@ func (c *SuiteContext) iRunOya(command string) error {
 
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
+		log.Println(c.stdout.String())
+		log.Println(c.stderr.String())
 		return errors.Wrap(c.lastCommandErr, "command unexpectedly failed")
 	}
 	return nil
@@ -214,6 +218,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 	s.Step(`^the command outputs to (stdout|stderr) text matching$`, c.theCommandOutputsTextMatching)
+	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })

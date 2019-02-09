@@ -10,7 +10,7 @@ Scenario: Get a pack
     """
   When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
 Scenario: Get a pack with invalid import
   Given file ./Oyafile containing
@@ -22,7 +22,7 @@ Scenario: Get a pack with invalid import
     """
   When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
 Scenario: Get two versions of the same pack
   Given file ./project1/Oyafile containing

@@ -10,8 +10,8 @@ Scenario: Get a specific pack version
     """
   When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
     """
     1.0.0
 
@@ -31,8 +31,8 @@ Scenario: Get the latest pack version
     """
   When I run "oya get github.com/tooploox/oya-fixtures"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.1.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.1.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.1.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.1.0/VERSION contains
     """
     1.1.0
 
@@ -52,8 +52,8 @@ Scenario: Get pack from a multi-pack repo
     """
   When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
     """
     1.1.1
 
@@ -73,8 +73,8 @@ Scenario: Fetch only the package, not the entire repo
     """
   When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.1.0/Oyafile does not exist
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.1.0/VERSION does not exist
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/Oyafile does not exist
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/VERSION does not exist
 
 Scenario: Require pack
   Given file ./Oyafile containing
@@ -86,8 +86,8 @@ Scenario: Require pack
     """
   When I run "oya run foo"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
     """
     1.0.0
 
@@ -103,8 +103,8 @@ Scenario: Require pack from multi-pack repo
     """
   When I run "oya run foo"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
     """
     1.0.0
 
@@ -121,14 +121,14 @@ Scenario: Require two packs from multi-pack repo
     """
   When I run "oya run foo"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
     """
     1.1.1
 
     """
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.1.2/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.1.2/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.2/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.2/VERSION contains
     """
     1.1.2
 
@@ -146,8 +146,8 @@ Scenario: Get command does not upgrade pack by default
   When I run "oya run foo"
   And I run "oya get github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
     """
     1.0.0
 
@@ -173,14 +173,14 @@ Scenario: Upgrade single pack using get command
   When I run "oya run foo"
   And I run "oya get -u github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
     """
     1.1.1
 
     """
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.0.0/Oyafile exists
-  And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.0.0/VERSION contains
     """
     1.0.0
 
@@ -206,13 +206,13 @@ Scenario: Upgrade single pack using get command
 #     """
 #   When I run "oya run foo"
 #   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
 #     v1.2.0
 #     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/VERSION contains
 #     """
 #     v1.0.0
 #     """
@@ -237,14 +237,14 @@ Scenario: Upgrade single pack using get command
 #     """
 #   When I run "oya run foo"
 #   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
 #     1.0.0
 
 #     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/VERSION contains
 #     """
 #     1.1.0
 
@@ -265,13 +265,13 @@ Scenario: Upgrade single pack using get command
 #     """
 #   When I run "oya run foo"
 #   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
 #     v1.2.0
 #     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack2/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/VERSION contains
 #     """
 #     v1.3.0
 #     """
@@ -296,13 +296,13 @@ Scenario: Upgrade single pack using get command
 #     """
 #   When I run "oya run foo"
 #   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
 #     v1.1.0
 #     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
 #     """
 #     v1.1.0
 #     """
@@ -325,13 +325,13 @@ Scenario: Upgrade single pack using get command
 #     """
 #   When I run "oya run foo"
 #   Then the command succeeds
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
 #     """
 #     v1.1.0
 #     """
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
-#   And file ./.oya/vendor/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
+#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
 #     """
 #     v1.1.0
 #     """

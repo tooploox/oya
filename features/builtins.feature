@@ -28,10 +28,14 @@ Scenario: Run pack's tasks
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     bar: |
       echo "bar"
@@ -53,16 +57,21 @@ Scenario: Pack can only run its own tasks
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+      github.com/test/bar: v0.0.1
+
     Import:
       foo: github.com/test/foo
       bar: github.com/test/bar
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     foo: |
       echo "foo"
     """
-  And file ./.oya/vendor/github.com/test/bar/Oyafile containing
+  And file ./.oya/packs/github.com/test/bar@v0.0.1/Oyafile containing
     """
     bar: |
       $Tasks.foo()
@@ -95,10 +104,14 @@ Scenario: Access pack base directory
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
       echo $BasePath
@@ -107,7 +120,7 @@ Scenario: Access pack base directory
   Then the command succeeds
   And the command outputs to stdout text matching
   """
-  ^.*github.com/test/foo
+  ^.*github.com/test/foo@v0.0.1
 
   """
 
@@ -149,10 +162,14 @@ Scenario: Access Oyafile Project name inside pack
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
       echo $Project
