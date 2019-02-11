@@ -96,9 +96,27 @@ func (p Project) updateDependencies() error {
 		}
 	}
 
+	deps, err := p.Dependencies()
+	if err != nil {
+		return err
+	}
+
 	for importPath := range importPaths {
+		_, found, err := deps.Find(importPath)
+		if err != nil {
+			return err
+		}
+		if found {
+			continue
+		}
+
 		l, err := pack.OpenLibrary(importPath)
 		if err != nil {
+			// Import paths can also be relative to the root directory.
+			// BUG(bilus): I don't particularly like it how tihs logic is split. Plus we may be masking some other errors this way
+			if _, ok := err.(pack.ErrNotGithub); ok {
+				continue
+			}
 			return err
 		}
 

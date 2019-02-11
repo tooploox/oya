@@ -260,6 +260,48 @@ Scenario: Generate requires from imports
 
     """
 
+Scenario: Preserve versions when generating requires from imports
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Import:
+      pack1: github.com/tooploox/oya-fixtures/pack1
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+    foo: echo "bar"
+    """
+  And file ./subdir/Oyafile containing
+    """
+    Import:
+      pack2: github.com/tooploox/oya-fixtures/pack2
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
+    """
+    1.0.0
+
+    """
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.2/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.2/VERSION contains
+    """
+    1.1.2
+
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Import:
+      pack1: github.com/tooploox/oya-fixtures/pack1
+    Require:
+      github.com/tooploox/oya-fixtures/pack2: v1.1.2
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+    foo: echo "bar"
+
+    """
+
+
 # Not supported yet (?)
 # Scenario: Require two packs from multi-pack repo by git sha
 #   Given file ./Oyafile containing

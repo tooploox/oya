@@ -1,6 +1,8 @@
 package oyafile
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/bilus/oya/pkg/template"
@@ -26,12 +28,9 @@ func (o *Oyafile) Build(loader PackLoader) error {
 
 func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 	for alias, importPath := range oyafile.Imports {
-		o, found, err := loader.Load(importPath)
+		o, err := oyafile.loadPackOyafile(loader, importPath)
 		if err != nil {
 			return err
-		}
-		if !found {
-			return errors.Errorf("missing pack %v", importPath)
 		}
 
 		oyafile.Values[string(alias)] = o.Values
@@ -42,6 +41,34 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 	}
 
 	return nil
+}
+
+func (oyafile *Oyafile) loadPackOyafile(loader PackLoader, importPath types.ImportPath) (*Oyafile, error) {
+	o, found, err := loader.Load(importPath)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		return o, nil
+	}
+
+	// Attempt to load the Oyafile using the local path.
+	fullImportPath := filepath.Join(oyafile.RootDir, string(importPath))
+	if isValidImportPath(fullImportPath) {
+		o, found, err := LoadFromDir(fullImportPath, oyafile.RootDir)
+		if err != nil {
+			return nil, err
+		}
+		if found {
+			return o, nil
+		}
+	}
+	return nil, errors.Errorf("missing pack %v", importPath)
+}
+
+func isValidImportPath(fullImportPath string) bool {
+	f, err := os.Stat(fullImportPath)
+	return err == nil && f.IsDir()
 }
 
 // collectPackValueOverrides collects all <alias>.xxx values, overriding values

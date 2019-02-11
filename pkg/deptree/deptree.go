@@ -1,9 +1,6 @@
 package deptree
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/types"
@@ -46,18 +43,6 @@ func (dt DependencyTree) Load(importPath types.ImportPath) (*oyafile.Oyafile, bo
 	}
 	if found {
 		return dt.loadOyafile(pack)
-	}
-
-	// Attempt to load the Oyafile using the local path.
-	fullImportPath := filepath.Join(dt.rootDir, string(importPath))
-	if isValidImportPath(fullImportPath) {
-		o, found, err := oyafile.LoadFromDir(fullImportPath, dt.rootDir)
-		if err != nil {
-			return nil, false, err
-		}
-		if found {
-			return o, true, nil
-		}
 	}
 	return nil, false, nil
 }
@@ -103,9 +88,4 @@ func (dt DependencyTree) findRequiredPack(importPath types.ImportPath) (pack.Pac
 		}
 	}
 	return nil, false, nil
-}
-
-func isValidImportPath(fullImportPath string) bool {
-	f, err := os.Stat(fullImportPath)
-	return err == nil && f.IsDir()
 }
