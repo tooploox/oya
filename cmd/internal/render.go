@@ -32,7 +32,12 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 		return err
 	}
 
-	err = o.Build(installDir)
+	loader, err := proj.PackLoader()
+	if err != nil {
+		return err
+	}
+
+	err = o.Build(loader)
 	if err != nil {
 		return err
 	}
