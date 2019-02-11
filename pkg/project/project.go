@@ -3,6 +3,7 @@ package project
 import (
 	"io"
 	"path/filepath"
+	"strings"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/raw"
@@ -63,16 +64,22 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 	for _, o := range changes {
 		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
+			return errors.Wrapf(err, "In: %v\nTask: %v\n", o.Path, taskName)
 		}
 		if found {
 			foundAtLeastOneTask = found
 		}
 	}
 	if !foundAtLeastOneTask {
-		return ErrNoTask{
+		err = ErrNoTask{
 			Task: taskName,
 		}
+		oyapaths := make([]string, len(changes))
+		for _, o := range changes {
+			oyapaths = append(oyapaths, o.Path)
+		}
+		oyafiles := strings.Join(oyapaths, "; ")
+		return errors.Wrapf(err, "In: %v\nTask: %v\n", oyafiles, taskName)
 	}
 	return nil
 }

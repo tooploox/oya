@@ -146,7 +146,9 @@ func (c *SuiteContext) iRunOya(command string) error {
 
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
-		return errors.Wrap(c.lastCommandErr, "command unexpectedly failed")
+		return errors.Wrap(c.lastCommandErr,
+			fmt.Sprintf("command unexpectedly failed\nstderr: %v\nstdout: %v",
+				c.stderr.String(), c.stdout.String()))
 	}
 	return nil
 }
@@ -168,6 +170,7 @@ func (c *SuiteContext) theCommandFailsWithErrorMatching(errMsg *gherkin.DocStrin
 	}
 	return nil
 }
+
 
 func (c *SuiteContext) theCommandOutputs(target string, expected *gherkin.DocString) error {
 	var actual string
