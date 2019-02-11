@@ -4,7 +4,7 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/loader"
+	"github.com/bilus/oya/pkg/deptree"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
@@ -15,9 +15,9 @@ import (
 
 // TODO: Duplicated in oyafile module.
 type Project struct {
-	RootDir    string
-	installDir string
-	packLoader *loader.Loader
+	RootDir      string
+	installDir   string
+	dependencies *deptree.DependencyTree
 }
 
 func Detect(workDir, installDir string) (Project, error) {
@@ -29,9 +29,9 @@ func Detect(workDir, installDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		RootDir:    detectedRootDir,
-		installDir: installDir,
-		packLoader: nil, // lazily-loaded by PackLoader()
+		RootDir:      detectedRootDir,
+		installDir:   installDir,
+		dependencies: nil, // lazily-loaded in Dependencies()
 	}, nil
 }
 
@@ -47,14 +47,14 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 		return nil
 	}
 
-	loader, err := p.PackLoader()
+	dependencies, err := p.Dependencies()
 	if err != nil {
 		return err
 	}
 
 	foundAtLeastOneTask := false
 	for _, o := range changes {
-		err = o.Build(loader)
+		err = o.Build(dependencies)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}

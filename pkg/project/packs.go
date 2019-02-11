@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/bilus/oya/pkg/loader"
+	"github.com/bilus/oya/pkg/deptree"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/types"
 )
@@ -59,22 +59,22 @@ func (p Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool,
 	return nil, false, nil
 }
 
-func (p Project) PackLoader() (loader.Loader, error) {
-	if p.packLoader != nil {
-		return *p.packLoader, nil
+func (p Project) Dependencies() (deptree.DependencyTree, error) {
+	if p.dependencies != nil {
+		return *p.dependencies, nil
 	}
 
 	o, err := p.rootOyafile()
 	if err != nil {
-		return loader.Loader{}, err
+		return deptree.DependencyTree{}, err
 	}
 	installDirs := []string{
 		p.installDir,
 	}
-	ldr, err := loader.New(p.RootDir, installDirs, o.Require)
+	ldr, err := deptree.New(p.RootDir, installDirs, o.Require)
 	if err != nil {
-		return loader.Loader{}, err
+		return deptree.DependencyTree{}, err
 	}
-	p.packLoader = &ldr
+	p.dependencies = &ldr
 	return ldr, nil
 }
