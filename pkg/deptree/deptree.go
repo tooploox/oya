@@ -27,6 +27,14 @@ func New(rootDir string, installDirs []string, dependencies []pack.Pack) (Depend
 	}, nil
 }
 
+func (dt DependencyTree) WithDependencies(dependencies []pack.Pack) (DependencyTree, error) {
+	return DependencyTree{
+		rootDir:      dt.rootDir,
+		installDirs:  dt.installDirs,
+		dependencies: dt.dependencies,
+	}, nil
+}
+
 // Load loads an pack's Oyafile based on its import path.
 // It supports two types of import paths:
 // - referring to the project's Require: section (e.g. github.com/tooploox/oya-packs/docker), in this case it will load, the required version;

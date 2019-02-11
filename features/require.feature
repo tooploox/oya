@@ -226,13 +226,13 @@ Scenario: Generate requires from imports
     """
     Project: project
     Import:
-      pack1: github.com/tooploox/oya-example/packs/pack1
+      pack1: github.com/tooploox/oya-fixtures/pack1
     foo: echo "bar"
     """
   And file ./subdir/Oyafile containing
     """
     Import:
-      pack2: github.com/tooploox/oya-example/packs/pack2
+      pack2: github.com/tooploox/oya-fixtures/pack2
     """
   When I run "oya run foo"
   Then the command succeeds
@@ -251,12 +251,13 @@ Scenario: Generate requires from imports
   And file ./Oyafile contains
     """
     Project: project
-    Import:
-      pack1: github.com/tooploox/oya-example/packs/pack1
     Require:
-      github.com/tooploox/oya-fixtures/pack1: v1.1.1
       github.com/tooploox/oya-fixtures/pack2: v1.1.2
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+    Import:
+      pack1: github.com/tooploox/oya-fixtures/pack1
     foo: echo "bar"
+
     """
 
 # Not supported yet (?)

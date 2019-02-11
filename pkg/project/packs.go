@@ -11,8 +11,12 @@ func (p Project) Require(pack pack.Pack) error {
 	if err != nil {
 		return err
 	}
-
-	return raw.AddRequire(pack)
+	err = raw.AddRequire(pack)
+	if err != nil {
+		return err
+	}
+	p.dependencies = nil // Force reload.
+	return nil
 }
 
 func (p Project) Install(pack pack.Pack) error {
@@ -80,5 +84,34 @@ func (p Project) Dependencies() (deptree.DependencyTree, error) {
 }
 
 func (p Project) updateDependencies() error {
+	files, err := p.List(p.RootDir)
+	if err != nil {
+		return err
+	}
+
+	importPaths := make(map[types.ImportPath]struct{})
+	for _, o := range files {
+		for _, importPath := range o.Imports {
+			importPaths[importPath] = struct{}{}
+		}
+	}
+
+	for importPath := range importPaths {
+		l, err := pack.OpenLibrary(importPath)
+		if err != nil {
+			return err
+		}
+
+		pack, err := l.LatestVersion()
+		if err != nil {
+			return err
+		}
+		err = p.Require(pack)
+		if err != nil {
+			return err
+		}
+	}
+
+	p.dependencies = nil // Force reload.
 	return nil
 }
