@@ -9,12 +9,16 @@ import (
 	"github.com/bilus/oya/pkg/types"
 )
 
+// DependencyTree defines a project's dependencies, allowing for loading them.
 type DependencyTree struct {
 	rootDir      string
 	installDirs  []string
 	dependencies []pack.Pack
 }
 
+// New returns a new dependency tree.
+// BUG(bilus): It's called a 'tree' but it currently does not take into account inter-pack
+// dependencies. This will likely change and then the name will fit like a glove. ;)
 func New(rootDir string, installDirs []string, dependencies []pack.Pack) (DependencyTree, error) {
 	return DependencyTree{
 		rootDir:      rootDir,
@@ -23,6 +27,10 @@ func New(rootDir string, installDirs []string, dependencies []pack.Pack) (Depend
 	}, nil
 }
 
+// Load loads an pack's Oyafile based on its import path.
+// It supports two types of import paths:
+// - referring to the project's Require: section (e.g. github.com/tooploox/oya-packs/docker), in this case it will load, the required version;
+// - path relative to the project's root (e.g. /) -- does not support versioning, loads Oyafile directly from the path (<root dir>/<import path>).
 func (dt DependencyTree) Load(importPath types.ImportPath) (*oyafile.Oyafile, bool, error) {
 	pack, found, err := dt.findRequiredPack(importPath)
 	if err != nil {
