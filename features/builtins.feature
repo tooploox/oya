@@ -210,10 +210,13 @@ Scenario: Run render in alias scope can access variables directly
     Import:
       foo: github.com/test/foo
 
+    Require:
+      github.com/test/foo: v1.0.0
+
     Values:
       foo.other: banana
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v1.0.0/Oyafile containing
     """
     Values:
       foo: bar
@@ -221,7 +224,7 @@ Scenario: Run render in alias scope can access variables directly
     all: |
       $Render("$BasePath/templates/file.txt")
     """
-  And file ./.oya/vendor/github.com/test/foo/templates/file.txt containing
+  And file ./.oya/packs/github.com/test/foo@v1.0.0/templates/file.txt containing
     """
     $foo
     $other
