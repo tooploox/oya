@@ -54,6 +54,26 @@ func (dt DependencyTree) Load(importPath types.ImportPath) (*oyafile.Oyafile, bo
 	return nil, false, nil
 }
 
+// Find lookups pack by its import path.
+func (dt DependencyTree) Find(importPath types.ImportPath) (pack.Pack, bool, error) {
+	for _, pack := range dt.dependencies {
+		if pack.ImportPath() == importPath {
+			return pack, true, nil
+		}
+	}
+	return nil, false, nil
+}
+
+// ForEach iterates through the packs.
+func (dt DependencyTree) ForEach(f func(pack.Pack) error) error {
+	for _, pack := range dt.dependencies {
+		if err := f(pack); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (dt DependencyTree) loadOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
 	for _, installDir := range dt.installDirs {
 		o, found, err := oyafile.LoadFromDir(pack.InstallPath(installDir), dt.rootDir)
