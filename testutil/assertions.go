@@ -71,6 +71,13 @@ func AssertEqual(t *testing.T, expected, actual interface{}) {
 	}
 }
 
+func AssertEqualMsg(t *testing.T, expected, actual interface{}, msg string, args ...interface{}) {
+	t.Helper()
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("%v: expected: %v actual: %v", fmt.Sprintf(msg, args...), expected, actual)
+	}
+}
+
 func AssertObjectsEqual(t *testing.T, expected, actual interface{}) {
 	t.Helper()
 	if !reflect.DeepEqual(expected, actual) {

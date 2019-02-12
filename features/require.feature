@@ -301,60 +301,38 @@ Scenario: Preserve versions when generating requires from imports
 
     """
 
+Scenario: Indirect requirements
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack3: v1.0.0
+    foo: echo "bar"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.0/VERSION contains
+    """
+    1.1.0
 
-# Not supported yet (?)
-# Scenario: Require two packs from multi-pack repo by git sha
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack1: aaaa
-#       github.com/tooploox/oya-fixtures/pack2: bbbb
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     1.0.0
+    """
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/VERSION contains
+    """
+    1.0.0
 
-#     """
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2/VERSION contains
-#     """
-#     1.1.0
+    """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack3: v1.0.0
+      github.com/tooploox/oya-fixtures/pack1: v1.1.0
+    foo: echo "bar"
+    """
 
-#     """
 
-# Scenario: Indirect requirements
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack-requiring-pack1: v1.1.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.1.0
-#     """
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
-#     """
-#     v1.1.0
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack-requiring-pack1: v1.1.0
-#       github.com/tooploox/oya-fixtures/pack1: v1.1.0
-#     foo: echo "bar"
-#     """
 # Scenario: Indirectly required higher version
 #   Given file ./Oyafile containing
 #     """

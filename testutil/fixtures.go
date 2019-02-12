@@ -65,7 +65,7 @@ func (p mockPack) InstallPath(installPath string) string {
 	panic(errors.Errorf("mockPack#InstallPath is not implemented"))
 }
 
-func MustMakeMockPack(t *testing.T, importPath string, version string) pack.Pack {
+func MustMakeMockPack(importPath string, version string) pack.Pack {
 	return mockPack{
 		importPath: types.ImportPath(importPath),
 		version:    semver.MustParse(version),

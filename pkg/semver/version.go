@@ -35,3 +35,7 @@ func MustParse(v string) Version {
 func (ver Version) String() string {
 	return fmt.Sprintf("v%v", semver.Version(ver))
 }
+
+func (ver Version) LessThan(other Version) bool {
+	return semver.Version(ver).LT(semver.Version(other))
+}
