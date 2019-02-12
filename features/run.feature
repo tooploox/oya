@@ -159,9 +159,9 @@ Scenario: Missing task
     Project: project
     """
   When I run "oya run all"
-  Then the command fails with error
+  Then the command fails with error matching
     """
-    missing task "all"
+    (?s).*In:.*Oyafile.*Task: all.*missing task "all".*
     """
 
 Scenario: Script template
