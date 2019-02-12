@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 )
@@ -37,4 +38,11 @@ func (o *Oyafile) bindTasks(taskName task.Name, t task.Task, stdout, stderr io.W
 	})
 
 	return tasks, nil
+}
+
+func (o *Oyafile) bindRender(taskName task.Name, stdout, stderr io.Writer) (func(string) string, error) {
+	alias, _ := taskName.Split()
+	return func(templatePath string) string {
+		return fmt.Sprintf("%s render -f ./%s -a %q %s\n", o.OyaCmd, raw.DefaultName, alias, templatePath)
+	}, nil
 }
