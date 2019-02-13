@@ -7,35 +7,47 @@ import (
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
 func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
-	repoUri, versionStr, err := parseUri(uri)
+	importPathStr, versionStr, err := parseUri(uri)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
-	library, err := pack.OpenLibrary(repoUri)
+	importPath := types.ImportPath(importPathStr)
+	library, err := pack.OpenLibrary(importPath)
 
-	prj, err := project.Detect(workDir)
+	installDir, err := installDir()
+	if err != nil {
+		return wrapErr(err, uri)
+	}
+	prj, err := project.Detect(workDir, installDir)
 	if err != nil {
 		return wrapErr(err, uri)
 	}
 
 	var pack pack.Pack
 	if len(versionStr) == 0 {
-		pack, err = library.LatestVersion()
-		if err != nil {
-			return wrapErr(err, uri)
-		}
 		if !update {
-			installed, err := prj.IsInstalled(pack)
+			currentPack, found, err := prj.FindRequiredPack(importPath)
 			if err != nil {
 				return wrapErr(err, uri)
 			}
-			if installed {
-				return nil
+			if found {
+				installed, err := prj.IsInstalled(currentPack)
+				if err != nil {
+					return wrapErr(err, uri)
+				}
+				if installed {
+					return nil
+				}
 			}
+		}
+		pack, err = library.LatestVersion()
+		if err != nil {
+			return wrapErr(err, uri)
 		}
 	} else {
 		if update {
@@ -51,7 +63,7 @@ func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 			return wrapErr(err, uri)
 		}
 	}
-	err = prj.Vendor(pack)
+	err = prj.Install(pack)
 	if err != nil {
 		return wrapErr(err, uri)
 	}

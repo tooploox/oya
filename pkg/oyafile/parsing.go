@@ -69,10 +69,6 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 		}
 	}
 
-	err = oyafile.resolveImports()
-	if err != nil {
-		return nil, err
-	}
 	err = oyafile.addBuiltIns()
 	if err != nil {
 		return nil, err
@@ -180,7 +176,7 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 		if !ok {
 			return defaultErr
 		}
-		l, err := pack.OpenLibrary(importPath)
+		l, err := pack.OpenLibrary(types.ImportPath(importPath))
 		if err != nil {
 			return err
 		}

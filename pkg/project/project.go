@@ -4,6 +4,7 @@ import (
 	"io"
 	"path/filepath"
 
+	"github.com/bilus/oya/pkg/deptree"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
@@ -14,27 +15,12 @@ import (
 
 // TODO: Duplicated in oyafile module.
 type Project struct {
-	RootDir string
+	RootDir      string
+	installDir   string
+	dependencies *deptree.DependencyTree
 }
 
-func Load(rootDir string) (Project, error) {
-	prj, err := Detect(rootDir)
-	if err != nil {
-		return prj, err
-	}
-
-	rel, err := filepath.Rel(rootDir, prj.RootDir)
-	if err != nil {
-		return prj, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, prj.RootDir)
-	}
-	if rel != "." {
-		return prj, errors.Errorf("%v is not an Oya project root directory", rootDir)
-	}
-
-	return prj, nil
-}
-
-func Detect(workDir string) (Project, error) {
+func Detect(workDir, installDir string) (Project, error) {
 	detectedRootDir, found, err := detectRoot(workDir)
 	if err != nil {
 		return Project{}, err
@@ -43,7 +29,9 @@ func Detect(workDir string) (Project, error) {
 		return Project{}, ErrNoProject{Path: workDir}
 	}
 	return Project{
-		RootDir: detectedRootDir,
+		RootDir:      detectedRootDir,
+		installDir:   installDir,
+		dependencies: nil, // lazily-loaded in Dependencies()
 	}, nil
 }
 
@@ -59,8 +47,17 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 		return nil
 	}
 
+	dependencies, err := p.Dependencies()
+	if err != nil {
+		return err
+	}
+
 	foundAtLeastOneTask := false
 	for _, o := range changes {
+		err = o.Build(dependencies)
+		if err != nil {
+			return errors.Wrapf(err, "error in %v", o.Path)
+		}
 		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)

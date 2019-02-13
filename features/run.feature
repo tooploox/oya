@@ -182,24 +182,6 @@ Scenario: Script template
 
   """
 
-Scenario: Ignore vendored Oyafiles
-  Given file ./Oyafile containing
-    """
-    Project: project
-    all: echo "main"
-    """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
-    """
-    all: echo "vendored"
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  main
-
-  """
-
 Scenario: Ignore projects inside current project
   Given file ./Oyafile containing
     """

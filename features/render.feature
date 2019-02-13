@@ -79,10 +79,14 @@ Scenario: Render templated values in alias scope
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       fruit: orange
@@ -102,13 +106,17 @@ Scenario: Render templated values in alias scope can be overridden
   Given file ./Oyafile containing
     """
     Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
     Import:
       foo: github.com/test/foo
 
     Values:
       foo.fruit: banana
     """
-  And file ./.oya/vendor/github.com/test/foo/Oyafile containing
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     Values:
       fruit: orange

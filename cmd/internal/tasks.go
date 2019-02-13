@@ -14,7 +14,11 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
-	p, err := project.Detect(workDir)
+	installDir, err := installDir()
+	if err != nil {
+		return err
+	}
+	p, err := project.Detect(workDir, installDir)
 	if err != nil {
 		return err
 	}
