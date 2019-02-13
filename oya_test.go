@@ -144,6 +144,10 @@ func (c *SuiteContext) iRunOya(command string) error {
 	return c.execute("oya " + command)
 }
 
+func (c *SuiteContext) modifyFileToContain(path string, contents *gherkin.DocString) error {
+	return c.writeFile(path, contents.Content)
+}
+
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
 		log.Println(c.stdout.String())
@@ -210,6 +214,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
+	s.Step(`^I modify file (.+) to contain$`, c.modifyFileToContain)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^file (.+) does not exist$`, c.fileDoesNotExist)

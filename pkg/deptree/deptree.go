@@ -1,9 +1,6 @@
 package deptree
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/types"
@@ -27,6 +24,14 @@ func New(rootDir string, installDirs []string, dependencies []pack.Pack) (Depend
 	}, nil
 }
 
+func (dt DependencyTree) WithDependencies(dependencies []pack.Pack) (DependencyTree, error) {
+	return DependencyTree{
+		rootDir:      dt.rootDir,
+		installDirs:  dt.installDirs,
+		dependencies: dt.dependencies,
+	}, nil
+}
+
 // Load loads an pack's Oyafile based on its import path.
 // It supports two types of import paths:
 // - referring to the project's Require: section (e.g. github.com/tooploox/oya-packs/docker), in this case it will load, the required version;
@@ -39,19 +44,27 @@ func (dt DependencyTree) Load(importPath types.ImportPath) (*oyafile.Oyafile, bo
 	if found {
 		return dt.loadOyafile(pack)
 	}
+	return nil, false, nil
+}
 
-	// Attempt to load the Oyafile using the local path.
-	fullImportPath := filepath.Join(dt.rootDir, string(importPath))
-	if isValidImportPath(fullImportPath) {
-		o, found, err := oyafile.LoadFromDir(fullImportPath, dt.rootDir)
-		if err != nil {
-			return nil, false, err
-		}
-		if found {
-			return o, true, nil
+// Find lookups pack by its import path.
+func (dt DependencyTree) Find(importPath types.ImportPath) (pack.Pack, bool, error) {
+	for _, pack := range dt.dependencies {
+		if pack.ImportPath() == importPath {
+			return pack, true, nil
 		}
 	}
 	return nil, false, nil
+}
+
+// ForEach iterates through the packs.
+func (dt DependencyTree) ForEach(f func(pack.Pack) error) error {
+	for _, pack := range dt.dependencies {
+		if err := f(pack); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (dt DependencyTree) loadOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
@@ -75,9 +88,4 @@ func (dt DependencyTree) findRequiredPack(importPath types.ImportPath) (pack.Pac
 		}
 	}
 	return nil, false, nil
-}
-
-func isValidImportPath(fullImportPath string) bool {
-	f, err := os.Stat(fullImportPath)
-	return err == nil && f.IsDir()
 }

@@ -146,21 +146,6 @@ Scenario: Access current project values
 
   """
 
-Scenario: Invalid import (missing require)
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Import:
-      foo: github.com/test/foo
-
-    all: echo "OK"
-    """
-  When I run "oya run all"
-  Then the command fails with error matching
-  """
-  .*missing pack github.com/test/foo$
-  """
-
 Scenario: Pack values can be set from project Oyafile prefixed with pack alias
   Given file ./Oyafile containing
     """

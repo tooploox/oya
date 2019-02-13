@@ -31,13 +31,14 @@ func (raw *Oyafile) AddRequire(pack pack.Pack) error {
 	return raw.write()
 }
 
-// addRequire adds a require for a pack using the following algorithm:
+// addRequire adds a Require: entry for a pack using the following algorithm:
 // 1. Look for and update an existing entry for the path.
 // 2. Look for ANY pack under Require:; if found, insert the new entry beneath it.
 // 3. Look for Require: key (we know it's empty), insert the new entry inside it.
 // 4. Look for Project: key, insert the new entry beneath it (under Require:).
 // 5. Fail because Oyafile has no Project: so we shouldn't be trying to add a require to it.
 // The method stops if any of the steps succeeds.
+// NOTE: It does not modify the Oyafile on disk.
 func (raw *Oyafile) addRequire(pack pack.Pack) error {
 	if found, err := raw.updateExistingEntry(pack); err != nil || found {
 		return err // nil if found
@@ -57,7 +58,7 @@ func (raw *Oyafile) addRequire(pack pack.Pack) error {
 	if !found {
 		return ErrNotRootOyafile{Path: raw.Path}
 	}
-	return raw.write()
+	return nil
 }
 
 func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {

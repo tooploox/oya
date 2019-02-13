@@ -207,6 +207,7 @@ Scenario: Run render in alias scope can access variables directly
   Given file ./Oyafile containing
     """
     Project: project
+
     Import:
       foo: github.com/test/foo
 
