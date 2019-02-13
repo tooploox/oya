@@ -2,6 +2,7 @@ package project
 
 import (
 	"github.com/bilus/oya/pkg/deptree"
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/types"
 )
@@ -75,7 +76,11 @@ func (p Project) Deps() (Deps, error) {
 	installDirs := []string{
 		p.installDir,
 	}
-	ldr, err := deptree.New(p.RootDir, installDirs, o.Require)
+	requires, err := resolvePackReferences(o.Requires)
+	if err != nil {
+		return nil, err
+	}
+	ldr, err := deptree.New(p.RootDir, installDirs, requires)
 	if err != nil {
 		return nil, err
 	}
@@ -132,4 +137,20 @@ func (p Project) updateDependencies() error {
 
 	p.dependencies = nil // Force reload.
 	return nil
+}
+
+func resolvePackReferences(references []oyafile.PackReference) ([]pack.Pack, error) {
+	packs := make([]pack.Pack, len(references))
+	for i, reference := range references {
+		l, err := pack.OpenLibrary(reference.ImportPath)
+		if err != nil {
+			return nil, err
+		}
+		pack, err := l.Version(reference.Version)
+		if err != nil {
+			return nil, err
+		}
+		packs[i] = pack
+	}
+	return packs, nil
 }
