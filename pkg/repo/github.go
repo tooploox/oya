@@ -1,4 +1,4 @@
-package pack
+package repo
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
@@ -17,40 +18,19 @@ import (
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
-// GithubLibrary represents all versions of an Oya pack stored in a git repository on Github.com.
-type GithubLibrary struct {
+// GithubRepo represents all versions of an Oya pack stored in a git repository on Github.com.
+type GithubRepo struct {
 	repoUri    string
 	basePath   string
 	packPath   string
 	importPath types.ImportPath
 }
 
-// OpenLibrary opens a library containing all versions of a single Oya pack.
-func OpenLibrary(importPath types.ImportPath) (*GithubLibrary, error) {
-	if importPath.Host() != types.HostGithub {
-		return nil, ErrNotGithub{ImportPath: importPath}
-	}
-	repoUri, basePath, packPath, err := parseImportPath(importPath)
-	if err != nil {
-		return nil, err
-	}
-	return &GithubLibrary{
-		repoUri:    repoUri,
-		packPath:   packPath,
-		basePath:   basePath,
-		importPath: importPath,
-	}, nil
-}
-
 // AvailableVersions returns a sorted list of remotely available pack versions.
-func (l *GithubLibrary) AvailableVersions() ([]semver.Version, error) {
+func (l *GithubRepo) AvailableVersions() ([]semver.Version, error) {
 	versions := make([]semver.Version, 0)
 
-	fs := memfs.New()
-	storer := memory.NewStorage()
-	r, err := git.Clone(storer, fs, &git.CloneOptions{
-		URL: l.repoUri,
-	})
+	r, err := l.clone()
 	if err != nil {
 		return nil, err
 	}
@@ -77,14 +57,22 @@ func (l *GithubLibrary) AvailableVersions() ([]semver.Version, error) {
 	return versions, nil
 }
 
+func (l *GithubRepo) clone() (*git.Repository, error) {
+	fs := memfs.New()
+	storer := memory.NewStorage()
+	return git.Clone(storer, fs, &git.CloneOptions{
+		URL: l.repoUri,
+	})
+}
+
 // LatestVersion returns the latest available pack version based on tags in the remote Github repo.
-func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
+func (l *GithubRepo) LatestVersion() (pack.Pack, error) {
 	versions, err := l.AvailableVersions()
 	if err != nil {
-		return nil, err
+		return pack.Pack{}, err
 	}
 	if len(versions) == 0 {
-		return nil, ErrNoTaggedVersions{ImportPath: l.importPath}
+		return pack.Pack{}, ErrNoTaggedVersions{ImportPath: l.importPath}
 	}
 	latestVersion := versions[len(versions)-1]
 	return l.Version(latestVersion)
@@ -93,53 +81,50 @@ func (l *GithubLibrary) LatestVersion() (*GithubPack, error) {
 // Version returns the specified version of the pack.
 // NOTE: It doesn't check if it's available remotely. This may change.
 // It is used when loading Oyafiles so we probably shouldn't do it or use a different function there.
-func (l *GithubLibrary) Version(version semver.Version) (*GithubPack, error) {
+func (l *GithubRepo) Version(version semver.Version) (pack.Pack, error) {
 	// BUG(bilus): Check if version exists?
-	return &GithubPack{
-		library: l,
-		version: version,
-	}, nil
+	return pack.New(l, version)
 }
 
 // ImportPath returns the pack's import path, e.g. github.com/tooploox/oya-packs/docker.
-func (l *GithubLibrary) ImportPath() types.ImportPath {
+func (l *GithubRepo) ImportPath() types.ImportPath {
 	return l.importPath
 }
 
 // InstallPath returns the local path for the specific pack version.
-func (l *GithubLibrary) InstallPath(version semver.Version, installDir string) string {
+func (l *GithubRepo) InstallPath(version semver.Version, installDir string) string {
 	path := filepath.Join(installDir, l.basePath, l.packPath)
 	return fmt.Sprintf("%v@%v", path, version.String())
+}
+
+func (l *GithubRepo) checkout(version semver.Version) (*object.Commit, error) {
+	r, err := l.clone()
+	if err != nil {
+		return nil, err
+	}
+	tree, err := r.Worktree()
+	if err != nil {
+		return nil, err
+	}
+	err = tree.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
+	})
+	if err != nil {
+		return nil, err
+	}
+	ref, err := r.Head()
+	if err != nil {
+		return nil, err
+	}
+	return r.CommitObject(ref.Hash())
 }
 
 // Install downloads & copies the specified version of the path to the output directory,
 // preserving its import path.
 // For example, for /home/bilus/.oya output directory and import path github.com/bilus/foo,
 // the pack will be extracted to /home/bilus/.oya/github.com/bilus/foo.
-func (l *GithubLibrary) Install(version semver.Version, installDir string) error {
-	fs := memfs.New()
-	storer := memory.NewStorage()
-	r, err := git.Clone(storer, fs, &git.CloneOptions{
-		URL: l.repoUri,
-	})
-	if err != nil {
-		return err
-	}
-	tree, err := r.Worktree()
-	if err != nil {
-		return err
-	}
-	err = tree.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
-	})
-	if err != nil {
-		return err
-	}
-	ref, err := r.Head()
-	if err != nil {
-		return err
-	}
-	commit, err := r.CommitObject(ref.Hash())
+func (l *GithubRepo) Install(version semver.Version, installDir string) error {
+	commit, err := l.checkout(version)
 	if err != nil {
 		return err
 	}
@@ -167,7 +152,7 @@ func (l *GithubLibrary) Install(version semver.Version, installDir string) error
 	})
 }
 
-func (l *GithubLibrary) IsInstalled(version semver.Version, installDir string) (bool, error) {
+func (l *GithubRepo) IsInstalled(version semver.Version, installDir string) (bool, error) {
 	fullPath := l.InstallPath(version, installDir)
 	_, err := os.Stat(fullPath)
 	if err != nil {
@@ -177,6 +162,19 @@ func (l *GithubLibrary) IsInstalled(version semver.Version, installDir string) (
 		return false, err
 	}
 	return true, nil
+}
+
+func (l *GithubRepo) Reqs(version semver.Version) ([]pack.Pack, error) {
+	// commit, err := l.checkout(version)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// f, err := commit.File(raw.DefaultName)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return nil, nil
 }
 
 func copyFile(f *object.File, targetPath string) error {
@@ -223,7 +221,7 @@ func parseImportPath(importPath types.ImportPath) (string, string, string, error
 	return repoUri, basePath, packPath, nil
 }
 
-func (l *GithubLibrary) parseRef(tag string) (semver.Version, bool) {
+func (l *GithubRepo) parseRef(tag string) (semver.Version, bool) {
 	if len(l.packPath) > 0 && strings.HasPrefix(tag, l.packPath) {
 		tag = tag[len(l.packPath)+1:] // e.g. "pack1/v1.0.0" => v1.0.0
 	}
@@ -231,7 +229,7 @@ func (l *GithubLibrary) parseRef(tag string) (semver.Version, bool) {
 	return version, err == nil
 }
 
-func (l *GithubLibrary) makeRef(version semver.Version) string {
+func (l *GithubRepo) makeRef(version semver.Version) string {
 	if len(l.packPath) > 0 {
 		return fmt.Sprintf("%v/%v", l.packPath, version.String())
 
@@ -240,7 +238,7 @@ func (l *GithubLibrary) makeRef(version semver.Version) string {
 	}
 }
 
-func (l *GithubLibrary) isOutsidePack(relPath string) (bool, error) {
+func (l *GithubRepo) isOutsidePack(relPath string) (bool, error) {
 	r, err := filepath.Rel(l.packPath, relPath)
 	if err != nil {
 		return false, err

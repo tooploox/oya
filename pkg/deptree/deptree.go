@@ -54,7 +54,7 @@ func (dt DependencyTree) Find(importPath types.ImportPath) (pack.Pack, bool, err
 			return pack, true, nil
 		}
 	}
-	return nil, false, nil
+	return pack.Pack{}, false, nil
 }
 
 // ForEach iterates through the packs.
@@ -87,5 +87,5 @@ func (dt DependencyTree) findRequiredPack(importPath types.ImportPath) (pack.Pac
 			return pack, true, nil
 		}
 	}
-	return nil, false, nil
+	return pack.Pack{}, false, nil
 }

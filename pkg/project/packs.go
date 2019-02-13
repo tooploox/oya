@@ -4,6 +4,7 @@ import (
 	"github.com/bilus/oya/pkg/deptree"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/repo"
 	"github.com/bilus/oya/pkg/types"
 )
 
@@ -59,7 +60,7 @@ func (p Project) InstallPacks() error {
 func (p Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {
 	deps, err := p.Deps()
 	if err != nil {
-		return nil, false, err
+		return pack.Pack{}, false, err
 	}
 	return deps.Find(importPath)
 }
@@ -115,11 +116,11 @@ func (p Project) updateDependencies() error {
 			continue
 		}
 
-		l, err := pack.OpenLibrary(importPath)
+		l, err := repo.Open(importPath)
 		if err != nil {
 			// Import paths can also be relative to the root directory.
 			// BUG(bilus): I don't particularly like it how tihs logic is split. Plus we may be masking some other errors this way
-			if _, ok := err.(pack.ErrNotGithub); ok {
+			if _, ok := err.(repo.ErrNotGithub); ok {
 				continue
 			}
 			return err
@@ -142,7 +143,7 @@ func (p Project) updateDependencies() error {
 func resolvePackReferences(references []oyafile.PackReference) ([]pack.Pack, error) {
 	packs := make([]pack.Pack, len(references))
 	for i, reference := range references {
-		l, err := pack.OpenLibrary(reference.ImportPath)
+		l, err := repo.Open(reference.ImportPath)
 		if err != nil {
 			return nil, err
 		}

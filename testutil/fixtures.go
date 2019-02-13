@@ -40,34 +40,36 @@ func MustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
 	return o
 }
 
-type mockPack struct {
+type mockRepo struct {
 	importPath types.ImportPath
-	version    semver.Version
 }
 
-func (p mockPack) Version() semver.Version {
-	return p.version
+func (p mockRepo) Install(version semver.Version, installDir string) error {
+	return errors.Errorf("mockRepo#Install is not implemented")
 }
 
-func (p mockPack) ImportPath() types.ImportPath {
+func (p mockRepo) IsInstalled(version semver.Version, installDir string) (bool, error) {
+	return false, errors.Errorf("mockRepo#IsInstalled is not implemented")
+}
+
+func (p mockRepo) InstallPath(version semver.Version, installDir string) string {
+	panic(errors.Errorf("mockRepo#InstallPath is not implemented"))
+}
+
+func (p mockRepo) ImportPath() types.ImportPath {
 	return p.importPath
 }
 
-func (p mockPack) Install(installPath string) error {
-	return errors.Errorf("mockPack#Install is not implemented")
-}
-
-func (p mockPack) IsInstalled(installPath string) (bool, error) {
-	return false, errors.Errorf("mockPack#IsInstalled is not implemented")
-}
-
-func (p mockPack) InstallPath(installPath string) string {
-	panic(errors.Errorf("mockPack#InstallPath is not implemented"))
+func mustMakeMockRepo(importPath string) pack.Repo {
+	return mockRepo{
+		importPath: types.ImportPath(importPath),
+	}
 }
 
 func MustMakeMockPack(importPath string, version string) pack.Pack {
-	return mockPack{
-		importPath: types.ImportPath(importPath),
-		version:    semver.MustParse(version),
+	pack, err := pack.New(mustMakeMockRepo(importPath), semver.MustParse(version))
+	if err != nil {
+		panic(err)
 	}
+	return pack
 }
