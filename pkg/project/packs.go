@@ -37,7 +37,7 @@ func (p Project) InstallPacks() error {
 		return err
 	}
 
-	deps, err := p.Dependencies()
+	deps, err := p.Deps()
 	if err != nil {
 		return err
 	}
@@ -56,30 +56,30 @@ func (p Project) InstallPacks() error {
 }
 
 func (p Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {
-	deps, err := p.Dependencies()
+	deps, err := p.Deps()
 	if err != nil {
 		return nil, false, err
 	}
 	return deps.Find(importPath)
 }
 
-func (p Project) Dependencies() (deptree.DependencyTree, error) {
+func (p Project) Deps() (Deps, error) {
 	if p.dependencies != nil {
-		return *p.dependencies, nil
+		return p.dependencies, nil
 	}
 
 	o, err := p.rootOyafile()
 	if err != nil {
-		return deptree.DependencyTree{}, err
+		return nil, err
 	}
 	installDirs := []string{
 		p.installDir,
 	}
 	ldr, err := deptree.New(p.RootDir, installDirs, o.Require)
 	if err != nil {
-		return deptree.DependencyTree{}, err
+		return nil, err
 	}
-	p.dependencies = &ldr
+	p.dependencies = ldr
 	return ldr, nil
 }
 
@@ -96,7 +96,7 @@ func (p Project) updateDependencies() error {
 		}
 	}
 
-	deps, err := p.Dependencies()
+	deps, err := p.Deps()
 	if err != nil {
 		return err
 	}

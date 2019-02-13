@@ -4,7 +4,6 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/deptree"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
@@ -17,7 +16,7 @@ import (
 type Project struct {
 	RootDir      string
 	installDir   string
-	dependencies *deptree.DependencyTree
+	dependencies Deps
 }
 
 func Detect(workDir, installDir string) (Project, error) {
@@ -31,7 +30,7 @@ func Detect(workDir, installDir string) (Project, error) {
 	return Project{
 		RootDir:      detectedRootDir,
 		installDir:   installDir,
-		dependencies: nil, // lazily-loaded in Dependencies()
+		dependencies: nil, // lazily-loaded in Deps()
 	}, nil
 }
 
@@ -47,7 +46,7 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 		return nil
 	}
 
-	dependencies, err := p.Dependencies()
+	dependencies, err := p.Deps()
 	if err != nil {
 		return err
 	}
