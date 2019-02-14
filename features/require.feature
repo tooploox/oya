@@ -301,7 +301,7 @@ Scenario: Preserve versions when generating requires from imports
 
     """
 
-Scenario: Indirect requirements
+Scenario: Indirect requirements are downloaded
   Given file ./Oyafile containing
     """
     Project: project
@@ -311,57 +311,48 @@ Scenario: Indirect requirements
     """
   When I run "oya run foo"
   Then the command succeeds
-  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.0/Oyafile exists
-  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.0/VERSION contains
+  Then file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile contains
     """
-    1.1.0
+    Project: github.com/tooploox/oya-fixtures/pack3
+
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+
+    version: |
+      cat $BasePath/VERSION
 
     """
-  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile exists
-  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/VERSION contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
     """
-    1.0.0
+    1.1.1
 
     """
-  And file ./Oyafile contains
+
+Scenario: Indirectly required higher version
+  Given file ./Oyafile containing
     """
     Project: project
     Require:
       github.com/tooploox/oya-fixtures/pack3: v1.0.0
-      github.com/tooploox/oya-fixtures/pack1: v1.1.0
-    foo: echo "bar"
+      github.com/tooploox/oya-fixtures/pack1: v1.0.0
+
+    Import:
+      pack1: github.com/tooploox/oya-fixtures/pack1
     """
+  When I run "oya run pack1.version"
+  Then the command succeeds
+  And the command outputs to stdout
+    """
+    1.1.1
 
+    """
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
+    """
+    1.1.1
 
-# Scenario: Indirectly required higher version
-#   Given file ./Oyafile containing
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack-requiring-pack1: v1.1.0
-#       github.com/tooploox/oya-fixtures/pack1: v1.0.0
-#     foo: echo "bar"
-#     """
-#   When I run "oya run foo"
-#   Then the command succeeds
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1/VERSION contains
-#     """
-#     v1.1.0
-#     """
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/Oyafile exists
-#   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack-requiring-pack1/VERSION contains
-#     """
-#     v1.1.0
-#     """
-#   And file ./Oyafile contains
-#     """
-#     Project: project
-#     Require:
-#       github.com/tooploox/oya-fixtures/pack-requiring-pack1: v1.1.0
-#       github.com/tooploox/oya-fixtures/pack1: v1.1.0  # indirect
-#     foo: echo "bar"
-#     """
+    """
 
 #   # Two different major versions -- different paths
 #   # Two different major versions -- same path (conflict)

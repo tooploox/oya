@@ -10,5 +10,5 @@ type Deps interface {
 	Load(importPath types.ImportPath) (*oyafile.Oyafile, bool, error)
 	Find(importPath types.ImportPath) (pack.Pack, bool, error)
 	ForEach(f func(pack.Pack) error) error
-	// BuildList() error
+	Explode() error
 }

@@ -3,10 +3,12 @@ package repo
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
@@ -147,7 +149,6 @@ func (l *GithubRepo) Install(version semver.Version, installDir string) error {
 			return err
 		}
 		targetPath := filepath.Join(targetPath, relPath)
-		log.Println("Copying", f.Name, "to", targetPath)
 		return copyFile(f, targetPath)
 	})
 }
@@ -165,16 +166,45 @@ func (l *GithubRepo) IsInstalled(version semver.Version, installDir string) (boo
 }
 
 func (l *GithubRepo) Reqs(version semver.Version) ([]pack.Pack, error) {
-	// commit, err := l.checkout(version)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// f, err := commit.File(raw.DefaultName)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	// BUG(bilus): This is a slow way to get requirements for a pack.
+	// It involves installing it out to a local directory.
+	// But it's also the simplest one. We can optimize by using HTTP
+	// access to pull in Oyafile and then parse the Require: section here.
+	// It means duplicating the logic including the assumption that the requires
+	// will always be stored in Oyafile, rather than a separate file along the lines
+	// of go.mod.
 
-	return nil, nil
+	tempDir, err := ioutil.TempDir("", "oya")
+	defer os.RemoveAll(tempDir)
+
+	err = l.Install(version, tempDir)
+	if err != nil {
+		return nil, err
+	}
+
+	fullPath := l.InstallPath(version, tempDir)
+	o, found, err := oyafile.LoadFromDir(fullPath, fullPath)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ErrNoRootOyafile{l.importPath, version}
+	}
+
+	packs := make([]pack.Pack, len(o.Requires))
+	for i, require := range o.Requires {
+		repo, err := Open(require.ImportPath)
+		if err != nil {
+			return nil, err
+		}
+		pack, err := repo.Version(require.Version)
+		if err != nil {
+			return nil, err
+		}
+		packs[i] = pack
+	}
+
+	return packs, nil
 }
 
 func copyFile(f *object.File, targetPath string) error {

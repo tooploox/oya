@@ -45,8 +45,12 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 	for _, r := range required {
 		queue.Add(Job{r})
 	}
+	var firstErr error
 	queue.Do(10,
 		func(job internal.Job) {
+			if firstErr != nil {
+				return
+			}
 			mtx.Lock()
 			crnt, ok := job.Payload().(pack.Pack)
 			if !ok {
@@ -60,13 +64,18 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 
 			reqs, err := reqs.Reqs(crnt)
 			if err != nil {
-				// BUG(bilus): Handle errors by logging them & setting err.
+				firstErr = err
+				return
 			}
 
 			for _, req := range reqs {
 				queue.Add(Job{req})
 			}
 		})
+
+	if firstErr != nil {
+		return nil, firstErr
+	}
 
 	packs := make([]pack.Pack, 0)
 	for _, pack := range latest {

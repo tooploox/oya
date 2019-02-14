@@ -27,6 +27,7 @@ func New(repo Repo, version semver.Version) (Pack, error) {
 }
 
 func (p Pack) Install(installDir string) error {
+	// log.Println("Installing", p.ImportPath(), "@", p.Version(), "to", installDir)
 	err := p.repo.Install(p.version, installDir)
 	if err != nil {
 		return errors.Wrapf(err, "error installing pack %v", p.ImportPath())
