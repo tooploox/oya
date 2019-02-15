@@ -237,3 +237,19 @@ Scenario: Run render in alias scope can access variables directly
   bar
   banana
   """
+
+Scenario: Use sprig functions (http://masterminds.github.io/sprig)
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    foo: |
+      echo $Upper(Join(" ", Args))
+    """
+  When I run "oya run foo bar baz qux"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  BAR BAZ QUX
+
+  """
