@@ -14,6 +14,24 @@ Scenario: Render a template
     """
     $foo
     """
+  When I run "oya render ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  xxx
+  """
+
+Scenario: Render a template explicitly pointing to the Oyafile
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo: xxx
+    """
+  Given file ./templates/file.txt containing
+    """
+    $foo
+    """
   When I run "oya render -f ./Oyafile ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
@@ -37,7 +55,7 @@ Scenario: Render a template directory
     """
     $bar
     """
-  When I run "oya render -f ./Oyafile ./templates/"
+  When I run "oya render ./templates/"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -64,7 +82,7 @@ Scenario: Render templated paths
     """
     $bar
     """
-  When I run "oya render -f ./Oyafile ./templates/"
+  When I run "oya render ./templates/"
   Then the command succeeds
   And file ./xxx.txt contains
   """
@@ -95,7 +113,7 @@ Scenario: Render templated values in alias scope
     """
     $fruit
     """
-  When I run "oya render -f ./Oyafile -a foo ./templates/file.txt"
+  When I run "oya render -a foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -125,7 +143,7 @@ Scenario: Render templated values in alias scope can be overridden
     """
     $fruit
     """
-  When I run "oya render -f ./Oyafile -a foo ./templates/file.txt"
+  When I run "oya render -a foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -152,7 +170,7 @@ Scenario: Imported tasks render using target Oyafile scope
       fruit: orange
 
     render:
-      $OyaCmd render -f ./Oyafile ./templates/file.txt
+      $OyaCmd render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
@@ -182,7 +200,7 @@ Scenario: Alias scope can we detected in imported tasks
       fruit: orange
 
     render:
-      $OyaCmd render --auto-scope -f ./Oyafile ./templates/file.txt
+      $OyaCmd render --auto-scope ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
@@ -215,7 +233,7 @@ Scenario: Render templated values in alias scope can be overridden when auto-det
       fruit: orange
 
     render:
-      $OyaCmd render --auto-scope -f ./Oyafile ./templates/file.txt
+      $OyaCmd render --auto-scope ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
