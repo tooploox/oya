@@ -93,7 +93,7 @@ Scenario: Render templated paths
   yyy
   """
 
-Scenario: Render templated values in alias scope
+Scenario: Rendering values in specified scope pointing to imported pack
   Given file ./Oyafile containing
     """
     Project: project
@@ -120,7 +120,7 @@ Scenario: Render templated values in alias scope
   orange
   """
 
-Scenario: Render templated values in alias scope can be overridden
+Scenario: Rendered values in specified scope can be overridden
   Given file ./Oyafile containing
     """
     Project: project
@@ -183,7 +183,7 @@ Scenario: Imported tasks render using target Oyafile scope
   apple
   """
 
-Scenario: Alias scope can we detected in imported tasks
+Scenario: Scope can we detected in imported tasks
   Given file ./Oyafile containing
     """
     Project: project
@@ -213,7 +213,7 @@ Scenario: Alias scope can we detected in imported tasks
   orange
   """
 
-Scenario: Render templated values in alias scope can be overridden when auto-detecting scope
+Scenario: Values in auto-detected scope can be overridden
   Given file ./Oyafile containing
     """
     Project: project
@@ -244,4 +244,45 @@ Scenario: Render templated values in alias scope can be overridden when auto-det
   And file ./file.txt contains
   """
   banana
+  """
+
+Scenario: Rendering values in specified scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+      fruits:
+        fruit: orange
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya render --scope fruits ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  orange
+  """
+
+Scenario: Rendering values in specified nested scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+      plants:
+        fruits:
+          fruit: orange
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya render --scope plants.fruits ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  orange
   """
