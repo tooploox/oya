@@ -17,6 +17,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
+	github.com/go-test/deep v1.0.1
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0
 	github.com/hashicorp/go-getter v1.0.2
