@@ -11,6 +11,8 @@ import (
 	"github.com/bilus/oya/pkg/template"
 )
 
+var sprigFunctions = upcaseFuncNames(sprig.GenericFuncMap())
+
 func (o *Oyafile) addBuiltIns() error {
 	o.Values = o.Values.Merge(o.defaultValues())
 	return nil
@@ -22,17 +24,25 @@ func (o *Oyafile) defaultValues() template.Scope {
 	}
 
 	// Import sprig functions (http://masterminds.github.io/sprig/).
-	sprigFunctions := sprig.GenericFuncMap()
 	for name, f := range sprigFunctions {
-		upcaseName := string(unicode.ToUpper(rune(name[0]))) + name[1:] // We know we can cast the first byte to rune, these are function names, man!
-		_, exists := scope[upcaseName]
+		_, exists := scope[name]
 		if exists {
 			panic(fmt.Sprintf("INTERNAL: Conflicting sprig function name: %q", name))
 		}
-		scope[upcaseName] = f
+		scope[name] = f
 	}
 
 	return scope
+}
+
+func upcaseFuncNames(funcs map[string]interface{}) map[string]interface{} {
+	upcased := make(map[string]interface{})
+	for name, f := range funcs {
+		// We know we can cast the first byte to rune, these are function names.
+		upcasedName := string(unicode.ToUpper(rune(name[0]))) + name[1:]
+		upcased[upcasedName] = f
+	}
+	return upcased
 }
 
 // bindTasks returns a map of functions allowing invoking other tasks via $Tasks.xyz().
