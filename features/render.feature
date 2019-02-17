@@ -286,3 +286,50 @@ Scenario: Rendering values in specified nested scope
   """
   orange
   """
+
+Scenario: Rendering one file to an output dir
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+      fruit: orange
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya render --output-dir ./foobar ./templates/file.txt"
+  Then the command succeeds
+  And file ./foobar/file.txt contains
+  """
+  orange
+  """
+
+Scenario: Rendering a dir to an output dir
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+      culprit: Eve
+      weapon: apple
+    """
+  And file ./templates/file1.txt containing
+    """
+    $weapon
+    """
+  And file ./templates/file2.txt containing
+    """
+    $culprit
+    """
+  When I run "oya render --output-dir ./foobar ./templates/"
+  Then the command succeeds
+  And file ./foobar/file1.txt contains
+  """
+  apple
+  """
+  And file ./foobar/file2.txt contains
+  """
+  Eve
+  """
