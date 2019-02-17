@@ -27,6 +27,7 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -64,6 +65,21 @@ func ExecuteE() error {
 // SetOutput overrides cobra output (for testing).
 func SetOutput(out io.Writer) {
 	rootCmd.SetOutput(out)
+}
+
+// Reset all flags for all commands to their default values (testing).
+func ResetFlags() {
+	resetFlagsRecurse(rootCmd)
+}
+
+func resetFlagsRecurse(cmd *cobra.Command) {
+	cmd.Flags().VisitAll(
+		func(flag *pflag.Flag) {
+			flag.Value.Set(flag.DefValue)
+		})
+	for _, child := range cmd.Commands() {
+		resetFlagsRecurse(child)
+	}
 }
 
 func init() {
