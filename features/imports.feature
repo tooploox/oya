@@ -234,3 +234,30 @@ Scenario: Import tasks in a subdir Oyafile
   all
 
   """
+
+Scenario: Import tasks from a subdirectory
+  Given file ./Oyafile containing
+    """
+    Project: main
+    """
+  And file ./project1/Oyafile containing
+    """
+    Values:
+      foo: project1
+
+    echo: |
+      echo "project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    Import:
+      project1: /project1
+    """
+  And I'm in the ./project2 dir
+  When I run "oya run project1.echo"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  project1
+
+  """

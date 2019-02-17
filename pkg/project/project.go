@@ -85,46 +85,45 @@ func (p *Project) RunTargets(workDir string, recurse, useChangeset bool) ([]*oya
 		}
 
 		if !recurse {
-			o, err := p.rootOyafile()
-			if err != nil {
-				return nil, err
-			}
-			return []*oyafile.Oyafile{o}, nil
+			return p.oneTargetIn(workDir)
 		} else {
 			return changes, nil
 		}
 	} else {
 		if !recurse {
-			o, err := p.rootOyafile()
-			if err != nil {
-				return nil, err
-			}
-			return []*oyafile.Oyafile{o}, nil
+			return p.oneTargetIn(workDir)
 		} else {
 			return p.List(workDir)
 		}
 	}
 }
 
-func (p *Project) rootOyafile() (*oyafile.Oyafile, error) {
-	o, found, err := oyafile.LoadFromDir(p.RootDir, p.RootDir)
+func (p *Project) oneTargetIn(dir string) ([]*oyafile.Oyafile, error) {
+	o, err := p.oyafileIn(dir)
+	if err != nil {
+		return nil, err
+	}
+	return []*oyafile.Oyafile{o}, nil
+}
+
+func (p *Project) oyafileIn(dir string) (*oyafile.Oyafile, error) {
+	o, found, err := oyafile.LoadFromDir(dir, p.RootDir)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
-		return nil, ErrNoOyafile{Path: p.RootDir}
+		return nil, ErrNoOyafile{Path: dir}
 	}
-
 	return o, nil
 }
 
-func (p *Project) rootRawOyafile() (*raw.Oyafile, error) {
-	o, found, err := raw.LoadFromDir(p.RootDir, p.RootDir)
+func (p *Project) rawOyafileIn(dir string) (*raw.Oyafile, error) {
+	o, found, err := raw.LoadFromDir(dir, p.RootDir)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
-		return nil, ErrNoOyafile{Path: p.RootDir}
+		return nil, ErrNoOyafile{Path: dir}
 	}
 
 	return o, nil

@@ -230,3 +230,24 @@ Scenario: Running recursively
   And file ././Root does not exist
   And file ./Project1 exists
   And file ./../project2/Project2 does not exist
+
+Scenario: Running in a subdirectory
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      echo "Project1"
+    """
+  And I'm in the ./project1 dir
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Project1
+
+  """
