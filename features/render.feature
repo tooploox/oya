@@ -113,7 +113,7 @@ Scenario: Render templated values in alias scope
     """
     $fruit
     """
-  When I run "oya render -a foo ./templates/file.txt"
+  When I run "oya render --scope foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -143,7 +143,7 @@ Scenario: Render templated values in alias scope can be overridden
     """
     $fruit
     """
-  When I run "oya render -a foo ./templates/file.txt"
+  When I run "oya render --scope foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """

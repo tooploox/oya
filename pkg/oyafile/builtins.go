@@ -68,6 +68,6 @@ func (o *Oyafile) bindTasks(taskName task.Name, t task.Task, stdout, stderr io.W
 func (o *Oyafile) bindRender(taskName task.Name, stdout, stderr io.Writer) (func(string) string, error) {
 	alias, _ := taskName.Split()
 	return func(templatePath string) string {
-		return fmt.Sprintf("%s render -a %q %s\n", o.OyaCmd, alias, templatePath)
+		return fmt.Sprintf("%s render --scope %q %s\n", o.OyaCmd, alias, templatePath)
 	}, nil
 }

@@ -8,16 +8,16 @@ import (
 	"github.com/bilus/oya/pkg/template"
 )
 
-type ErrNoAlias struct {
-	Alias       string
+type ErrNoScope struct {
+	Scope       string
 	OyafilePath string
 }
 
-func (err ErrNoAlias) Error() string {
-	return fmt.Sprintf("Unknown import alias %q in %v", err.Alias, err.OyafilePath)
+func (err ErrNoScope) Error() string {
+	return fmt.Sprintf("Scope %q not found in %v", err.Scope, err.OyafilePath)
 }
 
-func Render(oyafilePath, templatePath, outputPath string, autoScope bool, alias string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeSelector string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -44,19 +44,19 @@ func Render(oyafilePath, templatePath, outputPath string, autoScope bool, alias 
 
 	var values template.Scope
 	if found {
-		if autoScope && alias == "" {
-			alias, _ = lookupOyaScope()
+		if autoScope && scopeSelector == "" {
+			scopeSelector, _ = lookupOyaScope()
 		}
-		if alias != "" {
-			av, ok := o.Values[alias]
+		if scopeSelector != "" {
+			av, ok := o.Values[scopeSelector]
 			if !ok {
-				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
+				return ErrNoScope{Scope: scopeSelector, OyafilePath: oyafilePath}
 			}
-			aliasScope, ok := av.(template.Scope)
+			selectedScope, ok := av.(template.Scope)
 			if !ok {
-				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
+				return ErrNoScope{Scope: scopeSelector, OyafilePath: oyafilePath}
 			}
-			values = aliasScope
+			values = selectedScope
 		} else {
 			values = o.Values
 		}

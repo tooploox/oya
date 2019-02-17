@@ -45,17 +45,17 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		alias, err := cmd.Flags().GetString("alias")
+		scopeSelector, err := cmd.Flags().GetString("scope")
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, outputPath, autoScope, alias, cmd.OutOrStdout(), cmd.OutOrStderr())
+		return internal.Render(fullOyafilePath, templatePath, outputPath, autoScope, scopeSelector, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(renderCmd)
 	renderCmd.Flags().StringP("file", "f", "Oyafile", "Read FILE as Oyafile")
-	renderCmd.Flags().StringP("alias", "a", "", "Render template in alias context")
-	renderCmd.Flags().BoolP("auto-scope", "s", false, "Automatically detect scope when running in imported tasks")
+	renderCmd.Flags().StringP("scope", "s", "", "Render template within the specified value scope")
+	renderCmd.Flags().BoolP("auto-scope", "a", false, "Automatically detect value scope when running in imported tasks")
 }
