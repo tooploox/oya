@@ -136,7 +136,7 @@ Scenario: Access current project values
       echo $p1.foo
       echo $foo
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -227,7 +227,7 @@ Scenario: Import tasks in a subdir Oyafile
       echo "all"
     """
   And I'm in the ./subdir dir
-  When I run "oya run foo.all"
+  When I run "oya run --recurse foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """

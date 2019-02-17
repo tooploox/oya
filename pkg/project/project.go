@@ -34,7 +34,7 @@ func Detect(workDir, installDir string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) Run(workDir string, taskName task.Name, scope template.Scope, stdout, stderr io.Writer) error {
+func (p *Project) Run(workDir string, taskName task.Name, recurse bool, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)
@@ -51,8 +51,19 @@ func (p *Project) Run(workDir string, taskName task.Name, scope template.Scope, 
 		return err
 	}
 
+	var targets []*oyafile.Oyafile
+	if !recurse {
+		o, err := p.rootOyafile()
+		if err != nil {
+			return err
+		}
+		targets = append(targets, o)
+	} else {
+		targets = changes
+	}
+
 	foundAtLeastOneTask := false
-	for _, o := range changes {
+	for _, o := range targets {
 		err = o.Build(dependencies)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)

@@ -23,7 +23,7 @@ Scenario: Successfully run task
   """
   And file ./OK exists
 
-Scenario: Nested Oyafiles
+Scenario: Nested Oyafiles are not processed recursively by default
   Given file ./Oyafile containing
     """
     Project: project
@@ -44,6 +44,37 @@ Scenario: Nested Oyafiles
       echo "Project2"
     """
   When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Root
+
+  """
+  And file ./Root exists
+  And file ./project1/Project1 does not exist
+  And file ./project2/Project2 does not exist
+
+Scenario: Nested Oyafiles can be processed recursively
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      touch Root
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      touch Project1
+      echo "Project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    all: |
+      touch Project2
+      echo "Project2"
+    """
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
