@@ -37,7 +37,7 @@ func Detect(workDir, installDir string) (*Project, error) {
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
-	targets, err := p.gatherRunTargets(workDir, recurse, useChangeset)
+	targets, err := p.RunTargets(workDir, recurse, useChangeset)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	return nil
 }
 
-func (p *Project) gatherRunTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+func (p *Project) RunTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
 	if useChangeset {
 		changes, err := p.Changeset(workDir)
 		if err != nil {
