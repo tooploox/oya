@@ -21,6 +21,7 @@ func (o *Oyafile) addBuiltIns() error {
 func (o *Oyafile) defaultValues() template.Scope {
 	scope := template.Scope{
 		"BasePath": o.Dir,
+		"OyaCmd":   o.OyaCmd,
 	}
 
 	// Import sprig functions (http://masterminds.github.io/sprig/).
