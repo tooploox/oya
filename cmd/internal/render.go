@@ -17,7 +17,7 @@ func (err ErrNoAlias) Error() string {
 	return fmt.Sprintf("Unknown import alias %q in %v", err.Alias, err.OyafilePath)
 }
 
-func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath, outputPath string, autoScope bool, alias string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -44,6 +44,9 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 
 	var values template.Scope
 	if found {
+		if autoScope && alias == "" {
+			alias, _ = lookupOyaScope()
+		}
 		if alias != "" {
 			av, ok := o.Values[alias]
 			if !ok {

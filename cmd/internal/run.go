@@ -27,7 +27,14 @@ func Run(workDir, taskName string, positionalArgs []string, flags map[string]str
 	if err != nil {
 		return err
 	}
-	return p.Run(workDir, task.Name(taskName), toScope(positionalArgs, flags).Merge(values), stdout, stderr)
+	tn := task.Name(taskName)
+
+	alias, _ := tn.Split()
+	if err := setOyaScope(alias.String()); err != nil {
+		return err
+	}
+
+	return p.Run(workDir, tn, toScope(positionalArgs, flags).Merge(values), stdout, stderr)
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {

@@ -131,3 +131,99 @@ Scenario: Render templated values in alias scope can be overridden
   """
   banana
   """
+
+Scenario: Imported tasks render using target Oyafile scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      fruit: apple
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    Values:
+      fruit: orange
+
+    render:
+      $OyaCmd render -f ./Oyafile ./templates/file.txt
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya run foo.render"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  apple
+  """
+
+Scenario: Alias scope can we detected in imported tasks
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    Values:
+      fruit: orange
+
+    render:
+      $OyaCmd render --auto-scope -f ./Oyafile ./templates/file.txt
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya run foo.render"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  orange
+  """
+
+Scenario: Render templated values in alias scope can be overridden when auto-detecting scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      foo.fruit: banana
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    Values:
+      fruit: orange
+
+    render:
+      $OyaCmd render --auto-scope -f ./Oyafile ./templates/file.txt
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya run foo.render"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  banana
+  """
