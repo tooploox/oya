@@ -34,32 +34,21 @@ func Detect(workDir, installDir string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) Run(workDir string, taskName task.Name, recurse bool, scope template.Scope, stdout, stderr io.Writer) error {
+func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
-	changes, err := p.Changeset(workDir)
+	targets, err := p.gatherRunTargets(workDir, recurse, useChangeset)
 	if err != nil {
 		return err
 	}
 
-	if len(changes) == 0 {
+	if len(targets) == 0 {
 		return nil
 	}
 
 	dependencies, err := p.Deps()
 	if err != nil {
 		return err
-	}
-
-	var targets []*oyafile.Oyafile
-	if !recurse {
-		o, err := p.rootOyafile()
-		if err != nil {
-			return err
-		}
-		targets = append(targets, o)
-	} else {
-		targets = changes
 	}
 
 	foundAtLeastOneTask := false
@@ -82,6 +71,39 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse bool, scope te
 		}
 	}
 	return nil
+}
+
+func (p *Project) gatherRunTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+	if useChangeset {
+		changes, err := p.Changeset(workDir)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(changes) == 0 {
+			return nil, nil
+		}
+
+		if !recurse {
+			o, err := p.rootOyafile()
+			if err != nil {
+				return nil, err
+			}
+			return []*oyafile.Oyafile{o}, nil
+		} else {
+			return changes, nil
+		}
+	} else {
+		if !recurse {
+			o, err := p.rootOyafile()
+			if err != nil {
+				return nil, err
+			}
+			return []*oyafile.Oyafile{o}, nil
+		} else {
+			return p.List(workDir)
+		}
+	}
 }
 
 func (p *Project) rootOyafile() (*oyafile.Oyafile, error) {

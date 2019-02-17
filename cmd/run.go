@@ -48,13 +48,18 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, recurse, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
+		changeset, err := cmd.Flags().GetBool("changeset")
+		if err != nil {
+			return err
+		}
+		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
+	runCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
 }
 
 func parseArgs(args []string) ([]string, string, []string, map[string]string, error) {
