@@ -75,27 +75,9 @@ func resolveScope(scopeSelector []string, scope template.Scope) (template.Scope,
 	if !ok {
 		return nil, errors.Errorf("Missing key %q", scopeName)
 	}
-	subScope, ok := parseScope(potentialScope)
+	subScope, ok := template.ParseScope(potentialScope)
 	if !ok {
 		return nil, errors.Errorf("Unsupported scope under %q", scopeName)
 	}
 	return resolveScope(scopeSelector[1:], subScope)
-}
-
-func parseScope(potentialScope interface{}) (template.Scope, bool) {
-	if selectedScope, ok := potentialScope.(template.Scope); ok {
-		return selectedScope, true
-	}
-	if aMap, ok := potentialScope.(map[interface{}]interface{}); ok {
-		scope := make(template.Scope)
-		for k, v := range aMap {
-			name, ok := k.(string)
-			if !ok {
-				return nil, false
-			}
-			scope[name] = v
-		}
-		return scope, true
-	}
-	return nil, false
 }
