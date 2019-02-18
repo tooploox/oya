@@ -1,8 +1,9 @@
-package pack
+package repo
 
 import (
 	"fmt"
 
+	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
 )
 
@@ -22,4 +23,14 @@ type ErrNoTaggedVersions struct {
 
 func (err ErrNoTaggedVersions) Error() string {
 	return fmt.Sprintf("no available remote versions for import path %q", err.ImportPath)
+}
+
+// ErrNoRootOyafile indicates that pack's root Oyafile is missing.
+type ErrNoRootOyafile struct {
+	ImportPath types.ImportPath
+	Version    semver.Version
+}
+
+func (err ErrNoRootOyafile) Error() string {
+	return fmt.Sprintf("missing top-level Oyafile for pack %v version %v", err.ImportPath, err.Version)
 }

@@ -1,12 +1,16 @@
 package project
 
 import (
+	"sort"
+
 	"github.com/bilus/oya/pkg/deptree"
+	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/repo"
 	"github.com/bilus/oya/pkg/types"
 )
 
-func (p Project) Require(pack pack.Pack) error {
+func (p *Project) Require(pack pack.Pack) error {
 	raw, err := p.rootRawOyafile()
 	if err != nil {
 		return err
@@ -15,15 +19,16 @@ func (p Project) Require(pack pack.Pack) error {
 	if err != nil {
 		return err
 	}
+
 	p.dependencies = nil // Force reload.
 	return nil
 }
 
-func (p Project) Install(pack pack.Pack) error {
+func (p *Project) Install(pack pack.Pack) error {
 	return pack.Install(p.installDir)
 }
 
-func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
+func (p *Project) IsInstalled(pack pack.Pack) (bool, error) {
 	return pack.IsInstalled(p.installDir)
 }
 
@@ -31,13 +36,13 @@ func (p Project) IsInstalled(pack pack.Pack) (bool, error) {
 // It works in two steps:
 // 1. It goes through all Import: directives and updates the Require: section with missing packs in their latest versions.
 // 2. It installs all packs that haven't been installed.
-func (p Project) InstallPacks() error {
+func (p *Project) InstallPacks() error {
 	err := p.updateDependencies()
 	if err != nil {
 		return err
 	}
 
-	deps, err := p.Dependencies()
+	deps, err := p.Deps()
 	if err != nil {
 		return err
 	}
@@ -50,58 +55,63 @@ func (p Project) InstallPacks() error {
 			if installed {
 				return nil
 			}
-			return p.Install(pack)
+			err = p.Install(pack)
+			return err
 		},
 	)
 }
 
-func (p Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {
-	deps, err := p.Dependencies()
+func (p *Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {
+	deps, err := p.Deps()
 	if err != nil {
-		return nil, false, err
+		return pack.Pack{}, false, err
 	}
 	return deps.Find(importPath)
 }
 
-func (p Project) Dependencies() (deptree.DependencyTree, error) {
+func (p *Project) Deps() (Deps, error) {
 	if p.dependencies != nil {
-		return *p.dependencies, nil
+		return p.dependencies, nil
 	}
 
 	o, err := p.rootOyafile()
 	if err != nil {
-		return deptree.DependencyTree{}, err
+		return nil, err
 	}
 	installDirs := []string{
 		p.installDir,
 	}
-	ldr, err := deptree.New(p.RootDir, installDirs, o.Require)
+	requires, err := resolvePackReferences(o.Requires)
 	if err != nil {
-		return deptree.DependencyTree{}, err
+		return nil, err
 	}
-	p.dependencies = &ldr
+	ldr, err := deptree.New(p.RootDir, installDirs, requires)
+	if err != nil {
+		return nil, err
+	}
+	err = ldr.Explode()
+	if err != nil {
+		return nil, err
+	}
+	p.dependencies = ldr
 	return ldr, nil
 }
 
-func (p Project) updateDependencies() error {
+func (p *Project) updateDependencies() error {
 	files, err := p.List(p.RootDir)
 	if err != nil {
 		return err
 	}
 
-	importPaths := make(map[types.ImportPath]struct{})
-	for _, o := range files {
-		for _, importPath := range o.Imports {
-			importPaths[importPath] = struct{}{}
-		}
-	}
-
-	deps, err := p.Dependencies()
+	deps, err := p.Deps()
 	if err != nil {
 		return err
 	}
 
-	for importPath := range importPaths {
+	// Collect all import paths from all Oyafiles. Make them unique.
+	// Also, sort them to make writing reliable tests easier.
+	importPaths := uniqueSortedImportPaths(files)
+	for _, importPath := range importPaths {
 		_, found, err := deps.Find(importPath)
 		if err != nil {
 			return err
@@ -110,11 +120,11 @@ func (p Project) updateDependencies() error {
 			continue
 		}
 
-		l, err := pack.OpenLibrary(importPath)
+		l, err := repo.Open(importPath)
 		if err != nil {
 			// Import paths can also be relative to the root directory.
 			// BUG(bilus): I don't particularly like it how tihs logic is split. Plus we may be masking some other errors this way
-			if _, ok := err.(pack.ErrNotGithub); ok {
+			if _, ok := err.(repo.ErrNotGithub); ok {
 				continue
 			}
 			return err
@@ -129,7 +139,40 @@ func (p Project) updateDependencies() error {
 			return err
 		}
 	}
-
-	p.dependencies = nil // Force reload.
 	return nil
+}
+
+func uniqueSortedImportPaths(oyafiles []*oyafile.Oyafile) []types.ImportPath {
+	importPathSet := make(map[types.ImportPath]struct{})
+	importPaths := make([]types.ImportPath, 0)
+	for _, o := range oyafiles {
+		for _, importPath := range o.Imports {
+			if _, exists := importPathSet[importPath]; !exists {
+				importPaths = append(importPaths, importPath)
+			}
+			importPathSet[importPath] = struct{}{}
+		}
+	}
+
+	sort.Slice(importPaths, func(i, j int) bool {
+		return importPaths[i] < importPaths[j]
+	})
+
+	return importPaths
+}
+
+func resolvePackReferences(references []oyafile.PackReference) ([]pack.Pack, error) {
+	packs := make([]pack.Pack, len(references))
+	for i, reference := range references {
+		l, err := repo.Open(reference.ImportPath)
+		if err != nil {
+			return nil, err
+		}
+		pack, err := l.Version(reference.Version)
+		if err != nil {
+			return nil, err
+		}
+		packs[i] = pack
+	}
+	return packs, nil
 }

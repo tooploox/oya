@@ -31,6 +31,7 @@ require (
 	github.com/pelletier/go-toml v1.2.0
 	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/rogpeppe/go-internal v1.2.0
 	github.com/sanity-io/litter v0.0.0-20181009143221-cdb60d0035dc
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v0.0.0-20180213143110-8c0189d9f6bb
@@ -45,6 +46,7 @@ require (
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/ulikunitz/xz v0.5.5
+	github.com/xeoncross/goworkqueue v0.0.0-20180512210549-cc56da012079
 	github.com/ziutek/kasia.go v0.0.0-20150722135753-be46c452e867
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/crypto v0.0.0-20190131182504-b8fe1690c613

@@ -32,7 +32,7 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 		return err
 	}
 
-	dt, err := proj.Dependencies()
+	dt, err := proj.Deps()
 	if err != nil {
 		return err
 	}

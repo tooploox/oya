@@ -5,9 +5,14 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
 )
+
+type Pack interface {
+	ImportPath() types.ImportPath
+	Version() semver.Version
+}
 
 type ErrNotRootOyafile struct {
 	Path string
@@ -24,7 +29,7 @@ var topLevelKeyRegexp = regexp.MustCompile("^[\\s]+:")
 var defaultIndent = 2
 
 // AddRequire adds a Require: entry for the pack.
-func (raw *Oyafile) AddRequire(pack pack.Pack) error {
+func (raw *Oyafile) AddRequire(pack Pack) error {
 	if err := raw.addRequire(pack); err != nil {
 		return err
 	}
@@ -39,7 +44,7 @@ func (raw *Oyafile) AddRequire(pack pack.Pack) error {
 // 5. Fail because Oyafile has no Project: so we shouldn't be trying to add a require to it.
 // The method stops if any of the steps succeeds.
 // NOTE: It does not modify the Oyafile on disk.
-func (raw *Oyafile) addRequire(pack pack.Pack) error {
+func (raw *Oyafile) addRequire(pack Pack) error {
 	if found, err := raw.updateExistingEntry(pack); err != nil || found {
 		return err // nil if found
 	}
@@ -61,7 +66,7 @@ func (raw *Oyafile) addRequire(pack pack.Pack) error {
 	return nil
 }
 
-func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
+func (raw *Oyafile) updateExistingEntry(pack Pack) (bool, error) {
 	return raw.replaceAllWhen(
 		func(line string) bool {
 			if matches := requireEntryRegexp.FindStringSubmatch(line); len(matches) == 4 {
@@ -72,11 +77,11 @@ func (raw *Oyafile) updateExistingEntry(pack pack.Pack) (bool, error) {
 		}, []string{formatRequire(0, pack)}...)
 }
 
-func (raw *Oyafile) insertBeforeExistingEntry(pack pack.Pack) (bool, error) {
+func (raw *Oyafile) insertBeforeExistingEntry(pack Pack) (bool, error) {
 	return raw.insertBeforeWithin("Require", requireEntryRegexp, formatRequire(0, pack))
 }
 
-func formatRequire(indent int, pack pack.Pack) string {
+func formatRequire(indent int, pack Pack) string {
 	return fmt.Sprintf("%v%v: %v",
 		strings.Repeat(" ", indent),
 		pack.ImportPath(),

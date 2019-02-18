@@ -11,11 +11,11 @@ import (
 	"k8s.io/helm/pkg/ignore"
 )
 
-func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
+func (p *Project) Oyafiles() ([]*oyafile.Oyafile, error) {
 	return listOyafiles(p.RootDir, p.RootDir)
 }
 
-func (p Project) List(startDir string) ([]*oyafile.Oyafile, error) {
+func (p *Project) List(startDir string) ([]*oyafile.Oyafile, error) {
 	return listOyafiles(startDir, p.RootDir)
 }
 

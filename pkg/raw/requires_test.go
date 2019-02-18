@@ -22,7 +22,7 @@ func TestOyafile_AddRequire_NoRequire(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/foo", "v1.0.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/foo", "v1.0.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -45,7 +45,7 @@ func TestOyafile_AddRequire_EmptyRequire(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/foo", "v1.0.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/foo", "v1.0.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -69,7 +69,7 @@ func TestOyafile_AddRequire_ExistingRequire(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/bar", "v1.1.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.1.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -94,7 +94,7 @@ func TestOyafile_AddRequire_SameVersion(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/foo", "v1.0.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/foo", "v1.0.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -118,7 +118,7 @@ func TestOyafile_AddRequire_DifferentVersion(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/foo", "v1.1.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/foo", "v1.1.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -142,7 +142,7 @@ func TestOyafile_AddRequire_MoreKeys(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/bar", "v1.1.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.1.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
@@ -168,7 +168,7 @@ func TestOyafile_AddRequire_DifferentVersionMoreKeys(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error loading raw Oyafile")
 	tu.AssertTrue(t, found, "No Oyafile found")
 
-	pack := tu.MustMakeMockPack(t, "github.com/tooploox/bar", "v1.5.0")
+	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.5.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
