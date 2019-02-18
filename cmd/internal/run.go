@@ -30,9 +30,11 @@ func Run(workDir, taskName string, positionalArgs []string, flags map[string]str
 	tn := task.Name(taskName)
 
 	alias, _ := tn.Split()
+	oldScope, _ := lookupOyaScope()
 	if err := setOyaScope(alias.String()); err != nil {
 		return err
 	}
+	defer setOyaScope(oldScope)
 
 	return p.Run(workDir, tn, toScope(positionalArgs, flags).Merge(values), stdout, stderr)
 }

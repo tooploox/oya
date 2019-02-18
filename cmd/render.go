@@ -62,5 +62,5 @@ func init() {
 	renderCmd.Flags().StringP("file", "f", "./Oyafile", "Path to Oyafile to read")
 	renderCmd.Flags().StringP("output-dir", "o", ".", "Specify the output DIRECTORY")
 	renderCmd.Flags().StringP("scope", "s", "", "Render template within the specified value scope")
-	renderCmd.Flags().BoolP("auto-scope", "a", false, "Automatically detect value scope when running in imported tasks")
+	renderCmd.Flags().BoolP("auto-scope", "a", true, "When running in an imported pack's task, use the pack's scope, unless --")
 }

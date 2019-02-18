@@ -150,7 +150,7 @@ Scenario: Rendered values in specified scope can be overridden
   banana
   """
 
-Scenario: Imported tasks render using target Oyafile scope
+Scenario: Imported tasks render using their own Oyafile scope by default
   Given file ./Oyafile containing
     """
     Project: project
@@ -160,9 +160,6 @@ Scenario: Imported tasks render using target Oyafile scope
 
     Import:
       foo: github.com/test/foo
-
-    Values:
-      fruit: apple
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
@@ -180,40 +177,10 @@ Scenario: Imported tasks render using target Oyafile scope
   Then the command succeeds
   And file ./file.txt contains
   """
-  apple
-  """
-
-Scenario: Scope can we detected in imported tasks
-  Given file ./Oyafile containing
-    """
-    Project: project
-
-    Require:
-      github.com/test/foo: v0.0.1
-
-    Import:
-      foo: github.com/test/foo
-    """
-  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
-    """
-    Values:
-      fruit: orange
-
-    render:
-      $OyaCmd render --auto-scope ./templates/file.txt
-    """
-  And file ./templates/file.txt containing
-    """
-    $fruit
-    """
-  When I run "oya run foo.render"
-  Then the command succeeds
-  And file ./file.txt contains
-  """
   orange
   """
 
-Scenario: Values in auto-detected scope can be overridden
+Scenario: Values in imported pack scope can be overridden
   Given file ./Oyafile containing
     """
     Project: project
@@ -233,7 +200,7 @@ Scenario: Values in auto-detected scope can be overridden
       fruit: orange
 
     render:
-      $OyaCmd render --auto-scope ./templates/file.txt
+      $OyaCmd render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
@@ -245,6 +212,39 @@ Scenario: Values in auto-detected scope can be overridden
   """
   banana
   """
+Scenario: Scope of the importing Oyafile can be optionally used
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      fruit: apple
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    Values:
+      fruit: orange
+
+    render:
+      $OyaCmd render --auto-scope=false ./templates/file.txt
+    """
+  And file ./templates/file.txt containing
+    """
+    $fruit
+    """
+  When I run "oya run foo.render"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  apple
+  """
+
 
 Scenario: Rendering values in specified scope
   Given file ./Oyafile containing
@@ -266,6 +266,7 @@ Scenario: Rendering values in specified scope
   orange
   """
 
+@xx
 Scenario: Rendering values in specified nested scope
   Given file ./Oyafile containing
     """
@@ -287,6 +288,7 @@ Scenario: Rendering values in specified nested scope
   orange
   """
 
+@xx
 Scenario: Rendering one file to an output dir
   Given file ./Oyafile containing
     """
