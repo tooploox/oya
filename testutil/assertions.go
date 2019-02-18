@@ -9,6 +9,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/go-test/deep"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/diff"
 )
@@ -80,17 +81,17 @@ func AssertEqualMsg(t *testing.T, expected, actual interface{}, msg string, args
 
 func AssertObjectsEqual(t *testing.T, expected, actual interface{}) {
 	t.Helper()
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("Objects are not equal.\n\nDiff: expected\tactual\n %v", diff.ObjectGoPrintSideBySide(expected, actual))
+	if df := deep.Equal(expected, actual); df != nil {
+		t.Errorf("Objects are not equal.\n\nDiff: expected\tactual\n %v\n\nSide-by-side: %v", df, diff.ObjectGoPrintSideBySide(expected, actual))
 	}
 }
 
 func AssertObjectsEqualMsg(t *testing.T, expected, actual interface{}, msg string, args ...interface{}) {
 	t.Helper()
-	if !reflect.DeepEqual(expected, actual) {
+	if df := deep.Equal(expected, actual); df != nil {
 		t.Errorf("%v: %v",
 			fmt.Sprintf(msg, args...),
-			fmt.Sprintf("objects are not equal.\n\nDiff: expected\tactual\n %v", diff.ObjectGoPrintSideBySide(expected, actual)))
+			fmt.Sprintf("objects are not equal.\n\nDiff:\n %v\n\nSide-by-side:\n%v", df, diff.ObjectGoPrintSideBySide(expected, actual)))
 	}
 }
 

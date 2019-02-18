@@ -3,6 +3,9 @@ module github.com/bilus/oya
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/DATA-DOG/godog v0.7.9
+	github.com/Masterminds/goutils v1.1.0 // indirect
+	github.com/Masterminds/semver v1.4.2 // indirect
+	github.com/Masterminds/sprig v2.18.0+incompatible
 	github.com/aws/aws-sdk-go v1.16.28
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
 	github.com/blang/semver v3.5.1+incompatible
@@ -14,11 +17,15 @@ require (
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
+	github.com/go-test/deep v1.0.1
+	github.com/google/uuid v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0
 	github.com/hashicorp/go-getter v1.0.2
 	github.com/hashicorp/go-safetemp v1.0.0
 	github.com/hashicorp/go-version v1.1.0
 	github.com/hashicorp/hcl v1.0.0
+	github.com/huandu/xstrings v1.2.0 // indirect
+	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
 	github.com/magiconair/properties v1.8.0
