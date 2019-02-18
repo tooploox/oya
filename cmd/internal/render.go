@@ -3,11 +3,9 @@ package internal
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
-	"github.com/pkg/errors"
 )
 
 type ErrNoScope struct {
@@ -19,7 +17,7 @@ func (err ErrNoScope) Error() string {
 	return fmt.Sprintf("Scope not found in %v: %q missing or cannot be used as a scope", err.OyafilePath, err.Scope)
 }
 
-func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeSelector string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopePath string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -46,38 +44,19 @@ func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeS
 
 	var values template.Scope
 	if found {
-		if autoScope && scopeSelector == "" {
-			scopeSelector, _ = lookupOyaScope()
+		if autoScope && scopePath == "" {
+			scopePath, _ = lookupOyaScope()
 		}
-		// BUG(bilus): Breaking encapsulation here (see task.Name#Split)
-		if scopeSelector != "" {
-			scopeSelectorParts := strings.Split(scopeSelector, ".")
-			values, err = resolveScope(scopeSelectorParts, o.Values)
+		if scopePath != "" {
+			values, err = o.Values.GetScopeAt(scopePath)
 		} else {
-			values, err = resolveScope(nil, o.Values)
+			values = o.Values
 		}
 		if err != nil {
 			// BUG(bilus): Ignoring err.
-			return ErrNoScope{Scope: scopeSelector, OyafilePath: oyafilePath}
+			return ErrNoScope{Scope: scopePath, OyafilePath: oyafilePath}
 		}
 	}
 
 	return template.RenderAll(templatePath, outputPath, values)
-}
-
-func resolveScope(scopeSelector []string, scope template.Scope) (template.Scope, error) {
-	if len(scopeSelector) == 0 {
-		return scope, nil
-	}
-
-	scopeName := scopeSelector[0]
-	potentialScope, ok := scope[scopeName]
-	if !ok {
-		return nil, errors.Errorf("Missing key %q", scopeName)
-	}
-	subScope, ok := template.ParseScope(potentialScope)
-	if !ok {
-		return nil, errors.Errorf("Unsupported scope under %q", scopeName)
-	}
-	return resolveScope(scopeSelector[1:], subScope)
 }

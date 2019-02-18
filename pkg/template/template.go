@@ -1,7 +1,6 @@
 package template
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -9,58 +8,6 @@ import (
 
 	kasia "github.com/ziutek/kasia.go"
 )
-
-type ErrScopeMergeConflict struct {
-	Key string
-}
-
-func (e ErrScopeMergeConflict) Error() string {
-	return fmt.Sprintf("key %v already exists", e.Key)
-}
-
-type Scope map[string]interface{}
-
-func ParseScope(v interface{}) (Scope, bool) {
-	if Scope, ok := v.(Scope); ok {
-		return Scope, true
-	}
-	if aMap, ok := v.(map[interface{}]interface{}); ok {
-		scope := make(Scope)
-		for k, v := range aMap {
-			name, ok := k.(string)
-			if !ok {
-				return nil, false
-			}
-			scope[name] = v
-		}
-		return scope, true
-	}
-	return nil, false
-}
-
-func (scope Scope) Merge(other Scope) Scope {
-	result := Scope{}
-	for k, v := range scope {
-		result[k] = v
-	}
-	for k, v := range other {
-		result[k] = v
-	}
-	return result
-}
-
-func (scope Scope) UpdateScopeAt(key string, f func(Scope) Scope) error {
-	target, ok := scope[key]
-	if !ok || target == nil {
-		target = Scope{}
-	}
-	targetScope, ok := ParseScope(target)
-	if !ok {
-		return ErrScopeMergeConflict{Key: key}
-	}
-	scope[key] = f(targetScope)
-	return nil
-}
 
 type Template interface {
 	Render(out io.Writer, values ...interface{}) error
