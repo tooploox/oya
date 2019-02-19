@@ -10,7 +10,7 @@ Background:
 
     """
 
-Scenario: It loads Values and Tasks from Oyafile.secrets if present
+Scenario: It loads Values and Tasks from secrets.oya if present
   Given file ./Oyafile containing
     """
     Project: Secrets
@@ -36,17 +36,30 @@ Scenario: It loads Values and Tasks from Oyafile.secrets if present
 
   """
 
-# Scenario: Encrypts secrets file
-#   Given file ./Oyafile.secrets containing
-#     """
-#     Values:
-#       foo: bar
-#     """
-#   When I run "oya secrets encrypt"
-#   Then the command succeeds
-#   And the command outputs to stdout
-#   """
-#   Done
+Scenario: Encrypts secrets file
+  Given file ./secrets.oya containing
+    """
+    Secrets:
+      foo: SECRETPHRASE
+    """
+  When I run "oya secrets encrypt"
+  Then the command succeeds
+  And file ./secrets.oya does not contain
+    """
+    SECRETPHRASE
+    """
 
-#   """
-#   And file ./OK exists
+Scenario: Views secrets file
+  Given file ./secrets.oya containing
+    """
+    Secrets:
+      foo: SECRETPHRASE
+    """
+  And I run "oya secrets encrypt"
+  When I run "oya secrets view"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Secrets:
+    foo: SECRETPHRASE
+  """

@@ -113,6 +113,18 @@ func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) er
 	return nil
 }
 
+func (c *SuiteContext) fileDoesNotContain(path string, contents *gherkin.DocString) error {
+	actual, err := c.readFile(path)
+	if err != nil {
+		return err
+	}
+	re := regexp.MustCompile(".*" + contents.Content + ".*")
+	if len(re.FindString(actual)) > 0 {
+		return fmt.Errorf("unexpected file %v contents: %q NOT expected: %q", path, actual, contents.Content)
+	}
+	return nil
+}
+
 func (c *SuiteContext) fileExists(path string) error {
 	_, err := os.Stat(path)
 	return err
@@ -209,6 +221,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
 	s.Step(`^file (.+) contains$`, c.fileContains)
+	s.Step(`^file (.+) does not contain$`, c.fileDoesNotContain)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^file (.+) does not exist$`, c.fileDoesNotExist)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
