@@ -50,7 +50,10 @@ func Parse(source string) (Template, error) {
 }
 
 func RenderAll(templatePath, outputPath string, values Scope) error {
-	return filepath.Walk(templatePath, func(path string, info os.FileInfo, _ error) error {
+	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return nil
 		}

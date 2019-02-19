@@ -36,11 +36,21 @@ var tasksCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Tasks(cwd, cmd.OutOrStdout(), cmd.OutOrStderr())
+		recurse, err := cmd.Flags().GetBool("recurse")
+		if err != nil {
+			return err
+		}
+		changeset, err := cmd.Flags().GetBool("changeset")
+		if err != nil {
+			return err
+		}
+		return internal.Tasks(cwd, recurse, changeset, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 	Args: cobra.NoArgs,
 }
 
 func init() {
 	rootCmd.AddCommand(tasksCmd)
+	tasksCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
+	tasksCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
 }

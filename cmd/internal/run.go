@@ -10,7 +10,7 @@ import (
 	"github.com/bilus/oya/pkg/template"
 )
 
-func Run(workDir, taskName string, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
+func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -30,13 +30,13 @@ func Run(workDir, taskName string, positionalArgs []string, flags map[string]str
 	tn := task.Name(taskName)
 
 	alias, _ := tn.Split()
-	oldScope, _ := lookupOyaScope()
+	oldOyaScope, _ := lookupOyaScope()
 	if err := setOyaScope(alias.String()); err != nil {
 		return err
 	}
-	defer setOyaScope(oldScope)
+	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
-	return p.Run(workDir, tn, toScope(positionalArgs, flags).Merge(values), stdout, stderr)
+	return p.Run(workDir, tn, recurse, changeset, toScope(positionalArgs, flags).Merge(values), stdout, stderr)
 }
 
 func toScope(positionalArgs []string, flags map[string]string) template.Scope {
