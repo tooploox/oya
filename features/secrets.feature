@@ -2,13 +2,6 @@ Feature: Manage Secrets for oya
 
 Background:
    Given I'm in project dir
-   And file ./.sops.yaml containing
-    """
-    creation_rules:
-      - path_regex: ^.*$
-        pgp: '317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202'
-
-    """
 
 Scenario: It loads Values and Tasks from secrets.oya if present
   Given file ./Oyafile containing

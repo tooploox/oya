@@ -19,6 +19,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
+
 type SuiteContext struct {
 	projectDir string
 
@@ -34,11 +36,7 @@ func (c *SuiteContext) MustSetUp() {
 	}
 
 	overrideOyaCmd(projectDir)
-
-	err = os.Setenv("OYA_HOME", projectDir)
-	if err != nil {
-		panic(err)
-	}
+	setEnv(projectDir)
 
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
@@ -48,6 +46,17 @@ func (c *SuiteContext) MustSetUp() {
 
 func (c *SuiteContext) MustTearDown() {
 	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func setEnv(projectDir string) {
+	err := os.Setenv("OYA_HOME", projectDir)
+	if err != nil {
+		panic(err)
+	}
+	err = os.Setenv("SOPS_PGP_FP", SOPS_PGP_KEY)
 	if err != nil {
 		panic(err)
 	}
