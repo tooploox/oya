@@ -6,7 +6,7 @@ Background:
     """
     creation_rules:
       - path_regex: ^.*$
-        pgp: 'D51D DE4C 439A 2FE8 4E67  2AFF 88FF AA75 1034 645E'
+        pgp: '317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202'
 
     """
 

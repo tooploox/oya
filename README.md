@@ -225,3 +225,29 @@ oya vendor
 ```
 
 3. Push to git
+
+## Secrets
+
+Secrets requires `SOPS` to be used.
+
+### PGP keys
+
+    $ gpg --list-keys
+    $ gpg --fingerprint
+    
+Generate/Export/Import
+
+    $ gpg --gen-key
+    $ gpg --export-secret-keys --armor {{fingerprint}} > private.rsa
+    $ gpg --import private.rsa
+    
+Remove
+
+    $ gpg --delete-keys {{fingerprint}}
+    $ gpg --delete-secret-keys {{fingerprint}}
+
+## Tests PGP keys
+
+To have all tests passing successfull it's require to have our pgp key for secrets
+
+    $ gpg --import testutil/pgp/private.rsa
