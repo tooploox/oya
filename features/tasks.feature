@@ -36,7 +36,7 @@ Scenario: Show only user-defined
 
   """
 
-Scenario: Subdirectories
+Scenario: Subdirectories are not recursed by default
   Given file ./Oyafile containing
     """
     Project: project
@@ -49,6 +49,27 @@ Scenario: Subdirectories
       echo "Done"
     """
   When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  # in ./Oyafile
+  oya run build
+
+  """
+
+Scenario: Subdirectories can be recursed
+  Given file ./Oyafile containing
+    """
+    Project: project
+    build: |
+      echo "Done"
+    """
+  And file ./subdir1/Oyafile containing
+    """
+    build: |
+      echo "Done"
+    """
+  When I run "oya tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -98,7 +119,7 @@ Scenario: Doc strings are properly aligned
     foo: |
       echo "Done"
     """
-  When I run "oya tasks"
+  When I run "oya tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -131,7 +152,7 @@ Scenario: Parent dir tasks are not listed
       echo "Done"
     """
   And I'm in the ./subdir1 dir
-  When I run "oya tasks"
+  When I run "oya tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """

@@ -46,7 +46,7 @@ func TestTemplate_Render_MissingVariables(t *testing.T) {
 	tu.AssertErr(t, err, "Expected template not to render")
 }
 
-func TestRenderAll(t *testing.T) {
+func TestRenderAll_Directory(t *testing.T) {
 	outputDir, err := ioutil.TempDir("", "oya")
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
@@ -56,4 +56,15 @@ func TestRenderAll(t *testing.T) {
 
 	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
 	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"), "bar\n")
+}
+
+func TestRenderAll_SingleFile(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	err = template.RenderAll("./fixtures/good.txt.kasia", outputDir, template.Scope{"foo": "bar"})
+	tu.AssertNoErr(t, err, "Expected templates to render")
+
+	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
 }

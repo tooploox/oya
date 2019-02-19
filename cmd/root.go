@@ -27,6 +27,7 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -51,7 +52,6 @@ to quickly create a Cobra application.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
@@ -67,17 +67,28 @@ func SetOutput(out io.Writer) {
 	rootCmd.SetOutput(out)
 }
 
+// Reset all flags for all commands to their default values (testing).
+func ResetFlags() {
+	resetFlagsRecurse(rootCmd)
+}
+
+func resetFlagsRecurse(cmd *cobra.Command) {
+	cmd.Flags().VisitAll(
+		func(flag *pflag.Flag) {
+			flag.Value.Set(flag.DefValue)
+		})
+	for _, child := range cmd.Commands() {
+		resetFlagsRecurse(child)
+	}
+}
+
 func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.oya.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.oya.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.

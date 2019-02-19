@@ -92,7 +92,7 @@ Scenario: Access Oyafile base directory
     all: |
       echo $BasePath
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -150,7 +150,7 @@ Scenario: Access Oyafile Project name in nested dir
     all: |
       echo $Project
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """

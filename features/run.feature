@@ -23,7 +23,7 @@ Scenario: Successfully run task
   """
   And file ./OK exists
 
-Scenario: Nested Oyafiles
+Scenario: Nested Oyafiles are not processed recursively by default
   Given file ./Oyafile containing
     """
     Project: project
@@ -48,6 +48,37 @@ Scenario: Nested Oyafiles
   And the command outputs to stdout
   """
   Root
+
+  """
+  And file ./Root exists
+  And file ./project1/Project1 does not exist
+  And file ./project2/Project2 does not exist
+
+Scenario: Nested Oyafiles can be processed recursively
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      touch Root
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      touch Project1
+      echo "Project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    all: |
+      touch Project2
+      echo "Project2"
+    """
+  When I run "oya run --recurse all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Root
   Project1
   Project2
 
@@ -55,92 +86,6 @@ Scenario: Nested Oyafiles
   And file ./Root exists
   And file ./project1/Project1 exists
   And file ./project2/Project2 exists
-
-Scenario: No changes
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Changeset: echo ""
-    all: |
-      echo "Root"
-    """
-  And file ./project1/Oyafile containing
-    """
-    Changeset: echo ""
-    all: |
-      echo "Project1"
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  """
-
-Scenario: Child marks itself as changed
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Changeset: echo ""
-    all: |
-      echo "Root"
-    """
-  And file ./project1/Oyafile containing
-    """
-    Changeset: echo "+."
-    all: |
-      echo "Root"
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  Root
-
-  """
-
-Scenario: Child marks parent as changed
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Changeset: echo ""
-    all: |
-      echo "Root"
-    """
-  And file ./project1/Oyafile containing
-    """
-    Changeset: echo "+../"
-    all: |
-      echo "Root"
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  Root
-
-  """
-
-Scenario: Parent marks child as changed
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Changeset: echo "+project1/"
-    all: |
-      echo "Root"
-    """
-  And file ./project1/Oyafile containing
-    """
-    Changeset: echo ""
-    all: |
-      echo "Project1"
-    """
-  When I run "oya run all"
-  Then the command succeeds
-  And the command outputs to stdout
-  """
-  Project1
-
-  """
 
 Scenario: No Oyafile
   Given file ./NotOyafile containing
@@ -222,7 +167,7 @@ Scenario: Ignore errors in projects inside current project
 
   """
 
-Scenario: Running in subdir
+Scenario: Running recursively
   Given file ./Oyafile containing
     """
     Project: project
@@ -243,7 +188,7 @@ Scenario: Running in subdir
       echo "Project2"
     """
   And I'm in the ./project1 dir
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -253,3 +198,56 @@ Scenario: Running in subdir
   And file ././Root does not exist
   And file ./Project1 exists
   And file ./../project2/Project2 does not exist
+
+Scenario: Running recursively
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      touch Root
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      touch Project1
+      echo "Project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    all: |
+      touch Project2
+      echo "Project2"
+    """
+  And I'm in the ./project1 dir
+  When I run "oya run --recurse all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Project1
+
+  """
+  And file ././Root does not exist
+  And file ./Project1 exists
+  And file ./../project2/Project2 does not exist
+
+Scenario: Running in a subdirectory
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      echo "Root"
+    """
+  And file ./project1/Oyafile containing
+    """
+    all: |
+      echo "Project1"
+    """
+  And I'm in the ./project1 dir
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  Project1
+
+  """

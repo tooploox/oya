@@ -3,8 +3,9 @@ package task
 import (
 	"io"
 	"io/ioutil"
-	"log"
+	corelog "log"
 	"os"
+	"strings"
 
 	"github.com/bilus/oya/pkg/template"
 	"github.com/magefile/mage/sh"
@@ -48,7 +49,22 @@ func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Wr
 	if err != nil {
 		return err
 	}
-	log.SetOutput(ioutil.Discard) // BUG(bilus): Suppress logging from the library. This prevents using standard logger anywhere else.
-	_, err = sh.Exec(nil, stdout, stderr, s.Shell, scriptFile.Name())
+	corelog.SetOutput(ioutil.Discard) // BUG(bilus): Suppress logging from the library. This prevents using standard logger anywhere else.
+
+	_, err = sh.Exec(env(), stdout, stderr, s.Shell, scriptFile.Name())
 	return err
+}
+
+func env() map[string]string {
+	env := make(map[string]string)
+	for _, v := range os.Environ() {
+		parts := strings.SplitN(v, "=", 2)
+		switch len(parts) {
+		case 1:
+			env[parts[0]] = ""
+		case 2:
+			env[parts[0]] = parts[1]
+		}
+	}
+	return env
 }
