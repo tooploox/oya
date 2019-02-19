@@ -8,6 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrScopeMergeConflict indicates that a conflict occurred when merging two scopes
+// at the specified path.
 type ErrScopeMergeConflict struct {
 	Path string
 }
@@ -16,8 +18,10 @@ func (e ErrScopeMergeConflict) Error() string {
 	return fmt.Sprintf("path %v already exists", e.Path)
 }
 
+// Scope represents a single lexical value scope. Scopes can be nested.
 type Scope map[interface{}]interface{}
 
+// ParseScope casts the value to Scope.
 func ParseScope(v interface{}) (Scope, bool) {
 	if scope, ok := v.(Scope); ok {
 		return scope, true
@@ -28,6 +32,7 @@ func ParseScope(v interface{}) (Scope, bool) {
 	return nil, false
 }
 
+// Merge combines two scopes together. If a key appears in both scopes, the other scope wins.
 func (scope Scope) Merge(other Scope) Scope {
 	result := Scope{}
 	for k, v := range scope {
@@ -39,6 +44,7 @@ func (scope Scope) Merge(other Scope) Scope {
 	return result
 }
 
+// Replace replaces contents of this scope with keys and values of the other one.
 func (scope Scope) Replace(other Scope) {
 	if reflect.ValueOf(scope).Pointer() == reflect.ValueOf(other).Pointer() {
 		return
@@ -51,6 +57,10 @@ func (scope Scope) Replace(other Scope) {
 	}
 }
 
+// UpdateScopeAt transforms a scope pointed to by the path (e.g. "foo.bar.baz").
+// It will create scopes along the way if they don't exist.
+// In case the value pointed by the path already exists and cannot be interpreted
+// as a Scope (see ParseScope), the function signals ErrScopeMergeConflict.
 func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope) error {
 	var pathArr []string
 	if len(path) > 0 {
@@ -65,6 +75,9 @@ func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope) error {
 	return nil
 }
 
+// GetScopeAt returns scope at the specified path. If path doesn't exist or points
+// to a value that cannot be interpreted as a Scope (see ParseScope), the function
+// signals an error.
 func (scope Scope) GetScopeAt(path string) (Scope, error) {
 	pathArr := strings.Split(path, ".")
 	return scope.resolveScope(pathArr, false)
