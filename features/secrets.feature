@@ -2,6 +2,13 @@ Feature: Manage Secrets for oya
 
 Background:
    Given I'm in project dir
+   And file ./.sops.yaml containing
+    """
+    creation_rules:
+      - path_regex: ^.*$
+        pgp: 'D51D DE4C 439A 2FE8 4E67  2AFF 88FF AA75 1034 645E'
+
+    """
 
 Scenario: It loads Values and Tasks from Oyafile.secrets if present
   Given file ./Oyafile containing
@@ -14,7 +21,7 @@ Scenario: It loads Values and Tasks from Oyafile.secrets if present
       echo $foo
       echo $bar
     """
-  And file ./Oyafile.secrets containing
+  And file ./secrets.oya containing
     """
     Secrets:
       bar: banana

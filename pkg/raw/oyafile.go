@@ -3,6 +3,7 @@ package raw
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -14,19 +15,23 @@ import (
 )
 
 const DefaultName = "Oyafile"
-const SecretsSuffix = ".secrets"
 
 // Oyafile represents an unparsed Oyafile.
 type Oyafile struct {
 	Path    string // Path contains normalized absolute path.
 	RootDir string // RootDir is the absolute, normalized path to the project root directory.
 	file    []byte // file contains Oyafile contents.
-	secrets []byte // secrets contains Oyafile.secrets contents.
 }
 
 // DecodedOyafile is an Oyafile that has been loaded from YAML
 // but hasn't been parsed yet.
 type DecodedOyafile map[string]interface{}
+
+func (o *DecodedOyafile) Merge(values map[string]interface{}) {
+	for k, v := range values {
+		(*o)[k] = v
+	}
+}
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
 	raw, err := New(oyafilePath, rootDir)
@@ -56,21 +61,15 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	if err != nil {
 		return nil, err
 	}
-	secs, err := secrets.DecryptSecrets(oyafilePath + SecretsSuffix)
-	if err != nil {
-		log.Debug("Secrets could not be loaded at %v. %v", oyafilePath+SecretsSuffix, err)
-	}
 	return &Oyafile{
 		Path:    oyafilePath,
 		RootDir: rootDir,
 		file:    file,
-		secrets: secs,
 	}, nil
 }
 
 func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	// YAML parser does not handle files without at least one node.
-	// TODO: do we need this ? maybe we can chack if raw.file is not empty?
 	empty, err := isEmptyYAML(raw.Path)
 	if err != nil {
 		return nil, err
@@ -78,10 +77,32 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	if empty {
 		return make(DecodedOyafile), nil
 	}
-	reader := bytes.NewReader(raw.Content())
+	decodedOyafile, err := decodeYaml(raw.file)
+	if err != nil {
+		return nil, err
+	}
+	secs, err := secrets.Decrypt(raw.RootDir)
+	if err != nil {
+		if log.GetLevel() == log.DebugLevel {
+			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+		}
+	} else {
+		if len(secs) > 0 {
+			decodedSecrets, err := decodeYaml(secs)
+			if err != nil {
+				log.Warn(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+			}
+			decodedOyafile.Merge(decodedSecrets)
+		}
+	}
+	return decodedOyafile, nil
+}
+
+func decodeYaml(content []byte) (DecodedOyafile, error) {
+	reader := bytes.NewReader(content)
 	decoder := yaml.NewDecoder(reader)
 	var of DecodedOyafile
-	err = decoder.Decode(&of)
+	err := decoder.Decode(&of)
 	if err != nil {
 		return nil, err
 	}
@@ -108,15 +129,6 @@ func (raw *Oyafile) IsRoot() (bool, error) {
 		return false, err
 	}
 	return hasProject && rel == DefaultName, nil
-}
-
-func (raw *Oyafile) Content() []byte {
-	if len(raw.secrets) > 0 {
-		output := append(raw.file, []byte("\n")...)
-		return append(output, raw.secrets...)
-	} else {
-		return raw.file
-	}
 }
 
 // isEmptyYAML returns true if the Oyafile contains only blank characters
