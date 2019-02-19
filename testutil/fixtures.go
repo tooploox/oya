@@ -1,18 +1,20 @@
 package testutil
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/semver"
+	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 )
 
 func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
 	t.Helper()
-	project, err := project.Load(rootDir)
+	project, err := project.Detect(rootDir, filepath.Join(rootDir, ".packs"))
 	AssertNoErr(t, err, "Error detecting project")
 	oyafiles, err := project.Oyafiles()
 	AssertNoErr(t, err, "Error listing Oyafiles")
@@ -22,7 +24,7 @@ func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
 
 func MustListOyafilesSubdir(t *testing.T, rootDir, subDir string) []*oyafile.Oyafile {
 	t.Helper()
-	project, err := project.Load(rootDir)
+	project, err := project.Detect(rootDir, filepath.Join(rootDir, ".packs"))
 	AssertNoErr(t, err, "Error detecting project")
 	oyafiles, err := project.List(subDir)
 	AssertNoErr(t, err, "Error listing Oyafiles")
@@ -38,30 +40,36 @@ func MustLoadOyafile(t *testing.T, dir, rootDir string) *oyafile.Oyafile {
 	return o
 }
 
-type mockPack struct {
-	importUrl string
-	version   semver.Version
+type mockRepo struct {
+	importPath types.ImportPath
 }
 
-func (p mockPack) Version() semver.Version {
-	return p.version
+func (p mockRepo) Install(version semver.Version, installDir string) error {
+	return errors.Errorf("mockRepo#Install is not implemented")
 }
 
-func (p mockPack) ImportPath() string {
-	return p.importUrl
+func (p mockRepo) IsInstalled(version semver.Version, installDir string) (bool, error) {
+	return false, errors.Errorf("mockRepo#IsInstalled is not implemented")
 }
 
-func (p mockPack) Vendor(vendorDir string) error {
-	return errors.Errorf("mockPack#Vendor is not implemented")
+func (p mockRepo) InstallPath(version semver.Version, installDir string) string {
+	panic(errors.Errorf("mockRepo#InstallPath is not implemented"))
 }
 
-func (p mockPack) IsVendored(vendorDir string) (bool, error) {
-	return false, errors.Errorf("mockPack#IsVendored is not implemented")
+func (p mockRepo) ImportPath() types.ImportPath {
+	return p.importPath
 }
 
-func MustMakeMockPack(t *testing.T, importUrl, version string) pack.Pack {
-	return mockPack{
-		importUrl: importUrl,
-		version:   semver.MustParse(version),
+func mustMakeMockRepo(importPath string) pack.Repo {
+	return mockRepo{
+		importPath: types.ImportPath(importPath),
 	}
+}
+
+func MustMakeMockPack(importPath string, version string) pack.Pack {
+	pack, err := pack.New(mustMakeMockRepo(importPath), semver.MustParse(version))
+	if err != nil {
+		panic(err)
+	}
+	return pack
 }

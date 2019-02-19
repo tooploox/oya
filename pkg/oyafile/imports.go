@@ -8,27 +8,67 @@ import (
 	"github.com/bilus/oya/pkg/template"
 	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
-const VendorDir = ".oya/vendor"
+type PackLoader interface {
+	Load(importPath types.ImportPath) (*Oyafile, bool, error)
+}
 
-func (oyafile *Oyafile) resolveImports() error {
-	for alias, path := range oyafile.Imports {
-		log.Debugf("Importing pack %v as %v", path, alias)
-		pack, err := oyafile.loadPack(path)
+func (o *Oyafile) Build(loader PackLoader) error {
+	// Do not resolve imports when loading Oyafile. Sometimes, we need to load Oyafile before packs are ready to be imported.
+	if !o.IsBuilt {
+		err := o.resolveImports(loader)
+		if err != nil {
+			return err
+		}
+		o.IsBuilt = true
+	}
+	return nil
+}
+
+func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
+	for alias, importPath := range oyafile.Imports {
+		o, err := oyafile.loadPackOyafile(loader, importPath)
 		if err != nil {
 			return err
 		}
 
-		oyafile.Values[string(alias)] = pack.Values
+		oyafile.Values[string(alias)] = o.Values
 		for key, val := range collectPackValueOverrides(alias, oyafile.Values) {
-			pack.Values[key] = val
+			o.Values[key] = val
 		}
-
-		oyafile.Tasks.ImportTasks(alias, pack.Tasks)
+		oyafile.Tasks.ImportTasks(alias, o.Tasks)
 	}
+
 	return nil
+}
+
+func (oyafile *Oyafile) loadPackOyafile(loader PackLoader, importPath types.ImportPath) (*Oyafile, error) {
+	o, found, err := loader.Load(importPath)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		return o, nil
+	}
+
+	// Attempt to load the Oyafile using the local path.
+	fullImportPath := filepath.Join(oyafile.RootDir, string(importPath))
+	if isValidImportPath(fullImportPath) {
+		o, found, err := LoadFromDir(fullImportPath, oyafile.RootDir)
+		if err != nil {
+			return nil, err
+		}
+		if found {
+			return o, nil
+		}
+	}
+	return nil, errors.Errorf("missing pack %v", importPath)
+}
+
+func isValidImportPath(fullImportPath string) bool {
+	f, err := os.Stat(fullImportPath)
+	return err == nil && f.IsDir()
 }
 
 // collectPackValueOverrides collects all <alias>.xxx values, overriding values
@@ -43,35 +83,4 @@ func collectPackValueOverrides(alias types.Alias, values template.Scope) templat
 		}
 	}
 	return packValues
-}
-
-func (oyafile *Oyafile) loadPack(path types.ImportPath) (*Oyafile, error) {
-	for _, importDir := range oyafile.importDirs() {
-		fullPath := filepath.Join(importDir, string(path))
-		if !isValidImportPath(fullPath) {
-			continue
-		}
-		pack, found, err := LoadFromDir(fullPath, oyafile.RootDir)
-		if err != nil {
-			continue
-		}
-		if !found {
-			continue
-		}
-		return pack, nil
-	}
-
-	return nil, errors.Errorf("missing pack %v", path)
-}
-
-func (oyafile *Oyafile) importDirs() []string {
-	return []string{
-		oyafile.RootDir,
-		filepath.Join(oyafile.RootDir, VendorDir),
-	}
-}
-
-func isValidImportPath(fullImportPath string) bool {
-	f, err := os.Stat(fullImportPath)
-	return err == nil && f.IsDir()
 }

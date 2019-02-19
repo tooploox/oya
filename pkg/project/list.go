@@ -11,11 +11,11 @@ import (
 	"k8s.io/helm/pkg/ignore"
 )
 
-func (p Project) Oyafiles() ([]*oyafile.Oyafile, error) {
+func (p *Project) Oyafiles() ([]*oyafile.Oyafile, error) {
 	return listOyafiles(p.RootDir, p.RootDir)
 }
 
-func (p Project) List(startDir string) ([]*oyafile.Oyafile, error) {
+func (p *Project) List(startDir string) ([]*oyafile.Oyafile, error) {
 	return listOyafiles(startDir, p.RootDir)
 }
 
@@ -65,14 +65,7 @@ func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
 // Similar to makeIgnoreFunc but does not parse Oyafile, thus allowing
 // for broken Oyafile projects nested under the current project.
 func makeSkipFunc(startDir, rootDir string) func(path string) (bool, error) {
-	vendorDir := filepath.Join(startDir, VendorDir)
 	return func(path string) (bool, error) {
-		// Exclude anything under .oya/vendor
-
-		if path == vendorDir {
-			return true, nil
-		}
-
 		// Exclude projects nested under the current project.
 
 		raw, ok, err := raw.LoadFromDir(path, rootDir)

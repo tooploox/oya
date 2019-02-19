@@ -14,40 +14,27 @@ import (
 
 // TODO: Duplicated in oyafile module.
 type Project struct {
-	RootDir string
+	RootDir      string
+	installDir   string
+	dependencies Deps
 }
 
-func Load(rootDir string) (Project, error) {
-	prj, err := Detect(rootDir)
-	if err != nil {
-		return prj, err
-	}
-
-	rel, err := filepath.Rel(rootDir, prj.RootDir)
-	if err != nil {
-		return prj, errors.Wrapf(err, "%v is not the Oya project root directory (it's %v)", rootDir, prj.RootDir)
-	}
-	if rel != "." {
-		return prj, errors.Errorf("%v is not an Oya project root directory", rootDir)
-	}
-
-	return prj, nil
-}
-
-func Detect(workDir string) (Project, error) {
+func Detect(workDir, installDir string) (*Project, error) {
 	detectedRootDir, found, err := detectRoot(workDir)
 	if err != nil {
-		return Project{}, err
+		return nil, err
 	}
 	if !found {
-		return Project{}, ErrNoProject{Path: workDir}
+		return nil, ErrNoProject{Path: workDir}
 	}
-	return Project{
-		RootDir: detectedRootDir,
+	return &Project{
+		RootDir:      detectedRootDir,
+		installDir:   installDir,
+		dependencies: nil, // lazily-loaded in Deps()
 	}, nil
 }
 
-func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, stdout, stderr io.Writer) error {
+func (p *Project) Run(workDir string, taskName task.Name, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	changes, err := p.Changeset(workDir)
@@ -59,8 +46,17 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 		return nil
 	}
 
+	dependencies, err := p.Deps()
+	if err != nil {
+		return err
+	}
+
 	foundAtLeastOneTask := false
 	for _, o := range changes {
+		err = o.Build(dependencies)
+		if err != nil {
+			return errors.Wrapf(err, "error in %v", o.Path)
+		}
 		found, err := o.RunTask(taskName, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
@@ -77,7 +73,7 @@ func (p Project) Run(workDir string, taskName task.Name, scope template.Scope, s
 	return nil
 }
 
-func (p Project) rootOyafile() (*oyafile.Oyafile, error) {
+func (p *Project) rootOyafile() (*oyafile.Oyafile, error) {
 	o, found, err := oyafile.LoadFromDir(p.RootDir, p.RootDir)
 	if err != nil {
 		return nil, err
@@ -89,7 +85,7 @@ func (p Project) rootOyafile() (*oyafile.Oyafile, error) {
 	return o, nil
 }
 
-func (p Project) rootRawOyafile() (*raw.Oyafile, error) {
+func (p *Project) rootRawOyafile() (*raw.Oyafile, error) {
 	o, found, err := raw.LoadFromDir(p.RootDir, p.RootDir)
 	if err != nil {
 		return nil, err
@@ -101,11 +97,11 @@ func (p Project) rootRawOyafile() (*raw.Oyafile, error) {
 	return o, nil
 }
 
-func (p Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
+func (p *Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
 	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
-func (p Project) Values() (template.Scope, error) {
+func (p *Project) Values() (template.Scope, error) {
 	oyafilePath := filepath.Join(p.RootDir, "Oyafile")
 	o, found, err := p.Oyafile(oyafilePath)
 	if err != nil {

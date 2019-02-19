@@ -9,8 +9,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
+	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 	"github.com/bilus/oya/pkg/types"
@@ -23,17 +23,23 @@ import (
 // so it has to be overridden (with 'go run oya.go', roughly speaking).
 var OyaCmdOverride *string
 
+type PackReference struct {
+	ImportPath types.ImportPath
+	Version    semver.Version
+}
+
 type Oyafile struct {
-	Dir     string
-	Path    string
-	RootDir string
-	Shell   string
-	Imports map[types.Alias]types.ImportPath
-	Tasks   task.Table
-	Values  template.Scope
-	Project string   // Project is set for root Oyafile.
-	Ignore  []string // Ignore contains directory exclusion rules.
-	Require []pack.Pack
+	Dir      string
+	Path     string
+	RootDir  string
+	Shell    string
+	Imports  map[types.Alias]types.ImportPath
+	Tasks    task.Table
+	Values   template.Scope
+	Project  string   // Project is set for root Oyafile.
+	Ignore   []string // Ignore contains directory exclusion rules.
+	Requires []PackReference
+	IsBuilt  bool
 
 	relPath string
 
@@ -53,7 +59,7 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}
 
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
-	log.Debug("Oyafile at", oyafilePath)
+	log.Debug("Oyafile at ", oyafilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +101,10 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	return oyafile, true, nil
 }
 
-func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (found bool, err error) {
+func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (bool, error) {
+	if !oyafile.IsBuilt {
+		return false, errors.Errorf("Internal error: Oyafile has not been built")
+	}
 	task, ok := oyafile.Tasks.LookupTask(taskName)
 	if !ok {
 		return false, nil

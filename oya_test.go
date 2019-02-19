@@ -21,7 +21,6 @@ import (
 
 type SuiteContext struct {
 	projectDir string
-	vendorDir  string
 
 	lastCommandErr error
 	stdout         *bytes.Buffer
@@ -29,11 +28,6 @@ type SuiteContext struct {
 }
 
 func (c *SuiteContext) MustSetUp() {
-	// BUG(bilus): Need to figure out a way to actually run oya in feature tests. The problem:
-	// We need to provide an override to the oya executable path (because the real one is godog). But because we're running the test outside of the oya development directory, it results in an error similar to:
-	// package github.com/bilus/oya: cannot find package "github.com/bilus/oya" in any of:
-	//         /Users/abc/go/src/github.com/bilus/oya (from $GOPATH)
-
 	projectDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
 		panic(err)
@@ -41,16 +35,22 @@ func (c *SuiteContext) MustSetUp() {
 
 	overrideOyaCmd(projectDir)
 
-	vendorDir := filepath.Join(projectDir, "oya/vendor")
-	err = os.MkdirAll(vendorDir, 0700)
+	err = os.Setenv("OYA_HOME", projectDir)
 	if err != nil {
 		panic(err)
 	}
+
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
-	c.vendorDir = vendorDir
 	c.stdout = bytes.NewBuffer(nil)
 	c.stderr = bytes.NewBuffer(nil)
+}
+
+func (c *SuiteContext) MustTearDown() {
+	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // overrideOyaCmd overrides `oya` command used by $Tasks in templates
@@ -83,13 +83,6 @@ func (c *SuiteContext) readFile(relPath string) (string, error) {
 	return string(contents), err
 }
 
-func (c *SuiteContext) MustTearDown() {
-	err := os.RemoveAll(c.projectDir)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (c *SuiteContext) iAmInProjectDir() error {
 	return os.Chdir(c.projectDir)
 }
@@ -100,6 +93,10 @@ func (c *SuiteContext) imInDir(subdir string) error {
 
 func (c *SuiteContext) fileContaining(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
+}
+
+func (c *SuiteContext) environmentVariableSet(name, value string) error {
+	return os.Setenv(name, value)
 }
 
 func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) error {
@@ -142,6 +139,9 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 }
 
 func (c *SuiteContext) execute(command string) error {
+	c.stdout.Reset()
+	c.stderr.Reset()
+
 	oldArgs := os.Args
 	os.Args = strings.Fields(command)
 	defer func() {
@@ -156,8 +156,14 @@ func (c *SuiteContext) iRunOya(command string) error {
 	return c.execute("oya " + command)
 }
 
+func (c *SuiteContext) modifyFileToContain(path string, contents *gherkin.DocString) error {
+	return c.writeFile(path, contents.Content)
+}
+
 func (c *SuiteContext) theCommandSucceeds() error {
 	if c.lastCommandErr != nil {
+		log.Println(c.stdout.String())
+		log.Println(c.stderr.String())
 		return errors.Wrap(c.lastCommandErr, "command unexpectedly failed")
 	}
 	return nil
@@ -220,6 +226,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
+	s.Step(`^I modify file (.+) to contain$`, c.modifyFileToContain)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) does not contain$`, c.fileDoesNotContain)
 	s.Step(`^file (.+) exists$`, c.fileExists)
@@ -229,6 +236,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)
 	s.Step(`^the command outputs to (stdout|stderr) text matching$`, c.theCommandOutputsTextMatching)
+	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })

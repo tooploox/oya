@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bilus/oya/pkg/pack"
 	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/task"
@@ -74,10 +73,6 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 		}
 	}
 
-	err = oyafile.resolveImports()
-	if err != nil {
-		return nil, err
-	}
 	err = oyafile.addBuiltIns()
 	if err != nil {
 		return nil, err
@@ -168,14 +163,14 @@ func parseTask(name string, value interface{}, o *Oyafile) error {
 }
 
 func parseRequire(name string, value interface{}, o *Oyafile) error {
-	defaultErr := fmt.Errorf("expected entries mapping pack import paths to their version, example: \"github.com/tooploox/oya-packs/docker: v1.0.0\"")
+	defaultErr := fmt.Errorf("expected entries mapping pack import paths to their version, example: \"github.com/tooploox/oya-packReferences/docker: v1.0.0\"")
 
 	requires, ok := value.(map[interface{}]interface{})
 	if !ok {
 		return defaultErr
 	}
 
-	packs := make([]pack.Pack, 0, len(requires))
+	packReferences := make([]PackReference, 0, len(requires))
 	for importPathI, versionI := range requires {
 		importPath, ok := importPathI.(string)
 		if !ok {
@@ -185,22 +180,18 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 		if !ok {
 			return defaultErr
 		}
-		l, err := pack.OpenLibrary(importPath)
-		if err != nil {
-			return err
-		}
 
 		ver, err := semver.Parse(version)
 		if err != nil {
 			return err
 		}
-		pack, err := l.Version(ver)
-		if err != nil {
-			return err
-		}
-		packs = append(packs, pack)
+		packReferences = append(packReferences,
+			PackReference{
+				ImportPath: types.ImportPath(importPath),
+				Version:    ver,
+			})
 	}
 
-	o.Require = packs
+	o.Requires = packReferences
 	return nil
 }

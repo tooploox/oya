@@ -22,7 +22,7 @@ import (
 //     - Contribute to changeset
 // - Deduplicate changeset
 // - Exclude changes outside work directory
-func (p Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
+func (p *Project) Changeset(workDir string) ([]*oyafile.Oyafile, error) {
 	oyafiles, err := p.Oyafiles()
 	if err != nil {
 		return nil, err
