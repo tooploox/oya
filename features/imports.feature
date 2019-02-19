@@ -48,7 +48,7 @@ Scenario: Import task using pack values
     Values:
       foo: xxx
     all: |
-      bar=$foo
+      bar="$foo"
       echo $$bar
     """
   When I run "oya run foo.all"
@@ -158,7 +158,8 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
       foo: github.com/test/foo
 
     Values:
-      foo.fruit: banana
+      foo:
+        fruit: banana
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
@@ -173,7 +174,7 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
 
   """
 
-Scenario: Pack values are overriden form project Oyafile
+Scenario: Pack values are overriden in main Oyafile
   Given file ./Oyafile containing
     """
     Project: project
@@ -185,7 +186,8 @@ Scenario: Pack values are overriden form project Oyafile
       foo: github.com/test/foo
 
     Values:
-      foo.wege: broccoli
+      foo:
+        wege: broccoli
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """

@@ -120,39 +120,7 @@ Scenario: Rendering values in specified scope pointing to imported pack
   orange
   """
 
-@current
 Scenario: Rendered values in specified scope can be overridden
-  Given file ./Oyafile containing
-    """
-    Project: project
-
-    Require:
-      github.com/test/foo: v0.0.1
-
-    Import:
-      foo: github.com/test/foo
-
-    Values:
-      foo.fruit: banana
-    """
-  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
-    """
-    Values:
-      fruit: orange
-    """
-  And file ./templates/file.txt containing
-    """
-    $fruit
-    """
-  When I run "oya render --scope foo ./templates/file.txt"
-  Then the command succeeds
-  And file ./file.txt contains
-  """
-  banana
-  """
-
-@current
-Scenario: Rendered values in specified scope can be overridden using nested syntax
   Given file ./Oyafile containing
     """
     Project: project
@@ -226,7 +194,8 @@ Scenario: Values in imported pack scope can be overridden
       foo: github.com/test/foo
 
     Values:
-      foo.fruit: banana
+      foo:
+        fruit: banana
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """

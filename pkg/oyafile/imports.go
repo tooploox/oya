@@ -7,7 +7,6 @@ import (
 	"github.com/bilus/oya/pkg/template"
 	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 type PackLoader interface {
@@ -36,17 +35,15 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 		err = oyafile.Values.UpdateScopeAt(string(alias),
 			func(scope template.Scope) template.Scope {
 				// Values in the main Oyafile overwrite values in the pack Oyafile.
-				return packOyafile.Values.Merge(scope)
+				merged := packOyafile.Values.Merge(scope)
+				// Task is keeping a pointed to the scope.
+				packOyafile.Values.Replace(merged)
+				return merged
 			})
-
 		if err != nil {
 			return errors.Wrapf(err, "error merging values for imported pack %v", alias)
 		}
-		log.Println(oyafile.Values)
 
-		for key, val := range collectPackValueOverrides(alias, oyafile.Values) {
-			packOyafile.Values[key] = val
-		}
 		oyafile.Tasks.ImportTasks(alias, packOyafile.Tasks)
 	}
 
@@ -79,16 +76,4 @@ func (oyafile *Oyafile) loadPackOyafile(loader PackLoader, importPath types.Impo
 func isValidImportPath(fullImportPath string) bool {
 	f, err := os.Stat(fullImportPath)
 	return err == nil && f.IsDir()
-}
-
-// collectPackValueOverrides collects all <alias>.xxx values, overriding values
-// in the pack imported under the alias. Example: docker.image.
-func collectPackValueOverrides(alias types.Alias, values template.Scope) template.Scope {
-	packValues := template.Scope{}
-	for key, val := range values {
-		if key == string(alias) {
-			packValues[key] = val
-		}
-	}
-	return packValues
 }

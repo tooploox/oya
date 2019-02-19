@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -15,21 +16,13 @@ func (e ErrScopeMergeConflict) Error() string {
 	return fmt.Sprintf("path %v already exists", e.Path)
 }
 
-type Scope map[string]interface{}
+type Scope map[interface{}]interface{}
 
 func ParseScope(v interface{}) (Scope, bool) {
-	if Scope, ok := v.(Scope); ok {
-		return Scope, true
+	if scope, ok := v.(Scope); ok {
+		return scope, true
 	}
-	if aMap, ok := v.(map[interface{}]interface{}); ok {
-		scope := make(Scope)
-		for k, v := range aMap {
-			name, ok := k.(string)
-			if !ok {
-				return nil, false
-			}
-			scope[name] = v
-		}
+	if scope, ok := v.(map[interface{}]interface{}); ok {
 		return scope, true
 	}
 	return nil, false
@@ -47,6 +40,9 @@ func (scope Scope) Merge(other Scope) Scope {
 }
 
 func (scope Scope) Replace(other Scope) {
+	if reflect.ValueOf(scope).Pointer() == reflect.ValueOf(other).Pointer() {
+		return
+	}
 	for k := range scope {
 		delete(scope, k)
 	}
@@ -56,7 +52,10 @@ func (scope Scope) Replace(other Scope) {
 }
 
 func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope) error {
-	pathArr := strings.Split(path, ".")
+	var pathArr []string
+	if len(path) > 0 {
+		pathArr = strings.Split(path, ".")
+	}
 	targetScope, err := scope.resolveScope(pathArr, true)
 	if err != nil {
 		// Ignore the reason.
