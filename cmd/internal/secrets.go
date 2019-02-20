@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/bilus/oya/pkg/secrets"
 	"github.com/kr/pty"
@@ -28,7 +27,6 @@ func SecretsEdit(workDir string, stdout, stderr io.Writer) error {
 	if err := terminalRun(viewCmd); err != nil {
 		return err
 	}
-	time.Sleep(100 * time.Millisecond)
 	return nil
 }
 
