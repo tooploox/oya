@@ -1,7 +1,6 @@
 package secrets
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,34 +8,6 @@ import (
 )
 
 const SecretsFileName = "secrets.oya"
-
-type ErrNoSecretsFile struct {
-	FileName    string
-	OyafilePath string
-}
-
-type ErrSecretsAlreadyEncrypted struct {
-	FileName    string
-	OyafilePath string
-}
-
-type ErrSecretsFailure struct {
-	FileName    string
-	OyafilePath string
-	CmdError    string
-}
-
-func (err ErrNoSecretsFile) Error() string {
-	return fmt.Sprintf("Oya secrets file \"%v\" not found in %v", err.FileName, err.OyafilePath)
-}
-
-func (err ErrSecretsAlreadyEncrypted) Error() string {
-	return fmt.Sprintf("Oya secrets file \"%v\" already encrypted in %v", err.FileName, err.OyafilePath)
-}
-
-func (err ErrSecretsFailure) Error() string {
-	return fmt.Sprintf("Oya secrets failure on file \"%v\" in %v, with error: %v", err.FileName, err.OyafilePath, err.CmdError)
-}
 
 func Decrypt(workDir string) ([]byte, error) {
 	var output []byte
@@ -62,7 +33,11 @@ func Encrypt(workDir string) error {
 	if err != nil {
 		return ErrSecretsFailure{FileName: SecretsFileName, OyafilePath: workDir, CmdError: string(encoded)}
 	}
-	err = ioutil.WriteFile(file, encoded, 0644)
+	fi, err := os.Stat(file)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(file, encoded, fi.Mode())
 	if err != nil {
 		return err
 	}
