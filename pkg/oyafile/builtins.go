@@ -6,7 +6,6 @@ import (
 	"unicode"
 
 	"github.com/Masterminds/sprig"
-	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/task"
 	"github.com/bilus/oya/pkg/template"
 )
@@ -21,6 +20,7 @@ func (o *Oyafile) addBuiltIns() error {
 func (o *Oyafile) defaultValues() template.Scope {
 	scope := template.Scope{
 		"BasePath": o.Dir,
+		"OyaCmd":   o.OyaCmd,
 	}
 
 	// Import sprig functions (http://masterminds.github.io/sprig/).
@@ -68,6 +68,6 @@ func (o *Oyafile) bindTasks(taskName task.Name, t task.Task, stdout, stderr io.W
 func (o *Oyafile) bindRender(taskName task.Name, stdout, stderr io.Writer) (func(string) string, error) {
 	alias, _ := taskName.Split()
 	return func(templatePath string) string {
-		return fmt.Sprintf("%s render -f ./%s -a %q %s\n", o.OyaCmd, raw.DefaultName, alias, templatePath)
+		return fmt.Sprintf("%s render --scope %q %s\n", o.OyaCmd, alias, templatePath)
 	}, nil
 }

@@ -13,7 +13,7 @@ Scenario: Empty .oyaignore
     """
     all: echo "subdir"
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -34,7 +34,7 @@ Scenario: Ignore file
     """
     all: echo "subdir"
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -58,7 +58,7 @@ Scenario: Wildcard ignore
     """
     all: echo "subdir/foo"
     """
-  When I run "oya run all"
+  When I run "oya run --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """

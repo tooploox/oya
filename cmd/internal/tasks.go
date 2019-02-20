@@ -10,7 +10,7 @@ import (
 	"github.com/bilus/oya/pkg/task"
 )
 
-func Tasks(workDir string, stdout, stderr io.Writer) error {
+func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) error {
 
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
@@ -26,7 +26,7 @@ func Tasks(workDir string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
-	oyafiles, err := p.Changeset(workDir)
+	oyafiles, err := p.RunTargets(workDir, recurse, changeset)
 	if err != nil {
 		return err
 	}

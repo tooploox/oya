@@ -150,6 +150,7 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 func (c *SuiteContext) execute(command string) error {
 	c.stdout.Reset()
 	c.stderr.Reset()
+	cmd.ResetFlags()
 
 	oldArgs := os.Args
 	os.Args = strings.Fields(command)

@@ -311,7 +311,7 @@ Scenario: Indirect requirements are downloaded
     """
   When I run "oya run foo"
   Then the command succeeds
-  Then file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile contains
+  And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile contains
     """
     Project: github.com/tooploox/oya-fixtures/pack3
 
@@ -334,7 +334,7 @@ Scenario: Indirectly required higher version
     """
     Project: project
     Require:
-      github.com/tooploox/oya-fixtures/pack3: v1.0.0
+      github.com/tooploox/oya-fixtures/pack3: v1.0.0  # Requires pack1@v1.1.1
       github.com/tooploox/oya-fixtures/pack1: v1.0.0
 
     Import:

@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/bilus/oya/cmd/internal"
@@ -25,7 +24,7 @@ import (
 // renderCmd represents the render command
 var renderCmd = &cobra.Command{
 	Use:   "render TEMPLATE",
-	Short: "Render a template using values from an Oyafile",
+	Short: "Render a template FILE or DIRECTORY using values from an Oyafile",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		oyafilePath, err := cmd.Flags().GetString("file")
@@ -33,7 +32,12 @@ var renderCmd = &cobra.Command{
 			return err
 		}
 		templatePath := args[0]
-		outputPath, err := os.Getwd()
+		outputPath, err := cmd.Flags().GetString("output-dir")
+		if err != nil {
+			return err
+		}
+		// This will turn "." or empty output path into full path relative to pwd.
+		fullOutputPath, err := filepath.Abs(outputPath)
 		if err != nil {
 			return err
 		}
@@ -41,16 +45,22 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		alias, err := cmd.Flags().GetString("alias")
+		autoScope, err := cmd.Flags().GetBool("auto-scope")
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, outputPath, alias, cmd.OutOrStdout(), cmd.OutOrStderr())
+		scopeSelector, err := cmd.Flags().GetString("scope")
+		if err != nil {
+			return err
+		}
+		return internal.Render(fullOyafilePath, templatePath, fullOutputPath, autoScope, scopeSelector, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(renderCmd)
-	renderCmd.Flags().StringP("file", "f", "Oyafile", "Read FILE as Oyafile")
-	renderCmd.Flags().StringP("alias", "a", "", "Render template in alias context")
+	renderCmd.Flags().StringP("file", "f", "./Oyafile", "Path to Oyafile to read")
+	renderCmd.Flags().StringP("output-dir", "o", ".", "Specify the output DIRECTORY")
+	renderCmd.Flags().StringP("scope", "s", "", "Render template within the specified value scope")
+	renderCmd.Flags().BoolP("auto-scope", "a", true, "When running in an imported pack's task, use the pack's scope, unless --")
 }

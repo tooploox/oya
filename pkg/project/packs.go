@@ -11,7 +11,7 @@ import (
 )
 
 func (p *Project) Require(pack pack.Pack) error {
-	raw, err := p.rootRawOyafile()
+	raw, err := p.rawOyafileIn(p.RootDir)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (p *Project) Deps() (Deps, error) {
 		return p.dependencies, nil
 	}
 
-	o, err := p.rootOyafile()
+	o, err := p.oyafileIn(p.RootDir)
 	if err != nil {
 		return nil, err
 	}

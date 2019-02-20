@@ -46,7 +46,7 @@ Scenario: Get two versions of the same pack
       fixtures: github.com/tooploox/oya-fixtures
     """
   When I'm in the ./project1 dir
-  And I run "oya run fixtures.version"
+  And I run "oya run --recurse fixtures.version"
   Then the command succeeds
   And the command outputs to stdout
   """
