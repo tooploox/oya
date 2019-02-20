@@ -49,11 +49,11 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		scopeSelector, err := cmd.Flags().GetString("scope")
+		path, err := cmd.Flags().GetString("scope")
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, fullOutputPath, autoScope, scopeSelector, cmd.OutOrStdout(), cmd.OutOrStderr())
+		return internal.Render(fullOyafilePath, templatePath, fullOutputPath, autoScope, path, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 

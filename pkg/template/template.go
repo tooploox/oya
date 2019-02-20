@@ -5,32 +5,15 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	kasia "github.com/ziutek/kasia.go"
 )
 
-type Scope map[string]interface{}
-
-func (scope Scope) Merge(other Scope) Scope {
-	result := Scope{}
-	for k, v := range scope {
-		result[k] = v
-	}
-	for k, v := range other {
-		result[k] = v
-	}
-	return result
-}
-
+// Template represents a template that can be rendered using provided values.
 type Template interface {
 	Render(out io.Writer, values ...interface{}) error
 	RenderString(values ...interface{}) (string, error)
 }
 
-type kasiaTemplate struct {
-	impl *kasia.Template
-}
-
+// Load loads template from the path.
 func Load(path string) (Template, error) {
 	source, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -39,16 +22,12 @@ func Load(path string) (Template, error) {
 	return Parse(string(source))
 }
 
+// Parse parses template in the source string.
 func Parse(source string) (Template, error) {
-	kt, err := kasia.Parse(source)
-	if err != nil {
-		return nil, err
-	}
-	kt.Strict = true
-	kt.EscapeFunc = nil
-	return kasiaTemplate{impl: kt}, nil
+	return parseKasia(source)
 }
 
+// RenderAll renders all templates in the path (directory or a single file) to an output path (directory or file) using the provided value scope.
 func RenderAll(templatePath, outputPath string, values Scope) error {
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -72,14 +51,6 @@ func RenderAll(templatePath, outputPath string, values Scope) error {
 		}
 		return renderFile(path, filePath, values)
 	})
-}
-
-func (t kasiaTemplate) Render(out io.Writer, values ...interface{}) error {
-	return t.impl.Run(out, values...)
-}
-
-func (t kasiaTemplate) RenderString(values ...interface{}) (string, error) {
-	return t.impl.RenderString(values...)
 }
 
 func renderFile(templatePath, outputPath string, values Scope) error {

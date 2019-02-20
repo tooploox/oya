@@ -215,7 +215,8 @@ Scenario: Run render in alias scope can access variables directly
       github.com/test/foo: v1.0.0
 
     Values:
-      foo.other: banana
+      foo:
+        other: banana
     """
   And file ./.oya/packs/github.com/test/foo@v1.0.0/Oyafile containing
     """

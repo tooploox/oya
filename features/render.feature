@@ -132,7 +132,8 @@ Scenario: Rendered values in specified scope can be overridden
       foo: github.com/test/foo
 
     Values:
-      foo.fruit: banana
+      foo:
+        fruit: banana
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
@@ -149,6 +150,7 @@ Scenario: Rendered values in specified scope can be overridden
   """
   banana
   """
+
 
 Scenario: Imported tasks render using their own Oyafile scope by default
   Given file ./Oyafile containing
@@ -192,7 +194,8 @@ Scenario: Values in imported pack scope can be overridden
       foo: github.com/test/foo
 
     Values:
-      foo.fruit: banana
+      foo:
+        fruit: banana
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
@@ -266,7 +269,6 @@ Scenario: Rendering values in specified scope
   orange
   """
 
-@xx
 Scenario: Rendering values in specified nested scope
   Given file ./Oyafile containing
     """
@@ -288,7 +290,6 @@ Scenario: Rendering values in specified nested scope
   orange
   """
 
-@xx
 Scenario: Rendering one file to an output dir
   Given file ./Oyafile containing
     """
