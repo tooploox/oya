@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bilus/oya/pkg/secrets"
 	"github.com/kr/pty"
@@ -27,6 +28,7 @@ func SecretsEdit(workDir string, stdout, stderr io.Writer) error {
 	if err := terminalRun(viewCmd); err != nil {
 		return err
 	}
+	time.Sleep(100 * time.Millisecond)
 	return nil
 }
 
@@ -48,6 +50,7 @@ func terminalRun(cmd *exec.Cmd) error {
 
 	// Handle pty size.
 	ch := make(chan os.Signal, 1)
+	defer close(ch)
 	signal.Notify(ch, syscall.SIGWINCH)
 	go func() {
 		for range ch {
@@ -61,13 +64,22 @@ func terminalRun(cmd *exec.Cmd) error {
 	// Set stdin in raw mode.
 	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer func() { _ = terminal.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
 
 	// Copy stdin to the pty and the pty to stdout.
-	go func() { _, _ = io.Copy(ptmx, os.Stdin) }()
-	_, _ = io.Copy(os.Stdout, ptmx)
+	go func() {
+		_, err = io.Copy(ptmx, os.Stdin)
+		if err != nil {
+			log.Printf("error %s", err)
+		}
+	}()
+
+	_, err = io.Copy(os.Stdout, ptmx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

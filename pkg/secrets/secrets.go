@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 const SecretsFileName = "secrets.oya"
@@ -39,7 +40,7 @@ func (err ErrSecretsFailure) Error() string {
 
 func Decrypt(workDir string) ([]byte, error) {
 	var output []byte
-	file := workDir + "/" + SecretsFileName
+	file := filepath.Join(workDir, SecretsFileName)
 	if _, err := os.Stat(file); err != nil {
 		return output, ErrNoSecretsFile{FileName: SecretsFileName, OyafilePath: workDir}
 	}
@@ -52,7 +53,7 @@ func Decrypt(workDir string) ([]byte, error) {
 }
 
 func Encrypt(workDir string) error {
-	file := workDir + "/" + SecretsFileName
+	file := filepath.Join(workDir, SecretsFileName)
 	if alreadyEncrypted(file) {
 		return ErrSecretsAlreadyEncrypted{FileName: SecretsFileName, OyafilePath: workDir}
 	}
@@ -69,7 +70,8 @@ func Encrypt(workDir string) error {
 }
 
 func ViewCmd(workDir string) *exec.Cmd {
-	return exec.Command("sops", SecretsFileName)
+	file := filepath.Join(workDir, SecretsFileName)
+	return exec.Command("sops", file)
 }
 
 func alreadyEncrypted(file string) bool {

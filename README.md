@@ -228,7 +228,7 @@ oya vendor
 
 ## Secrets
 
-Secrets requires `SOPS` to be used.
+Secrets requires [Sops](https://github.com/mozilla/sops) to be installed. 
 
 ### PGP keys
 
