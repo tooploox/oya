@@ -1,11 +1,15 @@
 package deptree
 
 import (
+	"path/filepath"
+
 	"github.com/bilus/oya/pkg/deptree/internal"
 	"github.com/bilus/oya/pkg/mvs"
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/types"
+	"github.com/pkg/errors"
 )
 
 // DependencyTree defines a project's dependencies, allowing for loading them.
@@ -75,6 +79,19 @@ func (dt *DependencyTree) ForEach(f func(pack.Pack) error) error {
 }
 
 func (dt *DependencyTree) loadOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
+	if path, ok := pack.ReplacementPath(); ok {
+		fullPath := filepath.Join(dt.rootDir, path)
+		o, found, err := oyafile.LoadFromDir(fullPath, dt.rootDir)
+		if !found {
+			return nil, false, errors.Errorf("no %v found at the replacement path %v for %q", raw.DefaultName, fullPath, pack.ImportPath())
+		}
+		if err != nil {
+			return nil, false, errors.Wrapf(err, "error resolving replacement path %v for %q", fullPath, pack.ImportPath())
+
+		}
+		return o, true, nil
+
+	}
 	for _, installDir := range dt.installDirs {
 		o, found, err := oyafile.LoadFromDir(pack.InstallPath(installDir), dt.rootDir)
 		if err != nil {
