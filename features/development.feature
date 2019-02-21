@@ -32,3 +32,26 @@ Scenario: Use a local require
 
     """
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile does not exist
+
+Scenario: With local require oya doesn't attempt to lookup requirements remotely
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/tooploox/does-not-exist: v1.0.0
+
+    Replace:
+      github.com/tooploox/does-not-exist: /pack
+
+    Import:
+      foo: github.com/tooploox/does-not-exist
+    """
+  And file /pack/Oyafile containing
+    """
+    Project: pack
+
+    version: echo 1.0.0
+    """
+  When I run "oya run foo.version"
+  Then the command succeeds
