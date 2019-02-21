@@ -19,6 +19,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
+
 type SuiteContext struct {
 	projectDir string
 
@@ -34,11 +36,7 @@ func (c *SuiteContext) MustSetUp() {
 	}
 
 	overrideOyaCmd(projectDir)
-
-	err = os.Setenv("OYA_HOME", projectDir)
-	if err != nil {
-		panic(err)
-	}
+	setEnv(projectDir)
 
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
@@ -48,6 +46,17 @@ func (c *SuiteContext) MustSetUp() {
 
 func (c *SuiteContext) MustTearDown() {
 	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func setEnv(projectDir string) {
+	err := os.Setenv("OYA_HOME", projectDir)
+	if err != nil {
+		panic(err)
+	}
+	err = os.Setenv("SOPS_PGP_FP", SOPS_PGP_KEY)
 	if err != nil {
 		panic(err)
 	}
@@ -106,6 +115,18 @@ func (c *SuiteContext) fileContains(path string, contents *gherkin.DocString) er
 	}
 	if actual != contents.Content {
 		return fmt.Errorf("unexpected file %v contents: %q expected: %q", path, actual, contents.Content)
+	}
+	return nil
+}
+
+func (c *SuiteContext) fileDoesNotContain(path string, contents *gherkin.DocString) error {
+	actual, err := c.readFile(path)
+	if err != nil {
+		return err
+	}
+	re := regexp.MustCompile(".*" + contents.Content + ".*")
+	if len(re.FindString(actual)) > 0 {
+		return fmt.Errorf("unexpected file %v contents: %q NOT expected: %q", path, actual, contents.Content)
 	}
 	return nil
 }
@@ -217,6 +238,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
 	s.Step(`^I modify file (.+) to contain$`, c.modifyFileToContain)
 	s.Step(`^file (.+) contains$`, c.fileContains)
+	s.Step(`^file (.+) does not contain$`, c.fileDoesNotContain)
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^file (.+) does not exist$`, c.fileDoesNotExist)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)

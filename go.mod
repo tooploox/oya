@@ -18,6 +18,7 @@ require (
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/go-test/deep v1.0.1
+	github.com/google/pprof v0.0.0-20190208070709-b421f19a5c07 // indirect
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0
 	github.com/hashicorp/go-getter v1.0.2
@@ -25,8 +26,9 @@ require (
 	github.com/hashicorp/go-version v1.1.0
 	github.com/hashicorp/hcl v1.0.0
 	github.com/huandu/xstrings v1.2.0 // indirect
+	github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
-	github.com/kr/pty v1.1.3 // indirect
+	github.com/kr/pty v1.1.3
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
 	github.com/magiconair/properties v1.8.0
 	github.com/mattn/go-colorable v0.1.0 // indirect

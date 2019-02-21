@@ -3,11 +3,14 @@ package raw
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 
+	"github.com/bilus/oya/pkg/secrets"
+	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -23,6 +26,12 @@ type Oyafile struct {
 // DecodedOyafile is an Oyafile that has been loaded from YAML
 // but hasn't been parsed yet.
 type DecodedOyafile map[string]interface{}
+
+func (o *DecodedOyafile) Merge(values map[string]interface{}) {
+	for k, v := range values {
+		(*o)[k] = v
+	}
+}
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
 	raw, err := New(oyafilePath, rootDir)
@@ -52,7 +61,6 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &Oyafile{
 		Path:    oyafilePath,
 		RootDir: rootDir,
@@ -69,10 +77,32 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	if empty {
 		return make(DecodedOyafile), nil
 	}
-	reader := bytes.NewReader(raw.file)
+	decodedOyafile, err := decodeYaml(raw.file)
+	if err != nil {
+		return nil, err
+	}
+	secs, err := secrets.Decrypt(raw.RootDir)
+	if err != nil {
+		if log.GetLevel() == log.DebugLevel {
+			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+		}
+	} else {
+		if len(secs) > 0 {
+			decodedSecrets, err := decodeYaml(secs)
+			if err != nil {
+				log.Warn(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+			}
+			decodedOyafile.Merge(decodedSecrets)
+		}
+	}
+	return decodedOyafile, nil
+}
+
+func decodeYaml(content []byte) (DecodedOyafile, error) {
+	reader := bytes.NewReader(content)
 	decoder := yaml.NewDecoder(reader)
 	var of DecodedOyafile
-	err = decoder.Decode(&of)
+	err := decoder.Decode(&of)
 	if err != nil {
 		return nil, err
 	}

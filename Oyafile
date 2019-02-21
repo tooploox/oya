@@ -2,12 +2,16 @@ Project: project
 Require:
   github.com/tooploox/oya-fixtures: v1.1.0
 
+Values:
+  pgpkey: 317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202
+
 Ignore:
 - pkg/*
 
 develop.Doc: Install development prerequisites.
 develop: |
-  go get github.com/DATA-DOG/godog/cmd/godog
+  go get -u github.com/DATA-DOG/godog/cmd/godog
+  go get -u go.mozilla.org/sops/cmd/sops
 
 install.Doc: Install oya.
 install: |
@@ -17,3 +21,20 @@ test.Doc: Run tests.
 test: |
   go test -v ./... && \
   godog
+
+importTestKeys: |
+  if ! [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
+  then
+    gpg --import testutil/pgp/private.rsa
+
+    echo "Oya test PGP Key imported"
+  fi
+
+removeTestKeys: |
+  if [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
+  then
+    gpg --batch --delete-secret-keys '$pgpkey'
+    gpg --batch --delete-keys '$pgpkey'
+
+    echo "Oya test PGP Key deleted"
+  fi
