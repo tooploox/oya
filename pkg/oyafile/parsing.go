@@ -110,11 +110,11 @@ func parseValues(value interface{}, o *Oyafile) error {
 		return fmt.Errorf("expected map of keys to values")
 	}
 	for k, v := range values {
-		valueName, ok := k.(string)
+		key, ok := k.(string)
 		if !ok {
 			return fmt.Errorf("expected map of keys to values")
 		}
-		o.Values[valueName] = v
+		o.Values[key] = v
 	}
 	return nil
 }
