@@ -3,21 +3,23 @@ package internal
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
+	"github.com/pkg/errors"
 )
 
-type ErrNoAlias struct {
-	Alias       string
+type ErrNoScope struct {
+	Scope       string
 	OyafilePath string
 }
 
-func (err ErrNoAlias) Error() string {
-	return fmt.Sprintf("Unknown import alias %q in %v", err.Alias, err.OyafilePath)
+func (err ErrNoScope) Error() string {
+	return fmt.Sprintf("Scope not found in %v: %q missing or cannot be used as a scope", err.OyafilePath, err.Scope)
 }
 
-func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeSelector string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -44,20 +46,56 @@ func Render(oyafilePath, templatePath, outputPath, alias string, stdout, stderr 
 
 	var values template.Scope
 	if found {
-		if alias != "" {
-			av, ok := o.Values[alias]
-			if !ok {
-				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
-			}
-			aliasScope, ok := av.(template.Scope)
-			if !ok {
-				return ErrNoAlias{Alias: alias, OyafilePath: oyafilePath}
-			}
-			values = aliasScope
+		if autoScope && scopeSelector == "" {
+			scopeSelector, _ = lookupOyaScope()
+		}
+		// BUG(bilus): Breaking encapsulation here (see task.Name#Split)
+		if scopeSelector != "" {
+			scopeSelectorParts := strings.Split(scopeSelector, ".")
+			values, err = resolveScope(scopeSelectorParts, o.Values)
 		} else {
-			values = o.Values
+			values, err = resolveScope(nil, o.Values)
+		}
+		if err != nil {
+			// BUG(bilus): Ignoring err.
+			return ErrNoScope{Scope: scopeSelector, OyafilePath: oyafilePath}
 		}
 	}
 
 	return template.RenderAll(templatePath, outputPath, values)
+}
+
+func resolveScope(scopeSelector []string, scope template.Scope) (template.Scope, error) {
+	if len(scopeSelector) == 0 {
+		return scope, nil
+	}
+
+	scopeName := scopeSelector[0]
+	potentialScope, ok := scope[scopeName]
+	if !ok {
+		return nil, errors.Errorf("Missing key %q", scopeName)
+	}
+	subScope, ok := parseScope(potentialScope)
+	if !ok {
+		return nil, errors.Errorf("Unsupported scope under %q", scopeName)
+	}
+	return resolveScope(scopeSelector[1:], subScope)
+}
+
+func parseScope(potentialScope interface{}) (template.Scope, bool) {
+	if selectedScope, ok := potentialScope.(template.Scope); ok {
+		return selectedScope, true
+	}
+	if aMap, ok := potentialScope.(map[interface{}]interface{}); ok {
+		scope := make(template.Scope)
+		for k, v := range aMap {
+			name, ok := k.(string)
+			if !ok {
+				return nil, false
+			}
+			scope[name] = v
+		}
+		return scope, true
+	}
+	return nil, false
 }

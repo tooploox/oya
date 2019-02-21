@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/bilus/oya/cmd/internal"
 	"github.com/bilus/oya/pkg/flags"
@@ -29,23 +30,55 @@ var runCmd = &cobra.Command{
 	Args:               cobra.ArbitraryArgs,
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		taskName := args[0]
 		cwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		positionalArgs, flags, err := parseArgs(args)
+		cobraFlags, taskName, positionalArgs, flags, err := parseArgs(args)
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
+		// BUG(bilus): Yack. This is what has to be done to support arbitrary flags passed to tasks.
+		cmd.DisableFlagParsing = false
+		defer func() { cmd.DisableFlagParsing = true }()
+		if err := cmd.ParseFlags(cobraFlags); err != nil {
+			return err
+		}
+		recurse, err := cmd.Flags().GetBool("recurse")
+		if err != nil {
+			return err
+		}
+		changeset, err := cmd.Flags().GetBool("changeset")
+		if err != nil {
+			return err
+		}
+		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(runCmd)
+	runCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
+	runCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
 }
 
-func parseArgs(args []string) ([]string, map[string]string, error) {
-	return flags.Parse(args[1:])
+func parseArgs(args []string) ([]string, string, []string, map[string]string, error) {
+	cobraFlags, rest := detectFlags(args)
+	taskName := rest[0]
+	posArgs, flags, err := flags.Parse(rest[1:])
+	return cobraFlags, taskName, posArgs, flags, err
+}
+
+// detectFlags processed args consisting of flags followed by positional arguments, splitting them.
+// For example this: ["--foo", "-b", "xxx", "--foo"] becomes: ["--foo", "-b"], ["xxx", "--foo"].
+func detectFlags(args []string) ([]string, []string) {
+	flags := make([]string, 0, len(args))
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "-") {
+			flags = append(flags, arg)
+		} else {
+			return flags, args[i:]
+		}
+	}
+	return flags, nil
 }
