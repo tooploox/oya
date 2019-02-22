@@ -61,3 +61,12 @@ Scenario: Get two versions of the same pack
   1.1.0
 
   """
+
+Scenario: Get a pack from a private repo
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya get github.com/bilus/oya-fixtures-private@v1.0.0"
+  Then the command succeeds
+  And file ./.oya/packs/github.com/bilus/oya-fixtures-private@v1.0.0/Oyafile exists
