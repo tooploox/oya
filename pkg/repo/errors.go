@@ -25,6 +25,17 @@ func (err ErrNoTaggedVersions) Error() string {
 	return fmt.Sprintf("no available remote versions for import path %q", err.ImportPath)
 }
 
+// ErrNoTaggedVersion indicates there are no available remote version of the pack.
+type ErrCheckout struct {
+	ImportPath    types.ImportPath
+	ImportVersion semver.Version
+	ErrorMsg      error
+}
+
+func (err ErrCheckout) Error() string {
+	return fmt.Sprintf("Pack checkout - %q for %v@%v", err.ErrorMsg, err.ImportPath, err.ImportVersion)
+}
+
 // ErrNoRootOyafile indicates that pack's root Oyafile is missing.
 type ErrNoRootOyafile struct {
 	ImportPath types.ImportPath

@@ -14,7 +14,7 @@ import (
 	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-billy.v4/memfs"
-	"gopkg.in/src-d/go-git.v4"
+	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
@@ -102,21 +102,21 @@ func (l *GithubRepo) InstallPath(version semver.Version, installDir string) stri
 func (l *GithubRepo) checkout(version semver.Version) (*object.Commit, error) {
 	r, err := l.clone()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
 	}
 	tree, err := r.Worktree()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
 	}
 	err = tree.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
 	})
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
 	}
 	return r.CommitObject(ref.Hash())
 }
