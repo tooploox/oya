@@ -13,11 +13,11 @@ import (
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
-	"github.com/src-d/go-git/plumbing/transport"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
@@ -67,14 +67,10 @@ func (l *GithubRepo) clone() (*git.Repository, error) {
 		URL: l.repoUri,
 	})
 	if err != nil {
-		fmt.Printf("%T %v\n", err, err)
-		fmt.Printf("%T %v\n", transport.ErrAuthenticationRequired, transport.ErrAuthenticationRequired)
-		compare := (err == transport.ErrAuthenticationRequired)
-		fmt.Printf("%T %v\n", compare, compare)
 		if err == transport.ErrAuthenticationRequired {
-			fmt.Printf("AAAA")
+			return nil, ErrClone{RepoUrl: l.repoUri, GitMsg: "Repository not found or private"}
 		}
-		return nil, err
+		return nil, ErrClone{RepoUrl: l.repoUri, GitMsg: err.Error()}
 	}
 	return repo, nil
 }
@@ -114,21 +110,21 @@ func (l *GithubRepo) InstallPath(version semver.Version, installDir string) stri
 func (l *GithubRepo) checkout(version semver.Version) (*object.Commit, error) {
 	r, err := l.clone()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	tree, err := r.Worktree()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	err = tree.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
 	})
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, ErrorMsg: err}
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	return r.CommitObject(ref.Hash())
 }
