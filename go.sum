@@ -147,8 +147,6 @@ github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e h1:g4R4qT0VIFzSL2tZv/T
 github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e/go.mod h1:P4AexN0a+C9tGAnUFNwDMYYZv3pjFuvmeiMyKRaNVlI=
 github.com/src-d/gcfg v1.4.0 h1:xXbNR5AlLSA315x2UO+fTSSAXCDf+Ar38/6oyGbDKQ4=
 github.com/src-d/gcfg v1.4.0/go.mod h1:p/UMsR43ujA89BJY9duynAwIpvqEujIH/jFlfL7jWoI=
-github.com/src-d/go-git v4.7.0+incompatible h1:IYSSnbAHeKmsfbQFi9ozbid+KNh0bKjlorMfQehQbcE=
-github.com/src-d/go-git v4.7.0+incompatible/go.mod h1:1bQciz+hn0jzPQNsYj0hDFZHLJBdV7gXE2mWhC7EkFk=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
