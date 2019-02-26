@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gobwas/glob"
+	"github.com/sirupsen/logrus"
 )
 
 // Template represents a template that can be rendered using provided values.
@@ -50,6 +51,7 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 			return err // err is nil if ok
 		}
 
+		logrus.Println("Rendering", relPath)
 		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
 		if err != nil {
 			return err
