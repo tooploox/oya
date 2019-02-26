@@ -62,6 +62,7 @@ Scenario: Get two versions of the same pack
 
   """
 
+@nocircleci
 Scenario: Get a pack from a private repo
   Given file ./Oyafile containing
     """
