@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -22,6 +23,12 @@ import (
 	"github.com/bilus/oya/pkg/flags"
 	"github.com/spf13/cobra"
 )
+
+type ErrMissingTaskName struct{}
+
+func (e ErrMissingTaskName) Error() string {
+	return fmt.Sprintf("Missing task name to be run. To list available tasks type `$ oya tasks`")
+}
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
@@ -64,6 +71,9 @@ func init() {
 
 func parseArgs(args []string) ([]string, string, []string, map[string]string, error) {
 	cobraFlags, rest := detectFlags(args)
+	if len(rest) == 0 {
+		return nil, "", nil, nil, ErrMissingTaskName{}
+	}
 	taskName := rest[0]
 	posArgs, flags, err := flags.Parse(rest[1:])
 	return cobraFlags, taskName, posArgs, flags, err
