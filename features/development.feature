@@ -13,12 +13,12 @@ Scenario: Use a local require
       github.com/tooploox/oya-fixtures: v1.0.0
 
     Replace:
-      github.com/tooploox/oya-fixtures: /pack
+      github.com/tooploox/oya-fixtures: /tmp/pack
 
     Import:
       foo: github.com/tooploox/oya-fixtures
     """
-  And file /pack/Oyafile containing
+  And file /tmp/pack/Oyafile containing
     """
     Project: pack
 
@@ -42,12 +42,12 @@ Scenario: With local require oya doesn't attempt to lookup requirements remotely
       github.com/tooploox/does-not-exist: v1.0.0
 
     Replace:
-      github.com/tooploox/does-not-exist: /pack
+      github.com/tooploox/does-not-exist: /tmp/pack
 
     Import:
       foo: github.com/tooploox/does-not-exist
     """
-  And file /pack/Oyafile containing
+  And file /tmp/pack/Oyafile containing
     """
     Project: pack
 
