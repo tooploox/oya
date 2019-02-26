@@ -88,7 +88,7 @@ func parseMeta(metaName, key string) (task.Name, bool) {
 func parseImports(value interface{}, o *Oyafile) error {
 	imports, ok := value.(map[interface{}]interface{})
 	if !ok {
-		return fmt.Errorf("expected map of aliases to paths")
+		return nil // Allow empty Import:
 	}
 	for alias, path := range imports {
 		alias, ok := alias.(string)
@@ -107,7 +107,7 @@ func parseImports(value interface{}, o *Oyafile) error {
 func parseValues(value interface{}, o *Oyafile) error {
 	values, ok := value.(map[interface{}]interface{})
 	if !ok {
-		return fmt.Errorf("expected map of keys to values")
+		return nil // Allow empty Values:
 	}
 	for k, v := range values {
 		key, ok := k.(string)
@@ -167,7 +167,7 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 
 	requires, ok := value.(map[interface{}]interface{})
 	if !ok {
-		return defaultErr
+		return nil // Allow empty Require:
 	}
 
 	packReferences := make([]PackReference, 0, len(requires))
