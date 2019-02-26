@@ -13,6 +13,7 @@ import (
 	"github.com/bilus/oya/pkg/semver"
 	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
+	"github.com/src-d/go-git/plumbing/transport"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -62,9 +63,20 @@ func (l *GithubRepo) AvailableVersions() ([]semver.Version, error) {
 func (l *GithubRepo) clone() (*git.Repository, error) {
 	fs := memfs.New()
 	storer := memory.NewStorage()
-	return git.Clone(storer, fs, &git.CloneOptions{
+	repo, err := git.Clone(storer, fs, &git.CloneOptions{
 		URL: l.repoUri,
 	})
+	if err != nil {
+		fmt.Printf("%T %v\n", err, err)
+		fmt.Printf("%T %v\n", transport.ErrAuthenticationRequired, transport.ErrAuthenticationRequired)
+		compare := (err == transport.ErrAuthenticationRequired)
+		fmt.Printf("%T %v\n", compare, compare)
+		if err == transport.ErrAuthenticationRequired {
+			fmt.Printf("AAAA")
+		}
+		return nil, err
+	}
+	return repo, nil
 }
 
 // LatestVersion returns the latest available pack version based on tags in the remote Github repo.
