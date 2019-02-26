@@ -62,7 +62,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 				if len(meta.Doc) > 0 {
 					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
 				} else {
-					fmt.Fprintf(w, "oya run %s\n", taskName)
+					fmt.Fprintf(w, "oya run %s\t\n", taskName)
 				}
 			}
 			return nil
