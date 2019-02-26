@@ -8,6 +8,6 @@ jobs:
       - checkout
       - run: go version
       - run: go run oya.go run develop
-      - run: go run oya.go run importTestKeys
+      - run: go run oya.go run testKeysImport
       - run: go run oya.go run test
-      - run: go run oya.go run removeTestKeys
+      - run: go run oya.go run testKeysRemove
