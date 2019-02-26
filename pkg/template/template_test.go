@@ -51,7 +51,7 @@ func TestRenderAll_Directory(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	err = template.RenderAll("./fixtures/", outputDir, template.Scope{"foo": "bar"})
+	err = template.RenderAll("./fixtures/", nil, outputDir, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
 	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
@@ -63,8 +63,34 @@ func TestRenderAll_SingleFile(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	err = template.RenderAll("./fixtures/good.txt.kasia", outputDir, template.Scope{"foo": "bar"})
+	err = template.RenderAll("./fixtures/good.txt.kasia", nil, outputDir, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
 	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
+}
+
+func TestRenderAll_ExcludedPaths(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	excludedPaths := []string{"good.txt.kasia"}
+	err = template.RenderAll("./fixtures/", excludedPaths, outputDir, template.Scope{"foo": "bar"})
+	tu.AssertNoErr(t, err, "Expected templates to render")
+
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.kasia"))
+	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"), "bar\n")
+}
+
+func TestRenderAll_ExcludedPatterns(t *testing.T) {
+	outputDir, err := ioutil.TempDir("", "oya")
+	tu.AssertNoErr(t, err, "Error creating temporary output dir")
+	defer os.RemoveAll(outputDir)
+
+	excludedPaths := []string{"**.txt.kasia"}
+	err = template.RenderAll("./fixtures/", excludedPaths, outputDir, template.Scope{"foo": "bar"})
+	tu.AssertNoErr(t, err, "Expected templates to render")
+
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.kasia"))
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"))
 }
