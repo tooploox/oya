@@ -18,6 +18,7 @@ require (
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/go-test/deep v1.0.1
+	github.com/gobwas/glob v0.2.3
 	github.com/google/pprof v0.0.0-20190208070709-b421f19a5c07 // indirect
 	github.com/google/uuid v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0

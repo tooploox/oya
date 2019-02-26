@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/gobwas/glob"
 )
 
 // Template represents a template that can be rendered using provided values.
@@ -28,7 +30,7 @@ func Parse(source string) (Template, error) {
 }
 
 // RenderAll renders all templates in the path (directory or a single file) to an output path (directory or file) using the provided value scope.
-func RenderAll(templatePath, outputPath string, values Scope) error {
+func RenderAll(templatePath string, excludedPaths []string, outputPath string, values Scope) error {
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -43,6 +45,9 @@ func RenderAll(templatePath, outputPath string, values Scope) error {
 		if relPath == "." {
 			// templatePath is a path to a file.
 			relPath = filepath.Base(templatePath)
+		}
+		if ok, err := pathMatches(excludedPaths, relPath); ok || err != nil {
+			return err // err is nil if ok
 		}
 
 		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
@@ -85,4 +90,17 @@ func renderString(templateSource string, values Scope) (string, error) {
 		return "", err
 	}
 	return str, nil
+}
+
+func pathMatches(patterns []string, path string) (bool, error) {
+	for _, pattern := range patterns {
+		p, err := glob.Compile(pattern)
+		if err != nil {
+			return false, err
+		}
+		if p.Match(path) {
+			return true, nil
+		}
+	}
+	return false, nil
 }

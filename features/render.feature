@@ -336,3 +336,88 @@ Scenario: Rendering a dir to an output dir
   """
   Eve
   """
+
+Scenario: Render dir excluding files and directories
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo: xxx
+      bar: yyy
+    """
+  Given file ./templates/file.txt containing
+    """
+    $foo
+    """
+  And file ./templates/excludeme.txt containing
+    """
+    $badvariable
+    """
+  And file ./templates/subdir/excludeme.txt containing
+    """
+    $badvariable
+    """
+  And file ./templates/subdir/file.txt containing
+    """
+    $bar
+    """
+  And file ./templates/excludeme/excludeme.txt containing
+    """
+    $badvariable
+    """
+  When I run "oya render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme ./templates/"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  xxx
+  """
+  And file ./subdir/file.txt contains
+  """
+  yyy
+  """
+  And file ./excludeme.txt does not exist
+  And file ./subdir/excludeme.txt does not exist
+  And file ./excludeme/excludeme.txt does not exist
+
+
+Scenario: Render dir excluding using globbing
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo: xxx
+      bar: yyy
+    """
+  Given file ./templates/file.txt containing
+    """
+    $foo
+    """
+  And file ./templates/excludeme.txt containing
+    """
+    $badvariable
+    """
+  And file ./templates/subdir/excludeme.txt containing
+    """
+    $badvariable
+    """
+  And file ./templates/subdir/file.txt containing
+    """
+    $bar
+    """
+  And file ./templates/excludeme/excludeme.txt containing
+    """
+    $badvariable
+    """
+  When I run "oya render --exclude **excludeme.txt ./templates/"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  xxx
+  """
+  And file ./subdir/file.txt contains
+  """
+  yyy
+  """
+  And file ./excludeme.txt does not exist
+  And file ./subdir/excludeme.txt does not exist
+  And file ./excludeme/excludeme.txt does not exist

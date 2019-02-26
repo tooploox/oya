@@ -17,7 +17,8 @@ func (err ErrNoScope) Error() string {
 	return fmt.Sprintf("Scope not found in %v: %q missing or cannot be used as a scope", err.OyafilePath, err.Scope)
 }
 
-func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopePath string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath string,
+	autoScope bool, scopePath string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -58,5 +59,5 @@ func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeP
 		}
 	}
 
-	return template.RenderAll(templatePath, outputPath, values)
+	return template.RenderAll(templatePath, excludedPaths, outputPath, values)
 }

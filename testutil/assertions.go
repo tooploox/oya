@@ -103,6 +103,14 @@ func AssertPathExists(t *testing.T, path string) {
 	}
 }
 
+func AssertPathNotExists(t *testing.T, path string) {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err == nil {
+		t.Errorf("path %v does exist", path)
+	}
+}
+
 func AssertFileContains(t *testing.T, path string, expectedContent string) {
 	t.Helper()
 	AssertPathExists(t, path)
