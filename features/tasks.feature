@@ -15,7 +15,7 @@ Scenario: Single Oyafile
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build
+  oya run build  
 
   """
 
@@ -32,7 +32,7 @@ Scenario: Show only user-defined
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build
+  oya run build  
 
   """
 
@@ -53,7 +53,7 @@ Scenario: Subdirectories are not recursed by default
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build
+  oya run build  
 
   """
 
@@ -74,10 +74,10 @@ Scenario: Subdirectories can be recursed
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build
+  oya run build  
 
   # in ./subdir1/Oyafile
-  oya run build
+  oya run build  
 
   """
 
@@ -185,7 +185,7 @@ Scenario: Imported packs tasks are listed
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run foo.packTask
-  oya run test
+  oya run foo.packTask  
+  oya run test          
 
   """
