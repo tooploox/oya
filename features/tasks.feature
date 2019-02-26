@@ -160,3 +160,32 @@ Scenario: Parent dir tasks are not listed
   oya run foo  # Do foo
 
   """
+
+Scenario: Imported packs tasks are listed
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+
+    test: |
+      echo "Done"
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    packTask: |
+      echo "this task is in pack"
+    """
+  When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  # in ./Oyafile
+  oya run foo.packTask
+  oya run test
+
+  """
