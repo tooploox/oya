@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
@@ -23,7 +24,12 @@ func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath
 	if err != nil {
 		return err
 	}
-	proj, err := project.Detect(outputPath, installDir)
+	oyafileFullPath, err := filepath.Abs(oyafilePath)
+	if err != nil {
+		return err
+	}
+
+	proj, err := project.Detect(oyafileFullPath, installDir)
 	if err != nil {
 		return err
 	}

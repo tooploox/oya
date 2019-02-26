@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -73,23 +72,30 @@ func overrideOyaCmd(projectDir string) {
 	oyafile.OyaCmdOverride = &oyaCmdOverride
 }
 
-func (c *SuiteContext) writeFile(relPath, contents string) error {
-	sourceFileDirectory := path.Join(c.projectDir, relPath)
-	dir := path.Dir(sourceFileDirectory)
+func (c *SuiteContext) writeFile(path, contents string) error {
+	targetPath := c.resolvePath(path)
+	dir := filepath.Dir(targetPath)
 	err := os.MkdirAll(dir, 0700)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(sourceFileDirectory, []byte(contents), 0600)
+	return ioutil.WriteFile(targetPath, []byte(contents), 0600)
 }
 
-func (c *SuiteContext) readFile(relPath string) (string, error) {
-	sourceFileDirectory := path.Join(c.projectDir, relPath)
-	contents, err := ioutil.ReadFile(sourceFileDirectory)
+func (c *SuiteContext) readFile(path string) (string, error) {
+	sourcePath := c.resolvePath(path)
+	contents, err := ioutil.ReadFile(sourcePath)
 	if err != nil {
 		return "", err
 	}
 	return string(contents), err
+}
+
+func (c *SuiteContext) resolvePath(path string) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+	return filepath.Join(c.projectDir, path)
 }
 
 func (c *SuiteContext) iAmInProjectDir() error {
@@ -132,7 +138,7 @@ func (c *SuiteContext) fileDoesNotContain(path string, contents *gherkin.DocStri
 }
 
 func (c *SuiteContext) fileExists(path string) error {
-	_, err := os.Stat(path)
+	_, err := os.Stat(c.resolvePath(path))
 	return err
 }
 
