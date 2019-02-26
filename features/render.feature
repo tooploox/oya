@@ -421,3 +421,32 @@ Scenario: Render dir excluding using globbing
   And file ./excludeme.txt does not exist
   And file ./subdir/excludeme.txt does not exist
   And file ./excludeme/excludeme.txt does not exist
+
+
+Scenario: Rendering a dir to an output dir outside project dir
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+      culprit: Eve
+      weapon: apple
+    """
+  And file ./templates/file1.txt containing
+    """
+    $weapon
+    """
+  And file ./templates/file2.txt containing
+    """
+    $culprit
+    """
+  When I run "oya render --output-dir /tmp/foobar ./templates/"
+  Then the command succeeds
+  And file /tmp/foobar/file1.txt contains
+  """
+  apple
+  """
+  And file /tmp/foobar/file2.txt contains
+  """
+  Eve
+  """
