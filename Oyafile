@@ -1,6 +1,6 @@
 Project: project
 Require:
-  github.com/tooploox/oya-fixturess: v1.1.0
+  github.com/tooploox/oya-fixtures: v1.1.0
 
 Values:
   pgpkey: 317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202
