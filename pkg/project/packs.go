@@ -48,6 +48,10 @@ func (p *Project) InstallPacks() error {
 	}
 	return deps.ForEach(
 		func(pack pack.Pack) error {
+			_, ok := pack.ReplacementPath()
+			if ok {
+				return nil
+			}
 			installed, err := p.IsInstalled(pack)
 			if err != nil {
 				return err
@@ -171,6 +175,9 @@ func resolvePackReferences(references []oyafile.PackReference) ([]pack.Pack, err
 		pack, err := l.Version(reference.Version)
 		if err != nil {
 			return nil, err
+		}
+		if len(reference.ReplacementPath) > 0 {
+			pack = pack.LocalReplacement(reference.ReplacementPath)
 		}
 		packs[i] = pack
 	}

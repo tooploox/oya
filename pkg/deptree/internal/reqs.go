@@ -2,10 +2,12 @@ package internal
 
 import (
 	"fmt"
+	"path/filepath"
 	"sync"
 
 	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/bilus/oya/pkg/pack"
+	"github.com/bilus/oya/pkg/raw"
 	"github.com/bilus/oya/pkg/repo"
 	"github.com/pkg/errors"
 )
@@ -78,7 +80,7 @@ func id(pack pack.Pack) string {
 }
 
 func (r *Reqs) localReqs(pack pack.Pack) ([]pack.Pack, bool, error) {
-	o, found, err := r.loadLocalOyafile(pack)
+	o, found, err := r.LoadLocalOyafile(pack)
 	if err != nil {
 		return nil, false, err
 	}
@@ -92,7 +94,20 @@ func (r *Reqs) localReqs(pack pack.Pack) ([]pack.Pack, bool, error) {
 	return nil, false, nil
 }
 
-func (r *Reqs) loadLocalOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
+func (r *Reqs) LoadLocalOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
+	if path, ok := pack.ReplacementPath(); ok {
+		fullPath := filepath.Join(r.rootDir, path)
+		o, found, err := oyafile.LoadFromDir(fullPath, r.rootDir)
+		if !found {
+			return nil, false, errors.Errorf("no %v found at the replacement path %v for %q", raw.DefaultName, fullPath, pack.ImportPath())
+		}
+		if err != nil {
+			return nil, false, errors.Wrapf(err, "error resolving replacement path %v for %q", fullPath, pack.ImportPath())
+
+		}
+		return o, true, nil
+
+	}
 	for _, installDir := range r.installDirs {
 		o, found, err := oyafile.LoadFromDir(pack.InstallPath(installDir), r.rootDir)
 		if err != nil {
