@@ -10,7 +10,6 @@ import (
 
 // DependencyTree defines a project's dependencies, allowing for loading them.
 type DependencyTree struct {
-	rootDir      string
 	installDirs  []string
 	dependencies []pack.Pack
 	reqs         *internal.Reqs
@@ -21,7 +20,6 @@ type DependencyTree struct {
 // dependencies. This will likely change and then the name will fit like a glove. ;)
 func New(rootDir string, installDirs []string, dependencies []pack.Pack) (*DependencyTree, error) {
 	return &DependencyTree{
-		rootDir:      rootDir,
 		installDirs:  installDirs,
 		dependencies: dependencies,
 		reqs:         internal.NewReqs(rootDir, installDirs),
@@ -49,7 +47,7 @@ func (dt *DependencyTree) Load(importPath types.ImportPath) (*oyafile.Oyafile, b
 		return nil, false, err
 	}
 	if found {
-		return dt.loadOyafile(pack)
+		return dt.reqs.LoadLocalOyafile(pack)
 	}
 	return nil, false, nil
 }
@@ -72,20 +70,6 @@ func (dt *DependencyTree) ForEach(f func(pack.Pack) error) error {
 		}
 	}
 	return nil
-}
-
-func (dt *DependencyTree) loadOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
-	for _, installDir := range dt.installDirs {
-		o, found, err := oyafile.LoadFromDir(pack.InstallPath(installDir), dt.rootDir)
-		if err != nil {
-			continue
-		}
-		if !found {
-			continue
-		}
-		return o, true, nil
-	}
-	return nil, false, nil
 }
 
 func (dt *DependencyTree) findRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {

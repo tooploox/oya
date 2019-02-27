@@ -191,6 +191,10 @@ func (l *GithubRepo) Reqs(version semver.Version) ([]pack.Pack, error) {
 		return nil, ErrNoRootOyafile{l.importPath, version}
 	}
 
+	// BUG(bilus): This doesn't take Oyafile#Replacements into account.
+	// This probably doesn't matter because it's likely meaningless for
+	// packs accessed remotely but we may want to revisit it.
+
 	packs := make([]pack.Pack, len(o.Requires))
 	for i, require := range o.Requires {
 		repo, err := Open(require.ImportPath)
@@ -245,8 +249,8 @@ func parseImportPath(importPath types.ImportPath) (string, string, string, error
 	if len(parts) < 3 {
 		return "", "", "", ErrNotGithub{ImportPath: importPath}
 	}
+	repoUri := fmt.Sprintf("git@%s:%s/%s.git", parts[0], parts[1], parts[2])
 	basePath := strings.Join(parts[0:3], "/")
-	repoUri := fmt.Sprintf("https://%v.git", basePath)
 	packPath := strings.Join(parts[3:], "/")
 	return repoUri, basePath, packPath, nil
 }

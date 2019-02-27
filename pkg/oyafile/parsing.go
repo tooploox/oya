@@ -61,6 +61,11 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
+		case "Replace":
+			err := parseReplace(name, value, oyafile)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error parsing key %q", name)
+			}
 
 		default:
 			taskName := task.Name(name)
@@ -76,11 +81,26 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 		}
 	}
 
+	err = oyafile.resolveReplacements()
+	if err != nil {
+		return nil, err
+	}
+
 	err = oyafile.addBuiltIns()
 	if err != nil {
 		return nil, err
 	}
 	return oyafile, nil
+}
+
+func (oyafile *Oyafile) resolveReplacements() error {
+	for i, ref := range oyafile.Requires {
+		replPath, ok := oyafile.Replacements[ref.ImportPath]
+		if ok {
+			oyafile.Requires[i].ReplacementPath = replPath
+		}
+	}
+	return nil
 }
 
 func parseMeta(metaName, key string) (task.Name, bool) {
@@ -197,4 +217,29 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 
 	o.Requires = packReferences
 	return nil
+}
+
+func parseReplace(name string, value interface{}, o *Oyafile) error {
+	defaultErr := fmt.Errorf("expected entries mapping pack import paths to paths relative to the project root directory, example: \"github.com/tooploox/oya-pack/docker: /packs/docker\"")
+
+	replacements, ok := value.(map[interface{}]interface{})
+	if !ok {
+		return defaultErr
+	}
+
+	for importPathI, pathI := range replacements {
+		importPath, ok := importPathI.(string)
+		if !ok {
+			return defaultErr
+		}
+		path, ok := pathI.(string)
+		if !ok {
+			return defaultErr
+		}
+
+		o.Replacements[types.ImportPath(importPath)] = path
+	}
+
+	return nil
+
 }
