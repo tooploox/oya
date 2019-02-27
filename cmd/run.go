@@ -27,7 +27,7 @@ import (
 type ErrMissingTaskName struct{}
 
 func (e ErrMissingTaskName) Error() string {
-	return fmt.Sprintf("Missing TASK to be run. To list available tasks type `$ oya tasks`")
+	return fmt.Sprintf("missing TASK name")
 }
 
 // runCmd represents the run command
