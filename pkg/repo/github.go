@@ -191,6 +191,10 @@ func (l *GithubRepo) Reqs(version semver.Version) ([]pack.Pack, error) {
 		return nil, ErrNoRootOyafile{l.importPath, version}
 	}
 
+	// BUG(bilus): This doesn't take Oyafile#Replacements into account.
+	// This probably doesn't matter because it's likely meaningless for
+	// packs accessed remotely but we may want to revisit it.
+
 	packs := make([]pack.Pack, len(o.Requires))
 	for i, require := range o.Requires {
 		repo, err := Open(require.ImportPath)
