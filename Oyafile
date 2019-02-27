@@ -38,3 +38,17 @@ removeTestKeys: |
 
     echo "Oya test PGP Key deleted"
   fi
+
+release: |
+  go get -u github.com/mitchellh/gox
+  go get -u github.com/tcnksm/ghr
+  go get -u github.com/stevenmatthewt/semantics
+  tag=$$(semantics --output-tag)
+  gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_$${tag}_{{.OS}}_{{.Arch}}"
+  gzip dist/*
+  sha256sum dist/oya_$${tag}_{darwin,linux}_* | tee dist/oya_$${tag}_SHA256SUMS
+  if [ "$$tag" ]; then
+    ghr -t $$GITHUB_TOKEN -u $$CIRCLE_PROJECT_USERNAME -r $$CIRCLE_PROJECT_REPONAME --replace $$tag dist/
+  else
+    echo "The commit message(s) did not indicate a major/minor/patch version."
+  fi
