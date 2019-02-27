@@ -249,8 +249,8 @@ func parseImportPath(importPath types.ImportPath) (string, string, string, error
 	if len(parts) < 3 {
 		return "", "", "", ErrNotGithub{ImportPath: importPath}
 	}
+	repoUri := fmt.Sprintf("git@%s:%s/%s.git", parts[0], parts[1], parts[2])
 	basePath := strings.Join(parts[0:3], "/")
-	repoUri := fmt.Sprintf("https://%v.git", basePath)
 	packPath := strings.Join(parts[3:], "/")
 	return repoUri, basePath, packPath, nil
 }
