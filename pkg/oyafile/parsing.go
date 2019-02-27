@@ -110,7 +110,7 @@ func parseImports(value interface{}, o *Oyafile) error {
 func parseValues(value interface{}, o *Oyafile) error {
 	values, ok := value.(map[interface{}]interface{})
 	if !ok {
-		return fmt.Errorf("expected map of aliases to paths")
+		return fmt.Errorf("expected map of keys to values")
 	}
 	for k, v := range values {
 		key, ok := k.(string)
