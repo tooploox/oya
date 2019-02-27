@@ -11,3 +11,41 @@ jobs:
       - run: go run oya.go run importTestKeys
       - run: go run oya.go run test
       - run: go run oya.go run removeTestKeys
+
+  release:
+    docker:
+      - image: circleci/golang:1.11.4
+    steps:
+      - checkout
+      - run: go get -u github.com/mitchellh/gox
+      - run: go get -u github.com/tcnksm/ghr
+      - run: go get -u github.com/stevenmatthewt/semantics
+      - run:
+          name: cross compile
+          command: |
+            tag=$(semantics --output-tag)
+            gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_${tag}_{{.OS}}_{{.Arch}}"
+            cd dist/ && gzip *
+            sha256sum dist/oya_${tag}_{darwin,linux}_* | tee dist/oya_${tag}_SHA256SUMS
+      - add_ssh_keys
+      - run:
+          name: create release
+          command: |
+            tag=$(semantics --output-tag)
+            if [ "$tag" ]; then
+              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $tag dist/
+            else
+              echo "The commit message(s) did not indicate a major/minor/patch version."
+            fi
+
+workflows:
+  version: 2
+  build-release:
+    jobs:
+      - build
+      - release:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
