@@ -20,7 +20,7 @@ install: |
 test.Doc: Run tests.
 test: |
   go test -v ./... && \
-  godog
+  godog $Join(" ", Args)
 
 importTestKeys: |
   if ! [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
