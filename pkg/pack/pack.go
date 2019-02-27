@@ -15,8 +15,9 @@ type Repo interface {
 
 // Pack represents a specific version of an Oya pack.
 type Pack struct {
-	repo    Repo
-	version semver.Version
+	repo            Repo
+	version         semver.Version
+	replacementPath string
 }
 
 func New(repo Repo, version semver.Version) (Pack, error) {
@@ -24,6 +25,18 @@ func New(repo Repo, version semver.Version) (Pack, error) {
 		repo:    repo,
 		version: version,
 	}, nil
+}
+
+func (p Pack) LocalReplacement(replacementPath string) Pack {
+	return Pack{
+		repo:            p.repo,
+		version:         p.version,
+		replacementPath: replacementPath,
+	}
+}
+
+func (p Pack) ReplacementPath() (string, bool) {
+	return p.replacementPath, len(p.replacementPath) > 0
 }
 
 func (p Pack) Install(installDir string) error {

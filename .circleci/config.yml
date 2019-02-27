@@ -7,7 +7,8 @@ jobs:
     steps:
       - checkout
       - run: go version
-      - run: go run oya.go run develop
-      - run: go run oya.go run testKeysImport
-      - run: go run oya.go run test
-      - run: go run oya.go run testKeysRemove
+      - run: go build oya.go
+      - run: ./oya run develop
+      - run: ./oya run testKeysImport
+      - run: ./oya run test -t "~@nocircleci"
+      - run: ./oya run testKeysRemove

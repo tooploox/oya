@@ -26,7 +26,11 @@ var OyaCmdOverride *string
 type PackReference struct {
 	ImportPath types.ImportPath
 	Version    semver.Version
+	// ReplacementPath is a path relative to the root directory, when the replacement for the pack can be found, based on the Replace: directive.
+	ReplacementPath string
 }
+
+type PackReplacements map[types.ImportPath]string
 
 type Oyafile struct {
 	Dir      string
@@ -39,7 +43,9 @@ type Oyafile struct {
 	Project  string   // Project is set for root Oyafile.
 	Ignore   []string // Ignore contains directory exclusion rules.
 	Requires []PackReference
-	IsBuilt  bool
+	// Replacements map packs to local paths relative to project root directory for development based on the Replace: directive.
+	Replacements PackReplacements
+	IsBuilt      bool
 
 	relPath string
 
@@ -65,15 +71,16 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	}
 	dir := path.Dir(oyafilePath)
 	return &Oyafile{
-		Dir:     filepath.Clean(dir),
-		Path:    filepath.Clean(oyafilePath),
-		RootDir: filepath.Clean(rootDir),
-		Shell:   "/bin/bash",
-		Imports: make(map[types.Alias]types.ImportPath),
-		Tasks:   task.NewTable(),
-		Values:  template.Scope{},
-		relPath: relPath,
-		OyaCmd:  oyaCmd,
+		Dir:          filepath.Clean(dir),
+		Path:         filepath.Clean(oyafilePath),
+		RootDir:      filepath.Clean(rootDir),
+		Shell:        "/bin/bash",
+		Imports:      make(map[types.Alias]types.ImportPath),
+		Tasks:        task.NewTable(),
+		Values:       template.Scope{},
+		relPath:      relPath,
+		Replacements: make(PackReplacements),
+		OyaCmd:       oyaCmd,
 	}, nil
 }
 

@@ -20,7 +20,7 @@ install: |
 test.Doc: Run tests.
 test: |
   go test -v ./... && \
-  godog
+  godog $Join(" ", Args)
 
 testKeysImport.Doc: Imports test PGP keys required by sops.
 testKeysImport: |
