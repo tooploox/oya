@@ -67,10 +67,7 @@ func (l *GithubRepo) clone() (*git.Repository, error) {
 		URL: l.repoUri,
 	})
 	if err != nil {
-		if err == transport.ErrAuthenticationRequired {
-			return nil, ErrClone{RepoUrl: l.repoUri, GitMsg: "Repository not found or private"}
-		}
-		return nil, ErrClone{RepoUrl: l.repoUri, GitMsg: err.Error()}
+		return nil, toErrClone(l.repoUri, err)
 	}
 	return repo, nil
 }
@@ -286,4 +283,11 @@ func (l *GithubRepo) isOutsidePack(relPath string) (bool, error) {
 		return false, err
 	}
 	return strings.Contains(r, ".."), nil
+}
+
+func toErrClone(url string, err error) error {
+	if err == transport.ErrAuthenticationRequired {
+		return ErrClone{RepoUrl: url, GitMsg: "Repository not found or private"}
+	}
+	return ErrClone{RepoUrl: url, GitMsg: err.Error()}
 }

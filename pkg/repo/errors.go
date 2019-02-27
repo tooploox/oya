@@ -32,7 +32,7 @@ type ErrClone struct {
 }
 
 func (err ErrClone) Error() string {
-	return fmt.Sprintf("Clonning pack %v - %q", err.RepoUrl, err.GitMsg)
+	return fmt.Sprintf("cloning pack %v - %q", err.RepoUrl, err.GitMsg)
 }
 
 // ErrCheckout indicates problem during repository checkout for ex. unknown version
@@ -43,7 +43,7 @@ type ErrCheckout struct {
 }
 
 func (err ErrCheckout) Error() string {
-	return fmt.Sprintf("Pack checkout %v@%v - %q", err.ImportPath, err.ImportVersion, err.GitMsg)
+	return fmt.Sprintf("checking out pack %v@%v - %q", err.ImportPath, err.ImportVersion, err.GitMsg)
 }
 
 // ErrNoRootOyafile indicates that pack's root Oyafile is missing.
