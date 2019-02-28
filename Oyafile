@@ -40,3 +40,15 @@ testKeysRemove: |
 
     echo "Oya test PGP Key deleted"
   fi
+
+release: |
+  go get -u github.com/mitchellh/gox
+  go get -u github.com/tcnksm/ghr
+  gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_$${CIRCLE_TAG}_{{.OS}}_{{.Arch}}"
+  gzip dist/*
+  sha256sum dist/oya_$${CIRCLE_TAG}_{darwin,linux}_* | tee dist/oya_$${CIRCLE_TAG}_SHA256SUMS
+  if [ "$$CIRCLE_TAG" ]; then
+    ghr -t $$GITHUB_TOKEN -u $$CIRCLE_PROJECT_USERNAME -r $$CIRCLE_PROJECT_REPONAME --replace $$CIRCLE_TAG dist/
+  else
+    echo "The build is missing Git / CircleCi Tag"
+  fi
