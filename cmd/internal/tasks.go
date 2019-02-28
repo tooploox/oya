@@ -8,6 +8,7 @@ import (
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/task"
+	"github.com/pkg/errors"
 )
 
 func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) error {
@@ -31,11 +32,21 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 		return err
 	}
 
+	dependencies, err := p.Deps()
+	if err != nil {
+		return err
+	}
+
 	first := true
 	for _, o := range oyafiles {
 		relPath, err := filepath.Rel(workDir, o.Path)
 		if err != nil {
 			return err
+		}
+
+		err = o.Build(dependencies)
+		if err != nil {
+			return errors.Wrapf(err, "error in %v", o.Path)
 		}
 
 		if !first {
@@ -51,7 +62,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 				if len(meta.Doc) > 0 {
 					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
 				} else {
-					fmt.Fprintf(w, "oya run %s\n", taskName)
+					fmt.Fprintf(w, "oya run %s\t\n", taskName)
 				}
 			}
 			return nil
