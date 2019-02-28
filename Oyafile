@@ -48,5 +48,5 @@ release: |
   if [ "$$CIRCLE_TAG" ]; then
     ghr -t $$GITHUB_TOKEN -u $$CIRCLE_PROJECT_USERNAME -r $$CIRCLE_PROJECT_REPONAME --replace $$CIRCLE_TAG dist/
   else
-    echo "The commit message(s) did not indicate a major/minor/patch version."
+    echo "The build is missing Git / CircleCi Tag"
   fi
