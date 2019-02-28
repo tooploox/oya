@@ -6,9 +6,45 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
       - run: go version
       - run: go build oya.go
       - run: ./oya run develop
-      - run: ./oya run importTestKeys
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+      - run: ./oya run testKeysImport
       - run: ./oya run test -t "~@nocircleci"
-      - run: ./oya run removeTestKeys
+      - run: ./oya run testKeysRemove
+
+  release:
+    docker:
+      - image: circleci/golang:1.11.4
+    steps:
+      - checkout
+      - add_ssh_keys
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
+      - run: go run oya.go run release
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+
+workflows:
+  version: 2
+  build-release:
+    jobs:
+      - build
+      - release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
