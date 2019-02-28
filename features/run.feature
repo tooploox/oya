@@ -251,3 +251,23 @@ Scenario: Running in a subdirectory
   Project1
 
   """
+
+Scenario: Allow empty Require, Import: Values
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+    Import:
+    Values:
+
+    foo: |
+      echo "hello from foo"
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  hello from foo
+
+  """
