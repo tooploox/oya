@@ -22,7 +22,8 @@ test: |
   go test -v ./... && \
   godog $Join(" ", Args)
 
-importTestKeys: |
+testKeysImport.Doc: Imports test PGP keys required by sops.
+testKeysImport: |
   if ! [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
   then
     gpg --import testutil/pgp/private.rsa
@@ -30,7 +31,8 @@ importTestKeys: |
     echo "Oya test PGP Key imported"
   fi
 
-removeTestKeys: |
+testKeysRemove.Doc: Removes test PGP keys.
+testKeysRemove: |
   if [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
   then
     gpg --batch --delete-secret-keys '$pgpkey'
