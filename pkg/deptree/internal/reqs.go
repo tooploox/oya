@@ -96,7 +96,12 @@ func (r *Reqs) localReqs(pack pack.Pack) ([]pack.Pack, bool, error) {
 
 func (r *Reqs) LoadLocalOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) {
 	if path, ok := pack.ReplacementPath(); ok {
-		fullPath := filepath.Join(r.rootDir, path)
+		var fullPath string
+		if filepath.IsAbs(path) {
+			fullPath = path
+		} else {
+			fullPath = filepath.Join(r.rootDir, path)
+		}
 		o, found, err := oyafile.LoadFromDir(fullPath, r.rootDir)
 		if !found {
 			return nil, false, errors.Errorf("no %v found at the replacement path %v for %q", raw.DefaultName, fullPath, pack.ImportPath())
