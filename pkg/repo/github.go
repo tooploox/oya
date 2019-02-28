@@ -14,9 +14,10 @@ import (
 	"github.com/bilus/oya/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-billy.v4/memfs"
-	"gopkg.in/src-d/go-git.v4"
+	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
@@ -62,9 +63,13 @@ func (l *GithubRepo) AvailableVersions() ([]semver.Version, error) {
 func (l *GithubRepo) clone() (*git.Repository, error) {
 	fs := memfs.New()
 	storer := memory.NewStorage()
-	return git.Clone(storer, fs, &git.CloneOptions{
+	repo, err := git.Clone(storer, fs, &git.CloneOptions{
 		URL: l.repoUri,
 	})
+	if err != nil {
+		return nil, toErrClone(l.repoUri, err)
+	}
+	return repo, nil
 }
 
 // LatestVersion returns the latest available pack version based on tags in the remote Github repo.
@@ -102,21 +107,21 @@ func (l *GithubRepo) InstallPath(version semver.Version, installDir string) stri
 func (l *GithubRepo) checkout(version semver.Version) (*object.Commit, error) {
 	r, err := l.clone()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	tree, err := r.Worktree()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	err = tree.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
 	})
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return nil, err
+		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
 	}
 	return r.CommitObject(ref.Hash())
 }
@@ -278,4 +283,11 @@ func (l *GithubRepo) isOutsidePack(relPath string) (bool, error) {
 		return false, err
 	}
 	return strings.Contains(r, ".."), nil
+}
+
+func toErrClone(url string, err error) error {
+	if err == transport.ErrAuthenticationRequired {
+		return ErrClone{RepoUrl: url, GitMsg: "Repository not found or private"}
+	}
+	return ErrClone{RepoUrl: url, GitMsg: err.Error()}
 }

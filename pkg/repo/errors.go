@@ -25,6 +25,27 @@ func (err ErrNoTaggedVersions) Error() string {
 	return fmt.Sprintf("no available remote versions for import path %q", err.ImportPath)
 }
 
+// ErrClone indacates problem during repository clone (doesn't exist or private)
+type ErrClone struct {
+	RepoUrl string
+	GitMsg  string
+}
+
+func (err ErrClone) Error() string {
+	return fmt.Sprintf("cloning pack %v - %q", err.RepoUrl, err.GitMsg)
+}
+
+// ErrCheckout indicates problem during repository checkout for ex. unknown version
+type ErrCheckout struct {
+	ImportPath    types.ImportPath
+	ImportVersion semver.Version
+	GitMsg        string
+}
+
+func (err ErrCheckout) Error() string {
+	return fmt.Sprintf("checking out pack %v@%v - %q", err.ImportPath, err.ImportVersion, err.GitMsg)
+}
+
 // ErrNoRootOyafile indicates that pack's root Oyafile is missing.
 type ErrNoRootOyafile struct {
 	ImportPath types.ImportPath
