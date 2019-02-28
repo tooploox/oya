@@ -22,9 +22,6 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 		return nil, err
 	}
 	for name, value := range of {
-		if value == nil {
-			continue
-		}
 		switch name {
 		case "Import":
 			err := parseImports(value, oyafile)
@@ -109,6 +106,9 @@ func parseMeta(metaName, key string) (task.Name, bool) {
 }
 
 func parseImports(value interface{}, o *Oyafile) error {
+	if value == nil {
+		return nil
+	}
 	imports, ok := value.(map[interface{}]interface{})
 	if !ok {
 		return fmt.Errorf("expected map of aliases to paths")
@@ -128,6 +128,9 @@ func parseImports(value interface{}, o *Oyafile) error {
 }
 
 func parseValues(value interface{}, o *Oyafile) error {
+	if value == nil {
+		return nil
+	}
 	values, ok := value.(map[interface{}]interface{})
 	if !ok {
 		return fmt.Errorf("expected map of keys to values")
@@ -186,6 +189,9 @@ func parseTask(name string, value interface{}, o *Oyafile) error {
 }
 
 func parseRequire(name string, value interface{}, o *Oyafile) error {
+	if value == nil {
+		return nil
+	}
 	defaultErr := fmt.Errorf("expected entries mapping pack import paths to their version, example: \"github.com/tooploox/oya-packReferences/docker: v1.0.0\"")
 
 	requires, ok := value.(map[interface{}]interface{})
