@@ -365,7 +365,7 @@ Scenario: Render dir excluding files and directories
     """
     $badvariable
     """
-  When I run "oya render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme ./templates/"
+  When I run "oya render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme/* ./templates/"
   Then the command succeeds
   And file ./file.txt contains
   """

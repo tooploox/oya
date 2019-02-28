@@ -167,6 +167,7 @@ Scenario: Ignore errors in projects inside current project
 
   """
 
+@bug
 Scenario: Running recursively
   Given file ./Oyafile containing
     """
@@ -195,9 +196,9 @@ Scenario: Running recursively
   Project1
 
   """
-  And file ././Root does not exist
-  And file ./Project1 exists
-  And file ./../project2/Project2 does not exist
+  And file ./Root does not exist
+  And file ./project1/Project1 exists
+  And file ./project2/Project2 does not exist
 
 Scenario: Running recursively
   Given file ./Oyafile containing
@@ -227,9 +228,9 @@ Scenario: Running recursively
   Project1
 
   """
-  And file ././Root does not exist
-  And file ./Project1 exists
-  And file ./../project2/Project2 does not exist
+  And file ./Root does not exist
+  And file ./project1/Project1 exists
+  And file ./project2/Project2 does not exist
 
 Scenario: Running in a subdirectory
   Given file ./Oyafile containing
