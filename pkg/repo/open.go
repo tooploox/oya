@@ -7,12 +7,12 @@ func Open(importPath types.ImportPath) (*GithubRepo, error) {
 	if importPath.Host() != types.HostGithub {
 		return nil, ErrNotGithub{ImportPath: importPath}
 	}
-	repoUri, basePath, packPath, err := parseImportPath(importPath)
+	repoUris, basePath, packPath, err := parseImportPath(importPath)
 	if err != nil {
 		return nil, err
 	}
 	return &GithubRepo{
-		repoUri:    repoUri,
+		repoUris:   repoUris,
 		packPath:   packPath,
 		basePath:   basePath,
 		importPath: importPath,
