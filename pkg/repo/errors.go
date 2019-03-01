@@ -3,8 +3,8 @@ package repo
 import (
 	"fmt"
 
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 // ErrNotGithub indicates that the import path doesn't start with github.com.

@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/raw"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/raw"
 	"k8s.io/helm/pkg/ignore"
 )
 

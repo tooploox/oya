@@ -1,7 +1,7 @@
 require 'tmpdir'
 
 def include?(import_path)
-            import_path.start_with?("github.com/bilus/oya/pkg") &&
+            import_path.start_with?("github.com/tooploox/oya/pkg") &&
               !import_path.end_with?("/internal") &&
               !import_path.end_with?("/fixtures") &&
               !import_path.end_with?("/debug")

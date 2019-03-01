@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bilus/oya/pkg/raw"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/raw"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestOyafile_AddRequire_NoRequire(t *testing.T) {

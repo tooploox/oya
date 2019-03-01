@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bilus/oya/pkg/changeset"
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/changeset"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/task"
 )
 
 // Changeset returns the list of Oyafiles for the changed directories, based on the

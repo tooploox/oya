@@ -3,7 +3,7 @@ package task
 import (
 	"strings"
 
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Name string

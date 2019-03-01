@@ -3,7 +3,7 @@ package task
 import (
 	"fmt"
 
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Table struct {

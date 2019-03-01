@@ -9,12 +9,12 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/bilus/oya/pkg/raw"
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/template"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 // OyaCmdOverride is used in tests, to override the path to the current oya executable.

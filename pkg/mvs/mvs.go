@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bilus/oya/pkg/mvs/internal"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/mvs/internal"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Reqs interface {

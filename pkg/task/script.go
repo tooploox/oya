@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bilus/oya/pkg/template"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 type Script struct {

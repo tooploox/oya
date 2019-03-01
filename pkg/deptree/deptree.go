@@ -1,11 +1,11 @@
 package deptree
 
 import (
-	"github.com/bilus/oya/pkg/deptree/internal"
-	"github.com/bilus/oya/pkg/mvs"
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/deptree/internal"
+	"github.com/tooploox/oya/pkg/mvs"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 // DependencyTree defines a project's dependencies, allowing for loading them.

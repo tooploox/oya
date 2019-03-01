@@ -1,8 +1,8 @@
 package debug
 
 import (
-	"github.com/bilus/oya/pkg/oyafile"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/oyafile"
 )
 
 func LogOyafiles(msg string, oyafiles []*oyafile.Oyafile) {

@@ -4,9 +4,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/raw"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/raw"
 )
 
 func Import(workDir, uri string, stdout, stderr io.Writer) error {

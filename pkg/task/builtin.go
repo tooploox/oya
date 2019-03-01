@@ -3,7 +3,7 @@ package task
 import (
 	"io"
 
-	"github.com/bilus/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 type Builtin struct {

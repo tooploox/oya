@@ -1,9 +1,9 @@
 package pack
 
 import (
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Repo interface {

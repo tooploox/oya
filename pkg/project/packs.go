@@ -3,11 +3,11 @@ package project
 import (
 	"sort"
 
-	"github.com/bilus/oya/pkg/deptree"
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/repo"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/deptree"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/repo"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 func (p *Project) Require(pack pack.Pack) error {

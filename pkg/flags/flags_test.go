@@ -3,8 +3,8 @@ package flags_test
 import (
 	"testing"
 
-	"github.com/bilus/oya/pkg/flags"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/flags"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestEmpty(t *testing.T) {

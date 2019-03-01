@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bilus/oya/pkg/secrets"
 	"github.com/kr/pty"
+	"github.com/tooploox/oya/pkg/secrets"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

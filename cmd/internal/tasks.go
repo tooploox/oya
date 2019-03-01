@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"text/tabwriter"
 
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/task"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/task"
 )
 
 func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) error {
