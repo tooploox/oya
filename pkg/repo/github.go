@@ -23,7 +23,7 @@ import (
 
 // GithubRepo represents all versions of an Oya pack stored in a git repository on Github.com.
 type GithubRepo struct {
-	repoUri    string
+	repoUris   []string
 	basePath   string
 	packPath   string
 	importPath types.ImportPath
@@ -61,15 +61,20 @@ func (l *GithubRepo) AvailableVersions() ([]semver.Version, error) {
 }
 
 func (l *GithubRepo) clone() (*git.Repository, error) {
-	fs := memfs.New()
-	storer := memory.NewStorage()
-	repo, err := git.Clone(storer, fs, &git.CloneOptions{
-		URL: l.repoUri,
-	})
-	if err != nil {
-		return nil, toErrClone(l.repoUri, err)
+	var lastErr error
+	for _, uri := range l.repoUris {
+		fs := memfs.New()
+		storer := memory.NewStorage()
+		repo, err := git.Clone(storer, fs, &git.CloneOptions{
+			URL: uri,
+		})
+		if err == nil {
+			return repo, nil
+		}
+		lastErr = err
+
 	}
-	return repo, nil
+	return nil, lastErr
 }
 
 // LatestVersion returns the latest available pack version based on tags in the remote Github repo.
@@ -249,15 +254,20 @@ func copyFile(f *object.File, targetPath string) error {
 	return err
 }
 
-func parseImportPath(importPath types.ImportPath) (string, string, string, error) {
+func parseImportPath(importPath types.ImportPath) (uris []string, basePath string, packPath string, err error) {
 	parts := strings.Split(string(importPath), "/")
 	if len(parts) < 3 {
-		return "", "", "", ErrNotGithub{ImportPath: importPath}
+		return nil, "", "", ErrNotGithub{ImportPath: importPath}
 	}
-	repoUri := fmt.Sprintf("git@%s:%s/%s.git", parts[0], parts[1], parts[2])
-	basePath := strings.Join(parts[0:3], "/")
-	packPath := strings.Join(parts[3:], "/")
-	return repoUri, basePath, packPath, nil
+	basePath = strings.Join(parts[0:3], "/")
+	packPath = strings.Join(parts[3:], "/")
+	// Prefer https but fall back on ssh if cannot clone via https
+	// as would be the case for private repositories.
+	uris = []string{
+		fmt.Sprintf("https://%v.git", basePath),
+		fmt.Sprintf("git@%s:%s/%s.git", parts[0], parts[1], parts[2]),
+	}
+	return
 }
 
 func (l *GithubRepo) parseRef(tag string) (semver.Version, bool) {
