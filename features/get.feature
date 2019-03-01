@@ -3,6 +3,7 @@ Feature: Getting packs
 Background:
    Given I'm in project dir
 
+@github
 Scenario: Get a pack
   Given file ./Oyafile containing
     """
@@ -12,6 +13,7 @@ Scenario: Get a pack
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
+@github
 Scenario: Get a pack with invalid import
   Given file ./Oyafile containing
     """
@@ -24,6 +26,7 @@ Scenario: Get a pack with invalid import
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
+@github
 Scenario: Get two versions of the same pack
   Given file ./project1/Oyafile containing
     """
@@ -63,6 +66,7 @@ Scenario: Get two versions of the same pack
   """
 
 @nocircleci
+@github
 Scenario: Get a pack from a private repo
   Given file ./Oyafile containing
     """

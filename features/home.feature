@@ -3,6 +3,7 @@ Feature: Home directory
 Background:
    Given I'm in project dir
 
+@github
 Scenario: Decide where installed packs are stored
   Given file ./Oyafile containing
     """

@@ -3,6 +3,7 @@ Feature: Dependency management
 Background:
    Given I'm in project dir
 
+@github
 Scenario: Get a specific pack version
   Given file ./Oyafile containing
     """
@@ -24,6 +25,7 @@ Scenario: Get a specific pack version
 
     """
 
+@github
 Scenario: Get the latest pack version
   Given file ./Oyafile containing
     """
@@ -45,6 +47,7 @@ Scenario: Get the latest pack version
 
     """
 
+@github
 Scenario: Get pack from a multi-pack repo
   Given file ./Oyafile containing
     """
@@ -66,6 +69,7 @@ Scenario: Get pack from a multi-pack repo
 
     """
 
+@github
 Scenario: Fetch only the package, not the entire repo
   Given file ./Oyafile containing
     """
@@ -76,6 +80,7 @@ Scenario: Fetch only the package, not the entire repo
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/Oyafile does not exist
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/VERSION does not exist
 
+@github
 Scenario: Require pack
   Given file ./Oyafile containing
     """
@@ -93,6 +98,7 @@ Scenario: Require pack
 
     """
 
+@github
 Scenario: Require pack from multi-pack repo
   Given file ./Oyafile containing
     """
@@ -110,6 +116,7 @@ Scenario: Require pack from multi-pack repo
 
     """
 
+@github
 Scenario: Require two packs from multi-pack repo
   Given file ./Oyafile containing
     """
@@ -134,6 +141,7 @@ Scenario: Require two packs from multi-pack repo
 
     """
 
+@github
 Scenario: Get command does not upgrade pack by default
   Given file ./Oyafile containing
     """
@@ -161,6 +169,7 @@ Scenario: Get command does not upgrade pack by default
     foo: echo "bar"
     """
 
+@github
 Scenario: Upgrade single pack using get command
   Given file ./Oyafile containing
     """
@@ -195,6 +204,7 @@ Scenario: Upgrade single pack using get command
 
     """
 
+@github
 Scenario: Upgrade pack by editing the Require section
   Given file ./Oyafile containing
     """
@@ -221,6 +231,7 @@ Scenario: Upgrade pack by editing the Require section
 
     """
 
+@github
 Scenario: Generate requires from imports
   Given file ./Oyafile containing
     """
@@ -260,6 +271,7 @@ Scenario: Generate requires from imports
 
     """
 
+@github
 Scenario: Preserve versions when generating requires from imports
   Given file ./Oyafile containing
     """
@@ -301,6 +313,7 @@ Scenario: Preserve versions when generating requires from imports
 
     """
 
+@github
 Scenario: Indirect requirements are downloaded
   Given file ./Oyafile containing
     """
@@ -329,6 +342,7 @@ Scenario: Indirect requirements are downloaded
 
     """
 
+@github
 Scenario: Indirectly required higher version
   Given file ./Oyafile containing
     """
