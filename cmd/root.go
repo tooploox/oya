@@ -75,7 +75,14 @@ func ResetFlags() {
 func resetFlagsRecurse(cmd *cobra.Command) {
 	cmd.Flags().VisitAll(
 		func(flag *pflag.Flag) {
-			flag.Value.Set(flag.DefValue)
+			if flag.DefValue == "[]" {
+				// BUG(bilus): I don't know how to set default value for StringArray flag type.
+				flag.Value.Set("")
+
+			} else {
+				flag.Value.Set(flag.DefValue)
+			}
+
 		})
 	for _, child := range cmd.Commands() {
 		resetFlagsRecurse(child)

@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"github.com/bilus/oya/pkg/project"
 	"github.com/bilus/oya/pkg/template"
@@ -17,12 +18,18 @@ func (err ErrNoScope) Error() string {
 	return fmt.Sprintf("Scope not found in %v: %q missing or cannot be used as a scope", err.OyafilePath, err.Scope)
 }
 
-func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopePath string, stdout, stderr io.Writer) error {
+func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath string,
+	autoScope bool, scopePath string, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
 	}
-	proj, err := project.Detect(outputPath, installDir)
+	oyafileFullPath, err := filepath.Abs(oyafilePath)
+	if err != nil {
+		return err
+	}
+
+	proj, err := project.Detect(oyafileFullPath, installDir)
 	if err != nil {
 		return err
 	}
@@ -58,5 +65,5 @@ func Render(oyafilePath, templatePath, outputPath string, autoScope bool, scopeP
 		}
 	}
 
-	return template.RenderAll(templatePath, outputPath, values)
+	return template.RenderAll(templatePath, excludedPaths, outputPath, values)
 }
