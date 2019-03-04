@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/bilus/oya/pkg/types"
+import "github.com/tooploox/oya/pkg/types"
 
 // Open opens a library containing all versions of a single Oya pack.
 func Open(importPath types.ImportPath) (*GithubRepo, error) {

@@ -5,9 +5,9 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/bilus/oya/pkg/changeset"
-	"github.com/bilus/oya/pkg/oyafile"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/changeset"
+	"github.com/tooploox/oya/pkg/oyafile"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestNoChangesetTask(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bilus/oya/pkg/repo"
-	"github.com/bilus/oya/pkg/semver"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/repo"
+	"github.com/tooploox/oya/pkg/semver"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestPack_Vendor(t *testing.T) {

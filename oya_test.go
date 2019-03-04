@@ -12,10 +12,10 @@ import (
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
-	"github.com/bilus/oya/cmd"
-	"github.com/bilus/oya/pkg/oyafile"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/cmd"
+	"github.com/tooploox/oya/pkg/oyafile"
 )
 
 const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"

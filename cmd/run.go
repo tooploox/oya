@@ -19,9 +19,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bilus/oya/cmd/internal"
-	"github.com/bilus/oya/pkg/flags"
 	"github.com/spf13/cobra"
+	"github.com/tooploox/oya/cmd/internal"
+	"github.com/tooploox/oya/pkg/flags"
 )
 
 type ErrMissingTaskName struct{}

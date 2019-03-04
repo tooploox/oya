@@ -5,8 +5,8 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 type ErrNoScope struct {

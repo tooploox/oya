@@ -3,9 +3,9 @@ package fixtures
 import (
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/raw"
-	"github.com/bilus/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/task"
 )
 
 func Oyafile(dirPath string, kvs ...string) *oyafile.Oyafile {

@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {

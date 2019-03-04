@@ -1,9 +1,9 @@
 package project
 
 import (
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Deps interface {

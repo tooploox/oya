@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/template"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 // Calculate gets changeset from each Oyafile by invoking their Changeset: tasks

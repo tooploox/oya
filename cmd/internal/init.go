@@ -3,8 +3,8 @@ package internal
 import (
 	"io"
 
-	"github.com/bilus/oya/pkg/raw"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/raw"
 )
 
 func Init(rootDir string, stdout, stderr io.Writer) error {

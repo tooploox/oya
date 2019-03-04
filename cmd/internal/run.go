@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {

@@ -43,7 +43,7 @@ The task in the above example is called "build" but there's nothing special abou
 
 ## Plugins
 
-oya vendor p github.com/bilus/oya/packs/circleci-helm-platform
+oya vendor p github.com/tooploox/oya/packs/circleci-helm-platform
 
 installs into vendor/
 symlinks vendor/p to it
@@ -55,12 +55,12 @@ oya p/generate/docker
 delivery/broadcasts/Oyafile
 
 Import:
-  - github.com/bilus/oya/packs/jenkins-monorepo
+  - github.com/tooploox/oya/packs/jenkins-monorepo
 
 --
 
 Path:
-  jm: github.com/bilus/oya/packs/jenkins-monorepo/bin
+  jm: github.com/tooploox/oya/packs/jenkins-monorepo/bin
 
 buildDocker:
   jm/buildDocker
@@ -228,19 +228,19 @@ oya vendor
 
 ## Secrets
 
-Secrets requires [Sops](https://github.com/mozilla/sops) to be installed. 
+Secrets requires [Sops](https://github.com/mozilla/sops) to be installed.
 
 ### PGP keys
 
     $ gpg --list-keys
     $ gpg --fingerprint
-    
+
 Generate/Export/Import
 
     $ gpg --gen-key
     $ gpg --export-secret-keys --armor {{fingerprint}} > private.rsa
     $ gpg --import private.rsa
-    
+
 Remove
 
     $ gpg --delete-keys {{fingerprint}}

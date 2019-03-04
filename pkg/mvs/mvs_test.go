@@ -4,9 +4,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/bilus/oya/pkg/mvs"
-	"github.com/bilus/oya/pkg/pack"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/mvs"
+	"github.com/tooploox/oya/pkg/pack"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 type MockReqs map[string][]pack.Pack

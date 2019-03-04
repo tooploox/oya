@@ -6,8 +6,8 @@ import (
 	"unicode"
 
 	"github.com/Masterminds/sprig"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 var sprigFunctions = upcaseFuncNames(sprig.GenericFuncMap())

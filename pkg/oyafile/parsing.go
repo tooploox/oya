@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bilus/oya/pkg/raw"
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 func Parse(raw *raw.Oyafile) (*Oyafile, error) {

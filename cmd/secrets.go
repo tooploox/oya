@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/bilus/oya/cmd/internal"
 	"github.com/spf13/cobra"
+	"github.com/tooploox/oya/cmd/internal"
 )
 
 var secretsCmd = &cobra.Command{

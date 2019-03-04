@@ -17,8 +17,8 @@ package cmd
 import (
 	"path/filepath"
 
-	"github.com/bilus/oya/cmd/internal"
 	"github.com/spf13/cobra"
+	"github.com/tooploox/oya/cmd/internal"
 )
 
 // renderCmd represents the render command

@@ -4,12 +4,12 @@ import (
 	"io"
 	"strings"
 
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/repo"
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/repo"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {

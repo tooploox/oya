@@ -9,8 +9,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/secrets"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/secrets"
 	yaml "gopkg.in/yaml.v2"
 )
 

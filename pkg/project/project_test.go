@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/bilus/oya/pkg/project"
-	"github.com/bilus/oya/pkg/template"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/template"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 var (

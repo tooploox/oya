@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/bilus/oya/pkg/template"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/template"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestLoad(t *testing.T) {

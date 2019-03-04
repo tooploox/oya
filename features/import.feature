@@ -23,19 +23,19 @@ Scenario: Import a pack to other already imported
     """
     Project: project
     Import:
-      other: github.com/bilus/oya/other
+      other: github.com/tooploox/oya/other
 
     task: |
       echo "check"
     """
-  When I run "oya import github.com/bilus/oya/next"
+  When I run "oya import github.com/tooploox/oya/next"
   Then the command succeeds
   And file ./Oyafile contains
     """
     Project: project
     Import:
-      next: github.com/bilus/oya/next
-      other: github.com/bilus/oya/other
+      next: github.com/tooploox/oya/next
+      other: github.com/tooploox/oya/other
 
     task: |
       echo "check"
@@ -51,12 +51,12 @@ Scenario: Import a pack to empty Oyafile
     """
     """
   When I'm in the ./subdir dir
-  And I run "oya import github.com/bilus/oya/next"
+  And I run "oya import github.com/tooploox/oya/next"
   Then the command succeeds
   And file ./subdir/Oyafile contains
     """
     Import:
-      next: github.com/bilus/oya/next
+      next: github.com/tooploox/oya/next
 
     """
 

@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/project"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/project"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func TestProject_Changeset(t *testing.T) {

@@ -20,7 +20,7 @@
 
 package main
 
-import "github.com/bilus/oya/cmd"
+import "github.com/tooploox/oya/cmd"
 
 func main() {
 	cmd.Execute()

@@ -3,7 +3,7 @@ package project
 import (
 	"fmt"
 
-	"github.com/bilus/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/task"
 )
 
 type ErrNoOyafile struct {

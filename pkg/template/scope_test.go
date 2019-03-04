@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bilus/oya/pkg/template"
-	tu "github.com/bilus/oya/testutil"
+	"github.com/tooploox/oya/pkg/template"
+	tu "github.com/tooploox/oya/testutil"
 )
 
 func identity(scope template.Scope) template.Scope {

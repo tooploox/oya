@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/template"
-	"github.com/bilus/oya/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type PackLoader interface {

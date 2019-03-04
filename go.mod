@@ -1,4 +1,4 @@
-module github.com/bilus/oya
+module github.com/tooploox/oya
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect

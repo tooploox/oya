@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/pack"
-	"github.com/bilus/oya/pkg/raw"
-	"github.com/bilus/oya/pkg/repo"
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/pack"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/repo"
 )
 
 type Reqs struct {

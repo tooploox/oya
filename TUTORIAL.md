@@ -30,7 +30,7 @@ All it does is generate an empty Oyafile in the root directory.
 
 Let's dockerize our app using an Oya pack that makes it easy. First, install the pack:
 
-    oya get github.com/bilus/oya/packs/docker [--alias docker]
+    oya get github.com/tooploox/oya/packs/docker [--alias docker]
 
 Then, generate the assets necessary to put the application into a Docker image:
 
@@ -61,11 +61,11 @@ HERE NEXT
 
 We need to tell Oya this is what we want to do:
 
-    oya get github.com/bilus/oya/packs/gke
+    oya get github.com/tooploox/oya/packs/gke
 
 The command installs the gke pack. We'll also need the docker pack to simplify putting our app in a docker container:
 
-    oya get github.com/bilus/oya/packs/docker
+    oya get github.com/tooploox/oya/packs/docker
 
 Let's generate code necessary to deploy our app in a docker container:
 

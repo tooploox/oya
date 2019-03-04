@@ -4,12 +4,12 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/bilus/oya/pkg/oyafile"
-	"github.com/bilus/oya/pkg/raw"
-	"github.com/bilus/oya/pkg/task"
-	"github.com/bilus/oya/pkg/template"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 // TODO: Duplicated in oyafile module.

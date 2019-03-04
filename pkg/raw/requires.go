@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bilus/oya/pkg/semver"
-	"github.com/bilus/oya/pkg/types"
+	"github.com/tooploox/oya/pkg/semver"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Pack interface {
