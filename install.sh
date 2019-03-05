@@ -34,10 +34,11 @@ get_os() {
 }
 
 get_arch() {
-    archstr=`arch`
-    if [[ "$archstr" == 'i486' || "$archstr" == 'i386' || "$archstr" == 'i586' ]]; then
+    archstr=`uname -m`
+    if [[ "$archstr" == 'x86_64' || "$archstr" == 'x86' ]]; then
         arch='386'
-    # TODO: !! else if [[ AMD ]]
+    elif [[ "$archstr" == 'AMD64' ]]; then
+         arch='amd64'
     else
         echo "Sorry Oya doesn't support ${archstr} architecture yet! :("
         exit 1
@@ -73,12 +74,16 @@ get_and_check() {
     _tmp_dir=`mktemp -d`
     _archive="oya.gz"
     _fileName="oya"
+    _bin_dir="/Users/bart/work/tooploox/tmp/bin"
+    _args=""
     get_package "$_url" "$_tmp_dir" "$_archive" || return $?
     verify_sha "$_sum_url" "$_tmp_dir" "$_archive" || return $?
     gunzip ${_tmp_dir}/${_archive} || return $?
     chmod +x ${_tmp_dir}/${_fileName} || return $?
-    # TODO: check dir privileges
-    mv ${_tmp_dir}/${_fileName} /usr/local/bin
+    if [ ! -w "$_bin_dir" ]; then
+        _args="sudo "
+    fi
+    ${_args}mv ${_tmp_dir}/${_fileName} ${_bin_dir}
 }
 
 get_package() {
