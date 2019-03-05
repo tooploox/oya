@@ -16,6 +16,7 @@ check_sops() {
 }
 
 check_deps() {
+    echo "Checking required tools:"
     check_sops
 }
 
@@ -65,6 +66,7 @@ install_version() {
     _arch=$3
     _url="${OYA_URL}/releases/download/${_ver}/oya_${version}_${_os}_${_arch}.gz"
     _sum_url="${OYA_URL}/releases/download/${_ver}/oya_${version}_SHA256SUMS"
+    echo "Installing Oya ${_ver}"
     get_and_check "${_url}" "${_sum_url}" && return
 }
 
@@ -120,6 +122,7 @@ oya_install() {
         version=$2
     fi
     install_version $version $os $arch
+    echo "Done."
 }
 
 oya_install "$@"
