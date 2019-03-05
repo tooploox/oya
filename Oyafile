@@ -24,7 +24,7 @@ test: |
 
 test.Doc: Run installer tests.
 testInstaller: |
-  cd installer/
+  cd install/test/
   ./runTests.sh
 
 testKeysImport.Doc: Imports test PGP keys required by sops.

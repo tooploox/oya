@@ -3,7 +3,7 @@
 TEST_IMG_NAME="oya-installer-test"
 OUTPUT="$(mktemp -d)/install.log"
 
-runTest="docker run -v $(pwd):/oya -t $TEST_IMG_NAME"
+runTest="docker run -v $(dirname `pwd`):/oya -t $TEST_IMG_NAME"
 errors=0
 
 red=$'\e[1;31m'
@@ -16,7 +16,7 @@ docker build -t $TEST_IMG_NAME . 2>&1 >> $OUTPUT
 printf "%s\n" "${grn}DONE${end}"
 
 printf "Oya installer fails if sops is missing: "
-$runTest /oya/noSopsTest.sh 2>&1 >> $OUTPUT
+$runTest /oya/test/noSopsTest.sh 2>&1 >> $OUTPUT
 if [ $? -eq 0 ]; then
     printf "%s\n" "${red}FAIL${end}"
     errors=1
@@ -25,7 +25,7 @@ else
 fi
 
 printf "Oya installer passes if all good: "
-$runTest /oya/successTest.sh 2>&1 >> $OUTPUT
+$runTest /oya/test/successTest.sh 2>&1 >> $OUTPUT
 if [ $? -eq 0 ]; then
     printf "%s\n" "${grn}PASS${end}"
 else

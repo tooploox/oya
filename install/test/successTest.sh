@@ -6,5 +6,5 @@ dpkg -i sops_3.2.0_amd64.deb
 
 /oya/install.sh
 
-cd /oya/
+cd /oya/test/
 oya run test
