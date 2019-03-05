@@ -74,7 +74,7 @@ get_and_check() {
     _tmp_dir=`mktemp -d`
     _archive="oya.gz"
     _fileName="oya"
-    _bin_dir="/Users/bart/work/tooploox/tmp/bin"
+    _bin_dir="/usr/local/bin"
     _args=""
     get_package "$_url" "$_tmp_dir" "$_archive" || return $?
     verify_sha "$_sum_url" "$_tmp_dir" "$_archive" || return $?
