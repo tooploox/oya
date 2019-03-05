@@ -116,10 +116,10 @@ oya_install() {
     get_os
     get_arch
     check_deps
-    if [ -z "$2" ];then
+    if [ -z "$1" ];then
         version=$(find_latest)
     else
-        version=$2
+        version=$1
     fi
     install_version $version $os $arch
     echo "Done."
