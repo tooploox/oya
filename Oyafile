@@ -21,6 +21,8 @@ test.Doc: Run tests.
 test: |
   go test -v ./... && \
   godog $Join(" ", Args)
+  cd installer/
+  ./runTests.sh
 
 testKeysImport.Doc: Imports test PGP keys required by sops.
 testKeysImport: |

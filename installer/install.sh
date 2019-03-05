@@ -10,7 +10,7 @@ check_sops() {
     else
         printf "FAIL\n"
         echo "Oya requires SOPS (Secrets OPerationS) to manage secret files."
-        echo "Visit https://github.com/mozilla/sops for install instuctions."
+        echo "Visit https://github.com/mozilla/sops for install instructions."
         exit 1
     fi
 }
@@ -102,7 +102,7 @@ verify_sha() {
             echo "error downloading oya package SHA sums $url"
             return 1
         }
-    _mysum=$(shasum -a 256 ${_dir}/${_file} | awk '{print $1}')
+    _mysum=$(sha256sum ${_dir}/${_file} | awk '{print $1}')
     _result=$(cat ${_dir}/shasums | grep $_mysum)
     if [ -z "$_result" ]; then
         echo "downloaded archive checksum failed"
