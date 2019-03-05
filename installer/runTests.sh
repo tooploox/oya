@@ -15,7 +15,6 @@ printf "Building docker container $TEST_IMG_NAME: "
 docker build -t $TEST_IMG_NAME . 2>&1 >> $OUTPUT
 printf "%s\n" "${grn}DONE${end}"
 
-
 printf "Oya installer fails if sops is missing: "
 $runTest /oya/noSopsTest.sh 2>&1 >> $OUTPUT
 if [ $? -eq 0 ]; then

@@ -21,6 +21,9 @@ test.Doc: Run tests.
 test: |
   go test -v ./... && \
   godog $Join(" ", Args)
+
+test.Doc: Run installer tests.
+testInstaller: |
   cd installer/
   ./runTests.sh
 
