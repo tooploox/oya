@@ -22,6 +22,11 @@ test: |
   go test -v ./... && \
   godog $Join(" ", Args)
 
+test.Doc: Run installer tests.
+testInstaller: |
+  cd install/test/
+  ./runTests.sh
+
 testKeysImport.Doc: Imports test PGP keys required by sops.
 testKeysImport: |
   if ! [[ -n $$(gpg --fingerprint | grep '$pgpkey') ]]
