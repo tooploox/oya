@@ -59,7 +59,11 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
+		autoScope, err := cmd.Flags().GetBool("auto-scope")
+		if err != nil {
+			return err
+		}
+		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, autoScope, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
@@ -67,6 +71,7 @@ func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
 	runCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
+	runCmd.Flags().BoolP("auto-scope", "a", true, "When running in an imported pack's task, use the pack's scope, unless --")
 }
 
 func parseArgs(args []string) ([]string, string, []string, map[string]string, error) {

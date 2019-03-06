@@ -31,7 +31,10 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 		if err != nil {
 			return err
 		}
-
+		err = packOyafile.Build(loader)
+		if err != nil {
+			return err
+		}
 		err = oyafile.Values.UpdateScopeAt(string(alias),
 			func(scope template.Scope) template.Scope {
 				// Values in the main Oyafile overwrite values in the pack Oyafile.

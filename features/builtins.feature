@@ -44,7 +44,7 @@ Scenario: Run pack's tasks
     baz: |
       echo "baz"
     """
-  When I run "oya run foo.bar"
+  When I run "oya run --auto-scope=false foo.bar"
   Then the command succeeds
   And the command outputs to stdout
   """

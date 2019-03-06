@@ -8,9 +8,11 @@ import (
 	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/task"
 	"github.com/tooploox/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/types"
 )
 
-func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
+func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []string, flags map[string]string,
+	autoScope bool, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -23,16 +25,23 @@ func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []str
 	if err != nil {
 		return err
 	}
+
 	values, err := p.Values()
 	if err != nil {
 		return err
 	}
-	tn := task.Name(taskName)
 
+	tn := task.Name(taskName)
 	alias, _ := tn.Split()
-	oldOyaScope, _ := lookupOyaScope()
-	if err := setOyaScope(alias.String()); err != nil {
-		return err
+	oldOyaScope, ok := lookupOyaScope()
+	if ok && oldOyaScope != "" {
+		tn = tn.Aliased(types.Alias(oldOyaScope))
+	}
+	if alias != "" && autoScope {
+		alias, _ = tn.Split()
+		if err := setOyaScope(alias.String()); err != nil {
+			return err
+		}
 	}
 	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 

@@ -1,6 +1,7 @@
 package task
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/tooploox/oya/pkg/types"
@@ -17,11 +18,16 @@ func (n Name) Split() (types.Alias, string) {
 	case 1:
 		return "", parts[0]
 	default:
-		return types.Alias(parts[0]), strings.Join(parts[1:], ".")
+		lastIdx := len(parts) - 1
+		return types.Alias(strings.Join(parts[0:lastIdx], ".")), parts[lastIdx]
 	}
 }
 
 func (n Name) IsBuiltIn() bool {
 	firstChar := string(n)[0:1]
 	return firstChar == strings.ToUpper(firstChar)
+}
+
+func (n Name) Aliased(alias types.Alias) Name {
+	return Name(fmt.Sprintf("%v.%v", alias, n))
 }
