@@ -35,6 +35,7 @@ var runCmd = &cobra.Command{
 	Use:                "run TASK",
 	Short:              "Runs an Oya task",
 	Args:               cobra.ArbitraryArgs,
+	SilenceUsage:       true,
 	DisableFlagParsing: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
