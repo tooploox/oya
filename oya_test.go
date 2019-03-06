@@ -185,6 +185,13 @@ func (c *SuiteContext) theCommandSucceeds() error {
 	return nil
 }
 
+func (c *SuiteContext) theCommandFails() error {
+	if c.lastCommandErr == nil {
+		return errors.Errorf("last command unexpectedly succeeded")
+	}
+	return nil
+}
+
 func (c *SuiteContext) theCommandFailsWithError(errMsg *gherkin.DocString) error {
 	errMsg.Content = fmt.Sprintf("^%v$", errMsg.Content)
 	return c.theCommandFailsWithErrorMatching(errMsg)
@@ -248,6 +255,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^file (.+) exists$`, c.fileExists)
 	s.Step(`^file (.+) does not exist$`, c.fileDoesNotExist)
 	s.Step(`^the command succeeds$`, c.theCommandSucceeds)
+	s.Step(`^the command fails$`, c.theCommandFails)
 	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs to (stdout|stderr)$`, c.theCommandOutputs)

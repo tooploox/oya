@@ -15,13 +15,20 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
+	t "github.com/tonnerre/golang-text"
 	"github.com/tooploox/oya/cmd/internal"
 	"github.com/tooploox/oya/pkg/flags"
+)
+
+var (
+	stdoutPrefix = []byte("> ")
+	stderrPrefix = []byte("2> ")
 )
 
 type ErrMissingTaskName struct{}
@@ -59,7 +66,20 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
+		stdout := bufio.NewWriter(cmd.OutOrStdout())
+		defer stdout.Flush()
+		stderr := bufio.NewWriter(cmd.OutOrStderr())
+		defer stderr.Flush()
+		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags,
+			t.NewIndentWriter(stdout, stdoutPrefix),
+			t.NewIndentWriter(stderr, stderrPrefix))
+		// cmd.OutOrStdout(),
+		// cmd.OutOrStderr())
+		// os.Stdout,
+		// os.Stderr)
+		// t.NewIndentWriter(os.Stdout, stdoutPrefix),
+		// t.NewIndentWriter(os.Stderr, stderrPrefix))
+
 	},
 }
 

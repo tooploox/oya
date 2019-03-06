@@ -55,6 +55,7 @@ require (
 	github.com/src-d/go-git v4.7.0+incompatible
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
+	github.com/tonnerre/golang-text v0.0.0-20130925195846-048ed3d792f7
 	github.com/ulikunitz/xz v0.5.5
 	github.com/xeoncross/goworkqueue v0.0.0-20180512210549-cc56da012079
 	github.com/ziutek/kasia.go v0.0.0-20150722135753-be46c452e867
