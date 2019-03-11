@@ -71,4 +71,5 @@ require (
 	gopkg.in/yaml.v2 v2.2.1
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
 	k8s.io/helm v2.12.3+incompatible
+	mvdan.cc/sh v2.6.3+incompatible
 )
