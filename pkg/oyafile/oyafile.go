@@ -116,17 +116,6 @@ func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout,
 	if !ok {
 		return false, nil
 	}
-	tasks, err := oyafile.bindTasks(taskName, task, stdout, stderr)
-	if err != nil {
-		return true, err
-	}
-	scope["Tasks"] = tasks
-
-	render, err := oyafile.bindRender(taskName, stdout, stderr)
-	if err != nil {
-		return true, err
-	}
-	scope["Render"] = render
 
 	return true, task.Exec(oyafile.Dir, scope, stdout, stderr)
 }
