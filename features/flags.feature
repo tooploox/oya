@@ -8,24 +8,27 @@ Scenario: Pass flags and positional arguments to a task
     """
     Project: project
     task: |
-      bashVariable=42
-      $for i, arg in Args:
-        echo Args[$i] = $Args[i]
-      $end
-      echo Flags.switch = $Flags.switch
-      echo Flags.value = $Flags.value
-      echo Flags.otherSwitch = $Flags.otherSwitch
-      echo bashVariable = $$bashVariable
+      for i in $*; do
+        echo $i
+      done
+
+      echo ${Oya[Args.0]}
+      echo ${Oya[Args.1]}
+
+      echo --switch = ${Oya[Flags.switch]}
+      echo --value = ${Oya[Flags.value]}
+      echo --other-switch = ${Oya[Flags.otherSwitch]}
     """
   When I run "oya run task positional1 positional2 --switch --value=5 --other-switch"
   Then the command succeeds
   And the command outputs to stdout
   """
-  Args[0] = positional1
-  Args[1] = positional2
-  Flags.switch = true
-  Flags.value = 5
-  Flags.otherSwitch = true
-  bashVariable = 42
+  positional1
+  positional2
+  positional1
+  positional2
+  --switch = true
+  --value = 5
+  --other-switch = true
 
   """
