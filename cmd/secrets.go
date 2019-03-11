@@ -13,8 +13,9 @@ var secretsCmd = &cobra.Command{
 }
 
 var secretsViewCmd = &cobra.Command{
-	Use:   "view",
-	Short: "View secrets",
+	Use:          "view",
+	Short:        "View secrets",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -25,8 +26,9 @@ var secretsViewCmd = &cobra.Command{
 }
 
 var secretsEditCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "Edit secrets file",
+	Use:          "edit",
+	Short:        "Edit secrets file",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -37,8 +39,9 @@ var secretsEditCmd = &cobra.Command{
 }
 
 var secretsEncryptCmd = &cobra.Command{
-	Use:   "encrypt",
-	Short: "Encrypt secrets file",
+	Use:          "encrypt",
+	Short:        "Encrypt secrets file",
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
 		if err != nil {

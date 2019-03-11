@@ -23,9 +23,10 @@ import (
 
 // renderCmd represents the render command
 var renderCmd = &cobra.Command{
-	Use:   "render TEMPLATE",
-	Short: "Render a template FILE or DIRECTORY using values from an Oyafile",
-	Args:  cobra.ExactArgs(1),
+	Use:          "render TEMPLATE",
+	Short:        "Render a template FILE or DIRECTORY using values from an Oyafile",
+	SilenceUsage: true,
+	Args:         cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		oyafilePath, err := cmd.Flags().GetString("file")
 		if err != nil {
