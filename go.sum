@@ -219,3 +219,5 @@ k8s.io/helm v0.0.0-20180618142140-99f20d82bb2a h1:YFvxjdfsYGdYq57EKu5UJRH33Ma7sh
 k8s.io/helm v0.0.0-20180618142140-99f20d82bb2a/go.mod h1:LZzlS4LQBHfciFOurYBFkCMTaZ0D1l+p0teMg7TSULI=
 k8s.io/helm v2.12.3+incompatible h1:wo1cdYjOnr5Z+LFuhtwIJaeQnec6D4gcg2H5UAKzY6w=
 k8s.io/helm v2.12.3+incompatible/go.mod h1:LZzlS4LQBHfciFOurYBFkCMTaZ0D1l+p0teMg7TSULI=
+mvdan.cc/sh v2.6.3+incompatible h1:uXnnFNSBQbKUwwh2iBSkVjG+GbwoMuI+UmBVPnNiWhA=
+mvdan.cc/sh v2.6.3+incompatible/go.mod h1:IeeQbZq+x2SUGBensq/jge5lLQbS3XT2ktyp3wrt4x8=

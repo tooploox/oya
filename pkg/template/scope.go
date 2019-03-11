@@ -83,6 +83,8 @@ func (scope Scope) GetScopeAt(path string) (Scope, error) {
 	return scope.resolveScope(pathArr, false)
 }
 
+// Flat returns a flattened scope.
+
 func (scope Scope) resolveScope(path []string, create bool) (Scope, error) {
 	if len(path) == 0 {
 		return scope, nil
@@ -104,4 +106,53 @@ func (scope Scope) resolveScope(path []string, create bool) (Scope, error) {
 		return nil, errors.Errorf("Unsupported value under %q", scopeName)
 	}
 	return subScope.resolveScope(path[1:], create)
+}
+
+func (scope Scope) Flat() Scope {
+	result := make(Scope)
+	flatten(scope, &result, "")
+	return result
+}
+
+func flatten(value interface{}, result *Scope, parent string) {
+	if scope, ok := ParseScope(value); ok {
+		for k, v := range scope {
+			ks, ok := k.(string)
+			if !ok {
+				panic("Scope keys are expected to be strings!")
+			}
+			key := ks
+			if len(parent) > 0 {
+				// E.g. parent.key
+				key = fmt.Sprintf("%s.%s", parent, ks)
+			}
+			flatten(v, result, key)
+		}
+	} else if xs := reflect.ValueOf(value); xs.Kind() == reflect.Slice || xs.Kind() == reflect.Array {
+		for i := 0; i < xs.Len(); i++ {
+			x := xs.Index(i)
+			var key string
+			if len(parent) > 0 {
+				// E.g. parent.0
+				key = fmt.Sprintf("%s.%v", parent, i)
+			} else {
+				key = fmt.Sprintf("%v", i)
+			}
+			flatten(x, result, key)
+		}
+	} else if m := reflect.ValueOf(value); m.Kind() == reflect.Map {
+		for _, k := range m.MapKeys() {
+			v := m.MapIndex(k)
+			var key string
+			if len(parent) > 0 {
+				// E.g. parent.0
+				key = fmt.Sprintf("%s.%v", parent, k)
+			} else {
+				key = fmt.Sprintf("%v", k)
+			}
+			flatten(v, result, key)
+		}
+	} else {
+		(*result)[parent] = value
+	}
 }
