@@ -83,14 +83,14 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	}
 	secs, err := secrets.Decrypt(raw.RootDir)
 	if err != nil {
-		if log.GetLevel() == log.DebugLevel {
-			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+		if _, ok := err.(secrets.ErrNoSecretsFile); !ok {
+			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v: %v", raw.RootDir, err))
 		}
 	} else {
 		if len(secs) > 0 {
 			decodedSecrets, err := decodeYaml(secs)
 			if err != nil {
-				log.Warn(fmt.Sprintf("Secrets could not be loaded at %v. %v", raw.RootDir, err))
+				log.Warn(fmt.Sprintf("Secrets could not be parsed after loading from %v: %v", raw.RootDir, err))
 			}
 			decodedOyafile.Merge(decodedSecrets)
 		}

@@ -19,13 +19,13 @@ type ErrSecretsFailure struct {
 }
 
 func (err ErrNoSecretsFile) Error() string {
-	return fmt.Sprintf("Oya secrets file \"%v\" not found in %v", err.FileName, err.OyafilePath)
+	return fmt.Sprintf("secrets file \"%v\" not found in %v", err.FileName, err.OyafilePath)
 }
 
 func (err ErrSecretsAlreadyEncrypted) Error() string {
-	return fmt.Sprintf("Oya secrets file \"%v\" already encrypted in %v", err.FileName, err.OyafilePath)
+	return fmt.Sprintf("secrets file \"%v\" already encrypted in %v", err.FileName, err.OyafilePath)
 }
 
 func (err ErrSecretsFailure) Error() string {
-	return fmt.Sprintf("Oya secrets failure on file \"%v\" in %v, with error: %v", err.FileName, err.OyafilePath, err.CmdError)
+	return fmt.Sprintf("secrets failure on file \"%v\" in %v, with error: %v", err.FileName, err.OyafilePath, err.CmdError)
 }
