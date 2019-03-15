@@ -11,8 +11,8 @@ Scenario: It loads Values and Tasks from secrets.oya if present
       foo: bar
 
     all: |
-      echo $foo
-      echo $bar
+      echo ${Oya[foo]}
+      echo ${Oya[bar]}
     """
   And file ./secrets.oya containing
     """
