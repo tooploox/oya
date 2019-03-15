@@ -10,6 +10,6 @@ type Builtin struct {
 	OnExec func(stdout, stderr io.Writer) error
 }
 
-func (h Builtin) Exec(workDir string, params template.Scope, stdout, stderr io.Writer) error {
+func (h Builtin) Exec(workDir string, args []string, params template.Scope, stdout, stderr io.Writer) error {
 	return h.OnExec(stdout, stderr)
 }

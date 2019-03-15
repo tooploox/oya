@@ -41,7 +41,7 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		cobraFlags, taskName, positionalArgs, flags, err := parseArgs(args)
+		cobraFlags, taskName, taskArgs, err := parseArgs(args)
 		if err != nil {
 			return err
 		}
@@ -59,7 +59,7 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Run(cwd, taskName, recurse, changeset, positionalArgs, flags, cmd.OutOrStdout(), cmd.OutOrStderr())
+		return internal.Run(cwd, taskName, taskArgs, recurse, changeset, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
@@ -69,14 +69,20 @@ func init() {
 	runCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
 }
 
-func parseArgs(args []string) ([]string, string, []string, map[string]string, error) {
+func parseArgs(args []string) ([]string, string, internal.Args, error) {
 	cobraFlags, rest := detectFlags(args)
 	if len(rest) == 0 {
-		return nil, "", nil, nil, ErrMissingTaskName{}
+		return nil, "", internal.Args{}, ErrMissingTaskName{}
 	}
 	taskName := rest[0]
-	posArgs, flags, err := flags.Parse(rest[1:])
-	return cobraFlags, taskName, posArgs, flags, err
+	allTaskArgs := rest[1:]
+	posArgs, flags, err := flags.Parse(allTaskArgs)
+	taskArgs := internal.Args{
+		All:        rest[1:],
+		Positional: posArgs,
+		Flags:      flags,
+	}
+	return cobraFlags, taskName, taskArgs, err
 }
 
 // detectFlags processed args consisting of flags followed by positional arguments, splitting them.

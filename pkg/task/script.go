@@ -23,7 +23,7 @@ type Script struct {
 	Scope  *template.Scope
 }
 
-func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Writer) error {
+func (s Script) Exec(workDir string, args []string, values template.Scope, stdout, stderr io.Writer) error {
 	scope := values.Merge(*s.Scope)
 	defines := defines(scope)
 	script := strings.Join(defines, "; ") + ";\n" + s.Script
@@ -39,7 +39,7 @@ func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Wr
 		interp.Module(interp.DefaultExec),
 		interp.Dir(workDir),
 		interp.Env(nil),
-		interp.Params(args(scope)...))
+		interp.Params(toParams(args)...))
 	ctx := context.Background()
 StmtLoop:
 	for _, stmt := range file.Stmts {
@@ -84,17 +84,9 @@ func escapeQuotes(s string) string {
 	return strings.Replace(s1, "'", "\\'", -1)
 }
 
-func args(scope template.Scope) []string {
-	v, ok := scope["Args"]
-	if !ok || v == nil {
-		return nil
-	}
-	arr, ok := v.([]string)
-	if !ok {
-		return nil
-	}
-	args := make([]string, 0)
+func toParams(taskArgs []string) []string {
+	args := make([]string, 0, len(taskArgs)+1)
 	args = append(args, "--")
-	args = append(args, arr...)
+	args = append(args, taskArgs...)
 	return args
 }
