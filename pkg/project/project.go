@@ -34,7 +34,8 @@ func Detect(workDir, installDir string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool, scope template.Scope, stdout, stderr io.Writer) error {
+func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
+	args []string, scope template.Scope, stdout, stderr io.Writer) error {
 	log.Debugf("Task %q at %v", taskName, workDir)
 
 	targets, err := p.RunTargets(workDir, recurse, useChangeset)
@@ -57,7 +58,7 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
-		found, err := o.RunTask(taskName, scope, stdout, stderr)
+		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
 		if err != nil {
 			return errors.Wrapf(err, "error in %v", o.Path)
 		}
