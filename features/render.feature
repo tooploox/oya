@@ -168,8 +168,8 @@ Scenario: Imported tasks render using their own Oyafile scope by default
     Values:
       fruit: orange
 
-    render:
-      $OyaCmd render ./templates/file.txt
+    render: |
+      oya render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
@@ -203,7 +203,7 @@ Scenario: Values in imported pack scope can be overridden
       fruit: orange
 
     render:
-      $OyaCmd render ./templates/file.txt
+      oya render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
@@ -235,7 +235,7 @@ Scenario: Scope of the importing Oyafile can be optionally used
       fruit: orange
 
     render:
-      $OyaCmd render --auto-scope=false ./templates/file.txt
+      oya render --auto-scope=false ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """

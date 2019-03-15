@@ -11,6 +11,12 @@ import (
 	"mvdan.cc/sh/syntax"
 )
 
+// OyaCmdOverride is used in tests, to override the path to the current oya executable.
+// It is used to invoke other tasks from a task body.
+// When tests are run, the current process executable path points to the test runner
+// so it has to be overridden (with 'go run oya.go', roughly speaking).
+var OyaCmdOverride *string
+
 type Script struct {
 	Script string
 	Shell  string
@@ -20,7 +26,10 @@ type Script struct {
 func (s Script) Exec(workDir string, values template.Scope, stdout, stderr io.Writer) error {
 	scope := values.Merge(*s.Scope)
 	defines := defines(scope)
-	script := strings.Join(defines, "; ") + "\n" + s.Script
+	script := strings.Join(defines, "; ") + ";\n" + s.Script
+	if OyaCmdOverride != nil {
+		script = *OyaCmdOverride + "; " + script
+	}
 
 	file, err := syntax.NewParser().Parse(strings.NewReader(script), "")
 	if err != nil {
