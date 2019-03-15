@@ -319,7 +319,7 @@ Scenario: Indirect requirements are downloaded
       github.com/tooploox/oya-fixtures/pack1: v1.1.1
 
     version: |
-      cat $BasePath/VERSION
+      cat ${Oya[BasePath]}/VERSION
 
     """
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
