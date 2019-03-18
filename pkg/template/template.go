@@ -12,8 +12,8 @@ import (
 
 // Template represents a template that can be rendered using provided values.
 type Template interface {
-	Render(out io.Writer, values ...interface{}) error
-	RenderString(values ...interface{}) (string, error)
+	Render(out io.Writer, values Scope) error
+	RenderString(values Scope) (string, error)
 }
 
 // Load loads template from the path.
@@ -27,7 +27,7 @@ func Load(path string) (Template, error) {
 
 // Parse parses template in the source string.
 func Parse(source string) (Template, error) {
-	return parseKasia(source)
+	return parsePlush(source)
 }
 
 // RenderAll renders all templates in the path (directory or a single file) to an output path (directory or file) using the provided value scope.
