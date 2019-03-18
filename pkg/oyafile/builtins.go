@@ -12,6 +12,7 @@ var sprigFunctions = upcaseFuncNames(sprig.GenericFuncMap())
 
 func (o *Oyafile) addBuiltIns() error {
 	o.Values = o.Values.Merge(o.defaultValues())
+	// See also plush helpers in pgk/template/plush.go
 	return nil
 }
 
@@ -41,5 +42,3 @@ func upcaseFuncNames(funcs map[string]interface{}) map[string]interface{} {
 	}
 	return upcased
 }
-
-// bindTasks returns a map of functions allowing invoking other tasks via $Tasks.xyz().

@@ -103,6 +103,31 @@ Scenario: Access Oyafile Project name inside pack
 
   """
 
+Scenario: Use plush helpers when rendering
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Values:
+     arr:
+       - 1
+       - 2
+       - 3
+
+    foo: |
+      oya render template.txt
+    """
+  And file ./template.txt containing
+    """
+    <%= Len("box") %>
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./template.txt contains
+    """
+    3
+    """
+
 Scenario: Use sprig functions when rendering (http://masterminds.github.io/sprig)
   Given file ./Oyafile containing
     """
@@ -119,7 +144,7 @@ Scenario: Use sprig functions when rendering (http://masterminds.github.io/sprig
     """
   And file ./template.txt containing
     """
-    $Upper(Join(", ", arr))
+    <%= Upper(Join(", ", arr)) %>
     """
   When I run "oya run foo bar baz qux"
   Then the command succeeds

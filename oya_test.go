@@ -67,7 +67,7 @@ func setEnv(projectDir string) {
 func overrideOyaCmd(projectDir string) {
 	executablePath := filepath.Join(projectDir, "_bin/oya")
 	oyaCmdOverride := fmt.Sprintf(
-		"function oya() { (cd %v && go build -o %v oya.go); %v $@; }",
+		"function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
 		sourceFileDirectory(), executablePath, executablePath)
 	task.OyaCmdOverride = &oyaCmdOverride
 }
