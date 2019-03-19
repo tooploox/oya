@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/cmd"
-	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/task"
 )
 
 const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -44,10 +44,10 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
-	err := os.RemoveAll(c.projectDir)
-	if err != nil {
-		panic(err)
-	}
+	// err := os.RemoveAll(c.projectDir)
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
 
 func setEnv(projectDir string) {
@@ -67,9 +67,9 @@ func setEnv(projectDir string) {
 func overrideOyaCmd(projectDir string) {
 	executablePath := filepath.Join(projectDir, "_bin/oya")
 	oyaCmdOverride := fmt.Sprintf(
-		"(cd %v && go build -o %v oya.go); %v",
+		"function oya() { (cd %v && go build -o %v oya.go); %v $@; }",
 		sourceFileDirectory(), executablePath, executablePath)
-	oyafile.OyaCmdOverride = &oyaCmdOverride
+	task.OyaCmdOverride = &oyaCmdOverride
 }
 
 func (c *SuiteContext) writeFile(path, contents string) error {
