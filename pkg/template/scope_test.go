@@ -2,6 +2,7 @@ package template_test
 
 import (
 	"encoding/gob"
+	"fmt"
 	"os"
 	"testing"
 
@@ -153,4 +154,33 @@ func TestScope_UpdateScopeAt(t *testing.T) {
 		tu.AssertNoErr(t, err, "UpdateScopeAt failed in test case %q", tc.desc)
 		tu.AssertObjectsEqualMsg(t, tc.expectedScope, scope, "In test case %q", tc.desc)
 	}
+}
+
+func ExampleScope_Flat() {
+	scope := template.Scope{
+		"foo": map[interface{}]interface{}{
+			"bar": "baz",
+			"qux": []interface{}{
+				"1", "2", 3,
+			},
+			"abc": map[string]interface{}{
+				"123": true,
+			},
+		},
+	}
+	flattened := scope.Flat()
+	fmt.Println("foo.bar:", flattened["foo.bar"])
+	_, ok := flattened["foo"]
+	fmt.Println("foo exists?", ok)
+	fmt.Println("foo.qux.0:", flattened["foo.qux.0"])
+	fmt.Println("foo.qux.1:", flattened["foo.qux.1"])
+	fmt.Println("foo.qux.2:", flattened["foo.qux.2"])
+	fmt.Println("foo.abc.123:", flattened["foo.abc.123"])
+	// Output:
+	// foo.bar: baz
+	// foo exists? false
+	// foo.qux.0: 1
+	// foo.qux.1: 2
+	// foo.qux.2: 3
+	// foo.abc.123: true
 }

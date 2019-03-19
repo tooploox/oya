@@ -17,10 +17,7 @@ Scenario: Import tasks from installed packs
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
-      foo=4
-      if [ $$foo -ge 3 ]; then
-        touch OK
-      fi
+      touch OK
       echo "Done"
     """
   When I run "oya run foo.all"
@@ -48,8 +45,8 @@ Scenario: Import task using pack values
     Values:
       foo: xxx
     all: |
-      bar="$foo"
-      echo $$bar
+      bar="${Oya[foo]}"
+      echo $bar
     """
   When I run "oya run foo.all"
   Then the command succeeds
@@ -75,8 +72,8 @@ Scenario: Import task using BasePath
     Values:
       foo: xxx
     all: |
-      bar=$$(basename $BasePath)
-      echo $$bar
+      bar=$(basename ${Oya[BasePath]})
+      echo $bar
     """
   When I run "oya run foo.all"
   Then the command succeeds
@@ -97,7 +94,7 @@ Scenario: Access pack values
     Import:
       foo: github.com/test/foo
     all: |
-      echo $foo.bar
+      echo ${Oya[foo.bar]}
     """
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
@@ -132,9 +129,9 @@ Scenario: Access current project values
     Values:
       foo: project2
     all: |
-      echo $main.foo
-      echo $p1.foo
-      echo $foo
+      echo ${Oya[main.foo]}
+      echo ${Oya[p1.foo]}
+      echo ${Oya[foo]}
     """
   When I run "oya run --recurse all"
   Then the command succeeds
@@ -164,7 +161,7 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     all: |
-      echo $fruit
+      echo ${Oya[fruit]}
     """
   When I run "oya run foo.all"
   Then the command succeeds
@@ -196,8 +193,8 @@ Scenario: Pack values are overriden in main Oyafile
       wege: carrot
 
     all: |
-      echo $fruit
-      echo $wege
+      echo ${Oya[fruit]}
+      echo ${Oya[wege]}
     """
   When I run "oya run foo.all"
   Then the command succeeds

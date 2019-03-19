@@ -2,7 +2,6 @@ package oyafile
 
 import (
 	"io"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -16,12 +15,6 @@ import (
 	"github.com/tooploox/oya/pkg/template"
 	"github.com/tooploox/oya/pkg/types"
 )
-
-// OyaCmdOverride is used in tests, to override the path to the current oya executable.
-// It is used to invoke other tasks from a task body.
-// When tests are run, the current process executable path points to the test runner
-// so it has to be overridden (with 'go run oya.go', roughly speaking).
-var OyaCmdOverride *string
 
 type PackReference struct {
 	ImportPath types.ImportPath
@@ -48,22 +41,9 @@ type Oyafile struct {
 	IsBuilt      bool
 
 	relPath string
-
-	OyaCmd string // OyaCmd contains the path to the current oya executable.
 }
 
 func New(oyafilePath string, rootDir string) (*Oyafile, error) {
-	var oyaCmd string
-	if OyaCmdOverride != nil {
-		oyaCmd = *OyaCmdOverride
-	} else {
-		var err error
-		oyaCmd, err = os.Executable()
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
 	log.Debug("Oyafile at ", oyafilePath)
 	if err != nil {
@@ -80,7 +60,6 @@ func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 		Values:       template.Scope{},
 		relPath:      relPath,
 		Replacements: make(PackReplacements),
-		OyaCmd:       oyaCmd,
 	}, nil
 }
 
@@ -108,7 +87,7 @@ func LoadFromDir(dirPath, rootDir string) (*Oyafile, bool, error) {
 	return oyafile, true, nil
 }
 
-func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout, stderr io.Writer) (bool, error) {
+func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template.Scope, stdout, stderr io.Writer) (bool, error) {
 	if !oyafile.IsBuilt {
 		return false, errors.Errorf("Internal error: Oyafile has not been built")
 	}
@@ -116,19 +95,8 @@ func (oyafile Oyafile) RunTask(taskName task.Name, scope template.Scope, stdout,
 	if !ok {
 		return false, nil
 	}
-	tasks, err := oyafile.bindTasks(taskName, task, stdout, stderr)
-	if err != nil {
-		return true, err
-	}
-	scope["Tasks"] = tasks
 
-	render, err := oyafile.bindRender(taskName, stdout, stderr)
-	if err != nil {
-		return true, err
-	}
-	scope["Render"] = render
-
-	return true, task.Exec(oyafile.Dir, scope, stdout, stderr)
+	return true, task.Exec(oyafile.Dir, args, scope, stdout, stderr)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

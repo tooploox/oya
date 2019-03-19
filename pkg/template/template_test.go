@@ -12,7 +12,7 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	_, err := template.Load("./fixtures/good.txt.kasia")
+	_, err := template.Load("./fixtures/good.txt.plush")
 	tu.AssertNoErr(t, err, "Expected template to load")
 }
 
@@ -22,27 +22,27 @@ func TestParse(t *testing.T) {
 }
 
 func TestTemplate_Render_Loaded(t *testing.T) {
-	tpl, err := template.Load("./fixtures/good.txt.kasia")
+	tpl, err := template.Load("./fixtures/good.txt.plush")
 	tu.AssertNoErr(t, err, "Expected template to load")
 	output := new(bytes.Buffer)
-	err = tpl.Render(output, map[string]string{"foo": "bar"})
+	err = tpl.Render(output, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected template to render")
 	tu.AssertEqual(t, "bar\n", output.String())
 }
 
 func TestTemplate_Render_Parsed(t *testing.T) {
-	tpl, err := template.Parse("$foo")
+	tpl, err := template.Parse("<%= foo %>")
 	tu.AssertNoErr(t, err, "Expected template to parse")
 	output := new(bytes.Buffer)
-	err = tpl.Render(output, map[string]string{"foo": "bar"})
+	err = tpl.Render(output, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected template to render")
 	tu.AssertEqual(t, "bar", output.String())
 }
 
 func TestTemplate_Render_MissingVariables(t *testing.T) {
-	tpl, err := template.Parse("$noSuchVar")
+	tpl, err := template.Parse("<%= noSuchVar %>")
 	tu.AssertNoErr(t, err, "Expected template to parse")
-	err = tpl.Render(ioutil.Discard, map[string]string{"foo": "bar"})
+	err = tpl.Render(ioutil.Discard, template.Scope{"foo": "bar"})
 	tu.AssertErr(t, err, "Expected template not to render")
 }
 
@@ -51,11 +51,12 @@ func TestRenderAll_Directory(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	err = template.RenderAll("./fixtures/", nil, outputDir, template.Scope{"foo": "bar"})
+	err = template.RenderAll("./fixtures/", nil, outputDir,
+		template.Scope{"foo": "bar", "baz": map[string]interface{}{"qux": "abc"}})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
-	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
-	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"), "bar\n")
+	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.plush"), "bar\n")
+	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.plush"), "barabc\n")
 }
 
 func TestRenderAll_SingleFile(t *testing.T) {
@@ -63,10 +64,10 @@ func TestRenderAll_SingleFile(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	err = template.RenderAll("./fixtures/good.txt.kasia", nil, outputDir, template.Scope{"foo": "bar"})
+	err = template.RenderAll("./fixtures/good.txt.plush", nil, outputDir, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
-	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.kasia"), "bar\n")
+	tu.AssertFileContains(t, filepath.Join(outputDir, "good.txt.plush"), "bar\n")
 }
 
 func TestRenderAll_ExcludedPaths(t *testing.T) {
@@ -74,12 +75,13 @@ func TestRenderAll_ExcludedPaths(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	excludedPaths := []string{"good.txt.kasia"}
-	err = template.RenderAll("./fixtures/", excludedPaths, outputDir, template.Scope{"foo": "bar"})
+	excludedPaths := []string{"good.txt.plush"}
+	err = template.RenderAll("./fixtures/", excludedPaths, outputDir,
+		template.Scope{"foo": "bar", "baz": map[string]interface{}{"qux": "abc"}})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
-	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.kasia"))
-	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"), "bar\n")
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.plush"))
+	tu.AssertFileContains(t, filepath.Join(outputDir, "subdir/nested.txt.plush"), "barabc\n")
 }
 
 func TestRenderAll_ExcludedPatterns(t *testing.T) {
@@ -87,10 +89,10 @@ func TestRenderAll_ExcludedPatterns(t *testing.T) {
 	tu.AssertNoErr(t, err, "Error creating temporary output dir")
 	defer os.RemoveAll(outputDir)
 
-	excludedPaths := []string{"**.txt.kasia"}
+	excludedPaths := []string{"**.txt.plush"}
 	err = template.RenderAll("./fixtures/", excludedPaths, outputDir, template.Scope{"foo": "bar"})
 	tu.AssertNoErr(t, err, "Expected templates to render")
 
-	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.kasia"))
-	tu.AssertPathNotExists(t, filepath.Join(outputDir, "subdir/nested.txt.kasia"))
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "good.txt.plush"))
+	tu.AssertPathNotExists(t, filepath.Join(outputDir, "subdir/nested.txt.plush"))
 }

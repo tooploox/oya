@@ -7,5 +7,5 @@ import (
 )
 
 type Task interface {
-	Exec(workDir string, params template.Scope, stdout, stderr io.Writer) error
+	Exec(workDir string, args []string, scope template.Scope, stdout, stderr io.Writer) error
 }

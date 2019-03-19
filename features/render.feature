@@ -12,7 +12,7 @@ Scenario: Render a template
     """
   Given file ./templates/file.txt containing
     """
-    $foo
+    <%= foo %>
     """
   When I run "oya render ./templates/file.txt"
   Then the command succeeds
@@ -30,7 +30,7 @@ Scenario: Render a template explicitly pointing to the Oyafile
     """
   Given file ./templates/file.txt containing
     """
-    $foo
+    <%= foo %>
     """
   When I run "oya render -f ./Oyafile ./templates/file.txt"
   Then the command succeeds
@@ -49,11 +49,11 @@ Scenario: Render a template directory
     """
   Given file ./templates/file.txt containing
     """
-    $foo
+    <%= foo %>
     """
   Given file ./templates/subdir/file.txt containing
     """
-    $bar
+    <%= bar %>
     """
   When I run "oya render ./templates/"
   Then the command succeeds
@@ -62,33 +62,6 @@ Scenario: Render a template directory
   xxx
   """
   And file ./subdir/file.txt contains
-  """
-  yyy
-  """
-
-Scenario: Render templated paths
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Values:
-      foo: xxx
-      bar: yyy
-    """
-  Given file ./templates/${foo}.txt containing
-    """
-    $foo
-    """
-  Given file ./templates/$bar/${foo}.txt containing
-    """
-    $bar
-    """
-  When I run "oya render ./templates/"
-  Then the command succeeds
-  And file ./xxx.txt contains
-  """
-  xxx
-  """
-  And file ./yyy/xxx.txt contains
   """
   yyy
   """
@@ -111,7 +84,7 @@ Scenario: Rendering values in specified scope pointing to imported pack
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya render --scope foo ./templates/file.txt"
   Then the command succeeds
@@ -142,7 +115,7 @@ Scenario: Rendered values in specified scope can be overridden
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya render --scope foo ./templates/file.txt"
   Then the command succeeds
@@ -168,12 +141,12 @@ Scenario: Imported tasks render using their own Oyafile scope by default
     Values:
       fruit: orange
 
-    render:
-      $OyaCmd render ./templates/file.txt
+    render: |
+      oya render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya run foo.render"
   Then the command succeeds
@@ -203,11 +176,11 @@ Scenario: Values in imported pack scope can be overridden
       fruit: orange
 
     render:
-      $OyaCmd render ./templates/file.txt
+      oya render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya run foo.render"
   Then the command succeeds
@@ -235,11 +208,11 @@ Scenario: Scope of the importing Oyafile can be optionally used
       fruit: orange
 
     render:
-      $OyaCmd render --auto-scope=false ./templates/file.txt
+      oya render --auto-scope=false ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya run foo.render"
   Then the command succeeds
@@ -260,7 +233,7 @@ Scenario: Rendering values in specified scope
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya render --scope fruits ./templates/file.txt"
   Then the command succeeds
@@ -281,7 +254,7 @@ Scenario: Rendering values in specified nested scope
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya render --scope plants.fruits ./templates/file.txt"
   Then the command succeeds
@@ -300,7 +273,7 @@ Scenario: Rendering one file to an output dir
     """
   And file ./templates/file.txt containing
     """
-    $fruit
+    <%= fruit %>
     """
   When I run "oya render --output-dir ./foobar ./templates/file.txt"
   Then the command succeeds
@@ -320,11 +293,11 @@ Scenario: Rendering a dir to an output dir
     """
   And file ./templates/file1.txt containing
     """
-    $weapon
+    <%= weapon %>
     """
   And file ./templates/file2.txt containing
     """
-    $culprit
+    <%= culprit %>
     """
   When I run "oya render --output-dir ./foobar ./templates/"
   Then the command succeeds
@@ -347,23 +320,23 @@ Scenario: Render dir excluding files and directories
     """
   Given file ./templates/file.txt containing
     """
-    $foo
+    <%= foo %>
     """
   And file ./templates/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   And file ./templates/subdir/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   And file ./templates/subdir/file.txt containing
     """
-    $bar
+    <%= bar %>
     """
   And file ./templates/excludeme/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   When I run "oya render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme/* ./templates/"
   Then the command succeeds
@@ -390,23 +363,23 @@ Scenario: Render dir excluding using globbing
     """
   Given file ./templates/file.txt containing
     """
-    $foo
+    <%= foo %>
     """
   And file ./templates/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   And file ./templates/subdir/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   And file ./templates/subdir/file.txt containing
     """
-    $bar
+    <%= bar %>
     """
   And file ./templates/excludeme/excludeme.txt containing
     """
-    $badvariable
+    <%= badvariable %>
     """
   When I run "oya render --exclude **excludeme.txt ./templates/"
   Then the command succeeds
@@ -434,11 +407,11 @@ Scenario: Rendering a dir to an output dir outside project dir
     """
   And file ./templates/file1.txt containing
     """
-    $weapon
+    <%= weapon %>
     """
   And file ./templates/file2.txt containing
     """
-    $culprit
+    <%= culprit %>
     """
   When I run "oya render --output-dir /tmp/foobar ./templates/"
   Then the command succeeds

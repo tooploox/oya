@@ -9,7 +9,7 @@ Scenario: Successfully run task
     Project: project
     all: |
       foo=4
-      if [ $$foo -ge 3 ]; then
+      if [ $foo -ge 3 ]; then
         touch OK
       fi
       echo "Done"
@@ -116,8 +116,8 @@ Scenario: Script template
     Values:
       value: some value
     all: |
-      foo="$value"
-      echo $$foo
+      foo="${Oya[value]}"
+      echo $foo
     """
   When I run "oya run all"
   Then the command succeeds

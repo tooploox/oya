@@ -35,7 +35,7 @@ func execChangesetTask(workDir string, changesetTask task.Task) ([]string, error
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
-	err := changesetTask.Exec(workDir, template.Scope{}, stdout, stderr)
+	err := changesetTask.Exec(workDir, nil, template.Scope{}, stdout, stderr)
 	if err != nil {
 		return nil, err
 	}

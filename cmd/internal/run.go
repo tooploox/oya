@@ -10,7 +10,13 @@ import (
 	"github.com/tooploox/oya/pkg/template"
 )
 
-func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []string, flags map[string]string, stdout, stderr io.Writer) error {
+type Args struct {
+	All        []string
+	Positional []string
+	Flags      map[string]string
+}
+
+func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -36,13 +42,14 @@ func Run(workDir, taskName string, recurse, changeset bool, positionalArgs []str
 	}
 	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
-	return p.Run(workDir, tn, recurse, changeset, toScope(positionalArgs, flags).Merge(values), stdout, stderr)
+	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
+		toScope(taskArgs).Merge(values), stdout, stderr)
 }
 
-func toScope(positionalArgs []string, flags map[string]string) template.Scope {
+func toScope(taskArgs Args) template.Scope {
 	return template.Scope{
-		"Args":  positionalArgs,
-		"Flags": camelizeFlags(flags),
+		"Args":  taskArgs.Positional,
+		"Flags": camelizeFlags(taskArgs.Flags),
 	}
 }
 
