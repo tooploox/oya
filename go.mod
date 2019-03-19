@@ -18,11 +18,20 @@ require (
 	github.com/dimchansky/utfbom v1.1.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fako1024/topo v1.0.1 // indirect
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/go-test/deep v1.0.1
+	github.com/gobuffalo/envy v1.6.15 // indirect
+	github.com/gobuffalo/flect v0.1.1 // indirect
+	github.com/gobuffalo/github_flavored_markdown v1.0.7 // indirect
+	github.com/gobuffalo/plush v3.7.33+incompatible
+	github.com/gobuffalo/tags v2.0.15+incompatible // indirect
+	github.com/gobuffalo/uuid v2.0.5+incompatible // indirect
+	github.com/gobuffalo/validate v2.0.3+incompatible // indirect
 	github.com/gobwas/glob v0.2.3
+	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/google/pprof v0.0.0-20190208070709-b421f19a5c07 // indirect
 	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf // indirect
 	github.com/google/uuid v1.1.0 // indirect
@@ -40,6 +49,7 @@ require (
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
 	github.com/magiconair/properties v1.8.0
+	github.com/markbates/inflect v1.0.4 // indirect
 	github.com/mattn/go-colorable v0.1.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/go-testing-interface v1.0.0
