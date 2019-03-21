@@ -60,7 +60,7 @@
   margin-top: 38px;
   background-color: transparent;
   font-family: 'Roboto Mono', sans-serif;
-  color: #3717e8;
+  color: #091722;
   font-size: 24px;
   line-height: 42px;
   font-weight: 700;
@@ -72,7 +72,7 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  margin-top: 72px;
+  margin-top: 36px;
 }
 
 .cta-button {
@@ -80,8 +80,9 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  width: 272px;
-  height: 56px;
+  height: 44px;
+  padding-right: 20px;
+  padding-left: 12px;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   -ms-flex-pack: center;
@@ -92,6 +93,11 @@
 
 .cta-button.github-button {
   overflow: hidden;
+  min-width: 0px;
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
   text-decoration: none;
   cursor: pointer;
 }
@@ -99,6 +105,8 @@
 .cta-button.doc-button {
   overflow: hidden;
   margin-left: 16px;
+  padding-right: 12px;
+  padding-left: 20px;
   background-color: #b9eef1;
   text-decoration: none;
   cursor: pointer;
@@ -109,7 +117,7 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  margin-left: 18px;
+  margin-left: 14px;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
@@ -121,7 +129,7 @@
   justify-content: center;
   font-family: 'Roboto Mono', sans-serif;
   color: #fff;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -131,7 +139,7 @@
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  margin-right: 12px;
+  margin-right: 14px;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
@@ -143,7 +151,7 @@
   justify-content: center;
   font-family: 'Roboto Mono', sans-serif;
   color: #305b5d;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -330,6 +338,7 @@
 }
 
 .goals {
+  display: none;
   margin-top: 100px;
 }
 
@@ -363,7 +372,7 @@
 }
 
 .tagline {
-  margin-top: 100px;
+  margin-top: 150px;
 }
 
 .tagline-heading {
@@ -479,6 +488,7 @@
   font-family: 'Roboto Mono', sans-serif;
   color: #091722;
   line-height: 28px;
+  text-align: left;
 }
 
 .quote-mark {
@@ -512,8 +522,8 @@
 }
 
 .footer {
-  height: 50vh;
-  margin-top: 100px;
+  height: 60vh;
+  margin-top: 150px;
   background-color: #3717e8;
 }
 
@@ -596,6 +606,42 @@
   opacity: 0;
 }
 
+.underlined-link {
+  border-bottom: 2px dotted hsla(251.51785714285714, 89.60%, 50.98%, 1.00);
+  color: #3d12f2;
+}
+
+.button-github-icon {
+  max-width: 24px;
+}
+
+.cta-packs {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 42px;
+  padding-left: 20px;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.cta-packs-description {
+  margin-left: 30px;
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 auto;
+  -ms-flex: 0 auto;
+  flex: 0 auto;
+  opacity: 0.6;
+  font-family: 'Roboto Mono', sans-serif;
+  color: #091722;
+  font-size: 14px;
+  line-height: 28px;
+  font-weight: 400;
+}
+
 @media (max-width: 991px) {
   .container {
     padding-right: 5px;
@@ -664,6 +710,7 @@
     display: inline-block;
   }
   .sub-title {
+    width: 100%;
     padding-right: 40px;
     padding-left: 40px;
     background-color: #fff;
