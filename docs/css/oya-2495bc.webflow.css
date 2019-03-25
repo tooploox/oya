@@ -642,6 +642,11 @@
   font-weight: 400;
 }
 
+.work-in-progress {
+  opacity: 0.4;
+  color: #091722;
+}
+
 @media (max-width: 991px) {
   .container {
     padding-right: 5px;
