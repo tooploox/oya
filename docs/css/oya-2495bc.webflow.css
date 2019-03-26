@@ -999,5 +999,8 @@
   .cta-packs-description {
     font-size: 12px;
   }
+  .code-tooltip {
+    display: none;
+  }
 }
 
