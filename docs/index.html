@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--  This site was created in Webflow. http://www.webflow.com  -->
-<!--  Last Published: Mon Mar 25 2019 08:42:36 GMT+0000 (UTC)  -->
-<html data-wf-page="5c877e35b774e4cf7d1f13d1" data-wf-site="5c877e35b774e483c91f13d0">
+<!--  Last Published: Tue Mar 26 2019 10:44:28 GMT+0000 (UTC)  -->
+<html data-wf-page="5c877e35b774e4cf7d1f13d1" data-wf-site="5c877e35b774e483c91f13d0" lang="en">
 <head>
   <meta charset="utf-8">
   <title>Oya</title>
@@ -18,11 +18,42 @@
   <link href="images/favicon-big.png" rel="apple-touch-icon">
   <style>
 body {
--webkit-font-smoothing: antialiased;
--moz-font-smoothing: antialiased;
--o-font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
 }
 </style>
+  <script type="text/javascript">
+const ref = document.querySelector('style');
+const style = document.createElement('style');
+style.innerHTML = ".code:first-of-type:before { content: \"$ \"; display: inline; }";
+ref.parentNode.insertBefore(style, ref);
+function copyToClipboard(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("copy");
+}
+document.addEventListener('click', function (event) {
+  var target = event.target
+  var depth = 3
+  while(!target.matches('.code-block') || depth < 0) {
+    target = target.parentNode
+    depth--;
+  }
+  copyToClipboard(target)
+}, false);
+</script>
 </head>
 <body>
   <div class="top-line"></div><img src="images/pattern.svg" alt="" class="image-3">
@@ -37,12 +68,15 @@ body {
     <div class="how-to-install">
       <h3 class="heading h3">How to install</h3>
       <h2 class="heading h2">Quick start</h2>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ curl</div>
-          <div class="code white">https://oya.sh/get</div>
-          <div class="code gray">| bash</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">curl </div>
+            <div class="code white">https://oya.sh/get </div>
+            <div class="code gray">| bash</div>
+          </div>
         </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
     </div>
     <div data-w-id="1cc4c61c-f5ac-bac7-b63b-c4ad3a31b108" class="features">
@@ -67,65 +101,74 @@ body {
       <h3 class="heading h3">Example usage</h3>
       <h2 class="heading h2">How to use Oya</h2>
       <div class="text-block">Creating project template</div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/scaffold</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">scaffold.generate</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/scaffold</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">scaffold.generate</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
       <div class="text-block">Generating Dockerfile</div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/docker</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">docker.generate</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/docker</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">docker.generate</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
       <div class="text-block">Deploying to k8s <span class="work-in-progress">– work in progress</span></div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/k8s</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.generate</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.deploy</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/k8s</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.init</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.generate</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.deploy</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
       <div class="cta-packs"><a data-w-id="1bd0f877-cf9e-90de-f02f-3b41b352ad01" href="https://github.com/tooploox/oya" target="_blank" class="cta-button github-button w-inline-block"><img src="images/pacs-icon.svg" alt="" class="button-github-icon"><div class="github-button-text">Find packs you need</div></a>
         <div class="cta-packs-description">The biggest power of Oya is hidden in reusable packs combined with the most popular development enviroments and tools.</div>

@@ -50,11 +50,6 @@
   font-weight: 400;
 }
 
-.bold-text {
-  border-bottom: 2px dotted #3717e8;
-  color: #3717e8;
-}
-
 .title {
   width: 720px;
   margin-top: 38px;
@@ -190,10 +185,7 @@
 }
 
 .code-block {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  display: block;
   min-height: 54px;
   padding-top: 12px;
   padding-bottom: 12px;
@@ -216,28 +208,29 @@
 }
 
 .code {
+  display: inline;
   color: #f8e71c;
   line-height: 36px;
 }
 
 .code.yellow {
-  margin-right: 5px;
-  margin-left: 5px;
+  margin-right: 0px;
+  margin-left: 2px;
   font-family: 'Roboto Mono', sans-serif;
   font-weight: 400;
 }
 
 .code.white {
-  margin-right: 5px;
-  margin-left: 5px;
+  margin-right: 0px;
+  margin-left: 2px;
   font-family: 'Roboto Mono', sans-serif;
   color: #fff;
   font-weight: 400;
 }
 
 .code.blue {
-  margin-right: 5px;
-  margin-left: 5px;
+  margin-right: 0px;
+  margin-left: 2px;
   font-family: 'Roboto Mono', sans-serif;
   color: #b9eef1;
   font-weight: 400;
@@ -245,7 +238,7 @@
 
 .code.gray {
   margin-right: 5px;
-  margin-left: 5px;
+  margin-left: 2px;
   font-family: 'Roboto Mono', sans-serif;
   color: hsla(206.3157894736842, 18.06%, 64.20%, 1.00);
   font-weight: 400;
@@ -327,10 +320,7 @@
 }
 
 .code-line {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  display: block;
   -webkit-box-align: center;
   -webkit-align-items: center;
   -ms-flex-align: center;
@@ -647,6 +637,29 @@
   color: #091722;
 }
 
+.code-wrapper {
+  position: relative;
+}
+
+.code-tooltip {
+  position: absolute;
+  left: auto;
+  top: auto;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  display: block;
+  width: 104px;
+  height: 19px;
+  border-radius: 3px;
+  background-color: hsla(0, 0%, 100%, .3);
+  opacity: 0;
+  font-family: 'Roboto Mono', sans-serif;
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
+}
+
 @media (max-width: 991px) {
   .container {
     padding-right: 5px;
@@ -786,6 +799,7 @@
     -webkit-flex: 0 auto;
     -ms-flex: 0 auto;
     flex: 0 auto;
+    text-align: left;
   }
   .goals {
     margin-right: 20px;
