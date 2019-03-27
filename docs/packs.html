@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--  This site was created in Webflow. http://www.webflow.com  -->
+<!--  Last Published: Wed Mar 27 2019 12:01:52 GMT+0000 (UTC)  -->
+<html data-wf-page="5c9a0e2d6af0832f33a2c6f2" data-wf-site="5c877e35b774e483c91f13d0" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Packs</title>
+  <meta content="Packs" property="og:title">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta content="Webflow" name="generator">
+  <link href="css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/oya-2495bc.webflow.css" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js" type="text/javascript"></script>
+  <script type="text/javascript">WebFont.load({  google: {    families: ["PT Mono:regular:latin-ext,latin","Roboto Mono:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic:latin-ext,latin","Roboto:100,300,regular,500,700,900"]  }});</script>
+  <!-- [if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" type="text/javascript"></script><![endif] -->
+  <script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script>
+  <link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="images/favicon-big.png" rel="apple-touch-icon">
+  <style>
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+/* Animations to copying of command snippets */
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
+}
+/* Snackbar Control */
+#snackbar.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+</style>
+  <script> 
+  function showCommandSnackbar() {
+  var snackbarDiv = document.getElementById("snackbar");
+  snackbarDiv.className += " show";
+  setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
+	}
+</script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+  <script type="text/javascript">
+	document.addEventListener('click', function (event) {
+    if (event.target.matches('.pack-tooltip')) {
+       showCommandSnackbar()
+    }
+}, false);
+</script>
+  <style type="text/css">
+	.github-icon {
+  	fill: #091722;
+  }
+</style>
+</head>
+<body>
+  <div class="top-line"></div>
+  <div id="snackbar" class="snackbar">Commands copied to your clipboard</div>
+  <div class="container w-container">
+    <div class="logo-container"><a href="index.html" class="w-inline-block"><img src="images/Logo.svg" alt="" class="image"></a></div>
+    <p class="title">Packs</p>
+    <p class="sub-title">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id diam sed nisl tempus vulputate ac vel elit. Mauris sed nulla id</p>
+    <div data-w-id="acf1ea2c-9b13-de74-9324-144bd7f1e202" class="goals">
+      <h3 class="heading h3">Our goals</h3>
+      <h2 class="heading h2">What we achive</h2>
+      <div class="goals-list">
+        <div class="goal-row"><img src="images/goal-icon-1.svg" alt="">
+          <div class="goal-text">Offer the best possible experience out of the box with minimal or no configuration</div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="images/goal-icon-2.svg" alt="">
+          <div class="goal-text">Avoid unnecessary boilerplate by making it easy to share scripts, artefacts, <br>and configurations between projects including those created by others</div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="images/goal-icon-3.svg" alt="">
+          <div class="goal-text">Make creating build pipelines for large repositories and monorepos easier <br>thanks to “internal” versioned dependency management</div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-packs site-packs"><a data-w-id="e36a0feb-0135-df3e-5abb-7888969cea27" href="https://github.com/tooploox/oya" target="_blank" class="cta-button github-button w-inline-block"><img src="images/pacs-icon.svg" alt="" class="button-github-icon"><div class="github-button-text">Add your pack</div></a>
+      <div class="cta-packs-description">Learn more how you can add your packs to Oya</div>
+    </div>
+    <div class="all-packs">
+      <div data-w-id="44c4ec9e-383a-2b00-7710-d46905e6d4ba" class="pack">
+        <div data-w-id="d76ccead-172c-97e3-f08d-6c72b9d4bb32" class="github-icon w-embed"><svg width="20px" height="20px" viewbox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--  Generator: Sketch 53.2 (72643) - https://sketchapp.com  -->
+    <title>github-icon-dark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Designs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-426.000000, -3194.000000)" fill="currentColor">
+            <g id="Group-18" transform="translate(180.000000, 2691.000000)">
+                <g id="Group-16" transform="translate(0.000000, 257.000000)">
+                    <g id="social-24px-glyph-1-logo-github" transform="translate(246.000000, 246.000000)">
+                        <path d="M11.99922,0 C5.37319,0 0,5.50855789 0,12.3045475 C0,17.7400617 3.43803,22.3516704 8.20693,23.9788519 C8.80695,24.0916985 9.02596,23.7118485 9.02596,23.3857765 C9.02596,23.0936938 9.01557,22.319947 9.00975,21.2931616 C5.67176,22.0367026 4.96743,19.6438435 4.96743,19.6438435 C4.42178,18.2224846 3.63509,17.84407 3.63509,17.84407 C2.54556,17.0806687 3.71752,17.096151 3.71752,17.096151 C4.92176,17.1831596 5.55558,18.3641017 5.55558,18.3641017 C6.62603,20.2443217 8.36413,19.7013947 9.0479,19.3864269 C9.15693,18.5913021 9.46692,18.0491339 9.80976,17.7415689 C7.14508,17.4310612 4.34375,16.3754952 4.34375,11.6606368 C4.34375,10.3174482 4.81131,9.21913662 5.57892,8.35905791 C5.45555,8.04779152 5.04375,6.79683039 5.69658,5.10286986 C5.69658,5.10286986 6.70412,4.77204038 8.99649,6.36417646 C9.95364,6.09127752 10.98019,5.95479729 12.0007,5.95003981 C13.01973,5.95479729 14.04636,6.09128777 15.00491,6.36417646 C17.29588,4.77204038 18.30158,5.10286986 18.30158,5.10286986 C18.95626,6.79683039 18.54439,8.04779152 18.42099,8.35905791 C19.19007,9.21913662 19.65447,10.3174482 19.65447,11.6606368 C19.65447,16.3872761 16.84879,17.4273598 14.1755,17.7319719 C14.60638,18.1118219 14.99018,18.8627656 14.99018,20.0104669 C14.99018,21.6553249 14.97545,22.9823442 14.97545,23.3857662 C14.97545,23.7147809 15.19159,24.0975838 15.80059,23.9774062 C20.56484,22.3472102 24,17.7386262 24,12.3045475 C24,5.50855789 18.62674,0 11.99922,0 Z" id="github-icon-dark"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg></div>
+        <div class="pack-name-line">
+          <div data-w-id="21c792e1-2c64-369f-b53f-3776b398e237" class="pack-name">docker</div>
+          <div data-w-id="5bb88247-1e49-1454-b972-475c8f954b66" class="pack-version">v0.0.1</div>
+        </div>
+        <div data-w-id="2ba3f5cb-8b19-024d-5e91-ea4b0bc79f55" class="pack-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Du</div>
+        <a href="https://github.com/tooploox/oya-packs/tree/master/docker" target="_blank" class="link-block w-inline-block">
+          <div data-w-id="40e9183b-3276-daec-51bb-5fb49403a565" class="pack-link">github.com/tooploox/oya-packs/docker</div>
+        </a>
+        <div data-clipboard-text="oya import github.com/tooploox/oya-packs/docker" data-w-id="0af9961a-737a-ee28-9758-5de1a6849a9a" class="pack-tooltip">COPY IMPORT COMMAND</div>
+      </div>
+      <div class="pack">
+        <div class="github-icon w-embed"><svg width="20px" height="20px" viewbox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--  Generator: Sketch 53.2 (72643) - https://sketchapp.com  -->
+    <title>github-icon-dark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Designs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-426.000000, -3194.000000)" fill="currentColor">
+            <g id="Group-18" transform="translate(180.000000, 2691.000000)">
+                <g id="Group-16" transform="translate(0.000000, 257.000000)">
+                    <g id="social-24px-glyph-1-logo-github" transform="translate(246.000000, 246.000000)">
+                        <path d="M11.99922,0 C5.37319,0 0,5.50855789 0,12.3045475 C0,17.7400617 3.43803,22.3516704 8.20693,23.9788519 C8.80695,24.0916985 9.02596,23.7118485 9.02596,23.3857765 C9.02596,23.0936938 9.01557,22.319947 9.00975,21.2931616 C5.67176,22.0367026 4.96743,19.6438435 4.96743,19.6438435 C4.42178,18.2224846 3.63509,17.84407 3.63509,17.84407 C2.54556,17.0806687 3.71752,17.096151 3.71752,17.096151 C4.92176,17.1831596 5.55558,18.3641017 5.55558,18.3641017 C6.62603,20.2443217 8.36413,19.7013947 9.0479,19.3864269 C9.15693,18.5913021 9.46692,18.0491339 9.80976,17.7415689 C7.14508,17.4310612 4.34375,16.3754952 4.34375,11.6606368 C4.34375,10.3174482 4.81131,9.21913662 5.57892,8.35905791 C5.45555,8.04779152 5.04375,6.79683039 5.69658,5.10286986 C5.69658,5.10286986 6.70412,4.77204038 8.99649,6.36417646 C9.95364,6.09127752 10.98019,5.95479729 12.0007,5.95003981 C13.01973,5.95479729 14.04636,6.09128777 15.00491,6.36417646 C17.29588,4.77204038 18.30158,5.10286986 18.30158,5.10286986 C18.95626,6.79683039 18.54439,8.04779152 18.42099,8.35905791 C19.19007,9.21913662 19.65447,10.3174482 19.65447,11.6606368 C19.65447,16.3872761 16.84879,17.4273598 14.1755,17.7319719 C14.60638,18.1118219 14.99018,18.8627656 14.99018,20.0104669 C14.99018,21.6553249 14.97545,22.9823442 14.97545,23.3857662 C14.97545,23.7147809 15.19159,24.0975838 15.80059,23.9774062 C20.56484,22.3472102 24,17.7386262 24,12.3045475 C24,5.50855789 18.62674,0 11.99922,0 Z" id="github-icon-dark"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg></div>
+        <div class="pack-name-line">
+          <div class="pack-name">CircleCI</div>
+          <div class="pack-version">v0.0.1</div>
+        </div>
+        <div class="pack-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Du</div>
+        <a href="https://github.com/tooploox/oya-packs/tree/master/circleci" target="_blank" class="link-block w-inline-block">
+          <div class="pack-link">github.com/tooploox/oya-packs/circleci</div>
+        </a>
+        <div data-clipboard-text="oya import github.com/tooploox/oya-packs/circleci" class="pack-tooltip">COPY IMPORT COMMAND</div>
+      </div>
+      <div class="pack">
+        <div class="github-icon w-embed"><svg width="20px" height="20px" viewbox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!--  Generator: Sketch 53.2 (72643) - https://sketchapp.com  -->
+    <title>github-icon-dark</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Designs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-426.000000, -3194.000000)" fill="currentColor">
+            <g id="Group-18" transform="translate(180.000000, 2691.000000)">
+                <g id="Group-16" transform="translate(0.000000, 257.000000)">
+                    <g id="social-24px-glyph-1-logo-github" transform="translate(246.000000, 246.000000)">
+                        <path d="M11.99922,0 C5.37319,0 0,5.50855789 0,12.3045475 C0,17.7400617 3.43803,22.3516704 8.20693,23.9788519 C8.80695,24.0916985 9.02596,23.7118485 9.02596,23.3857765 C9.02596,23.0936938 9.01557,22.319947 9.00975,21.2931616 C5.67176,22.0367026 4.96743,19.6438435 4.96743,19.6438435 C4.42178,18.2224846 3.63509,17.84407 3.63509,17.84407 C2.54556,17.0806687 3.71752,17.096151 3.71752,17.096151 C4.92176,17.1831596 5.55558,18.3641017 5.55558,18.3641017 C6.62603,20.2443217 8.36413,19.7013947 9.0479,19.3864269 C9.15693,18.5913021 9.46692,18.0491339 9.80976,17.7415689 C7.14508,17.4310612 4.34375,16.3754952 4.34375,11.6606368 C4.34375,10.3174482 4.81131,9.21913662 5.57892,8.35905791 C5.45555,8.04779152 5.04375,6.79683039 5.69658,5.10286986 C5.69658,5.10286986 6.70412,4.77204038 8.99649,6.36417646 C9.95364,6.09127752 10.98019,5.95479729 12.0007,5.95003981 C13.01973,5.95479729 14.04636,6.09128777 15.00491,6.36417646 C17.29588,4.77204038 18.30158,5.10286986 18.30158,5.10286986 C18.95626,6.79683039 18.54439,8.04779152 18.42099,8.35905791 C19.19007,9.21913662 19.65447,10.3174482 19.65447,11.6606368 C19.65447,16.3872761 16.84879,17.4273598 14.1755,17.7319719 C14.60638,18.1118219 14.99018,18.8627656 14.99018,20.0104669 C14.99018,21.6553249 14.97545,22.9823442 14.97545,23.3857662 C14.97545,23.7147809 15.19159,24.0975838 15.80059,23.9774062 C20.56484,22.3472102 24,17.7386262 24,12.3045475 C24,5.50855789 18.62674,0 11.99922,0 Z" id="github-icon-dark"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg></div>
+        <div class="pack-name-line">
+          <div class="pack-name">scaffold</div>
+          <div class="pack-version">v0.0.1</div>
+        </div>
+        <div class="pack-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Du</div>
+        <a href="https://github.com/tooploox/oya-packs/tree/master/scaffold" target="_blank" class="link-block w-inline-block">
+          <div class="pack-link">github.com/tooploox/oya-packs/scaffold</div>
+        </a>
+        <div data-clipboard-text="oya import github.com/tooploox/oya-packs/scaffold" class="pack-tooltip">COPY IMPORT COMMAND</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="footer-container w-container">
+      <div class="columns w-row">
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Product</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Install</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="packs.html" class="footer-link w-inline-block w--current">
+            <div class="footer-link-text">Packs</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Documentation</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Contribution</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Learn more</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Join us</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Support</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Public Slack</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">FAQ</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Legal</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Terms of use</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Privacy Policy</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="footer-copyright-text">Copyright 2019 by Tooploox sp. z o.o.</div>
+        <div class="footer-rights-reserved">All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://d1tdp7z6w94jbb.cloudfront.net/js/jquery-3.3.1.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="js/webflow.js" type="text/javascript"></script>
+  <!-- [if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script><![endif] -->
+</body>
+</html>
