@@ -15,7 +15,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
-	installDir, err := installDir()
+	installDir, err := project.InstallDir()
 	if err != nil {
 		return err
 	}
@@ -60,9 +60,9 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 		err = o.Tasks.ForEachSorted(func(taskName task.Name, task task.Task, meta task.Meta) error {
 			if !taskName.IsBuiltIn() {
 				if len(meta.Doc) > 0 {
-					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
+					fmt.Fprintf(w, "oya %s\t# %s\n", taskName, meta.Doc)
 				} else {
-					fmt.Fprintf(w, "oya run %s\t\n", taskName)
+					fmt.Fprintf(w, "oya %s\t\n", taskName)
 				}
 			}
 			return nil

@@ -1,4 +1,4 @@
-package internal
+package project
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func installDir() (string, error) {
+func InstallDir() (string, error) {
 	homeDir, found := os.LookupEnv("OYA_HOME")
 	if !found {
 		user, err := user.Current()
@@ -25,10 +25,10 @@ func installDir() (string, error) {
 	return filepath.Join(homeDir, ".oya", "packs"), nil
 }
 
-func lookupOyaScope() (string, bool) {
+func LookupOyaScope() (string, bool) {
 	return os.LookupEnv("OYA_SCOPE")
 }
 
-func setOyaScope(scope string) error {
+func SetOyaScope(scope string) error {
 	return os.Setenv("OYA_SCOPE", scope)
 }

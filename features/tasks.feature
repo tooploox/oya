@@ -10,12 +10,12 @@ Scenario: Single Oyafile
     build: |
       echo "Done"
     """
-  When I run "oya tasks"
+  When I run "oya Oya.tasks"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build  
+  oya build  
 
   """
 
@@ -27,12 +27,12 @@ Scenario: Show only user-defined
     build: |
       echo "Done"
     """
-  When I run "oya tasks"
+  When I run "oya Oya.tasks"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build  
+  oya build  
 
   """
 
@@ -48,12 +48,12 @@ Scenario: Subdirectories are not recursed by default
     build: |
       echo "Done"
     """
-  When I run "oya tasks"
+  When I run "oya Oya.tasks"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build  
+  oya build  
 
   """
 
@@ -69,15 +69,15 @@ Scenario: Subdirectories can be recursed
     build: |
       echo "Done"
     """
-  When I run "oya tasks --recurse"
+  When I run "oya Oya.tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build  
+  oya build  
 
   # in ./subdir1/Oyafile
-  oya run build  
+  oya build  
 
   """
 
@@ -91,12 +91,12 @@ Scenario: Docstring prints
       echo "Done"
 
     """
-  When I run "oya tasks"
+  When I run "oya Oya.tasks"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build  # Build it
+  oya build  # Build it
 
   """
 
@@ -119,16 +119,16 @@ Scenario: Doc strings are properly aligned
     foo: |
       echo "Done"
     """
-  When I run "oya tasks --recurse"
+  When I run "oya Oya.tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run build    # Build it
-  oya run testAll  # Run all tests
+  oya build    # Build it
+  oya testAll  # Run all tests
 
   # in ./subdir1/Oyafile
-  oya run foo  # Do foo
+  oya foo  # Do foo
 
   """
 
@@ -152,12 +152,12 @@ Scenario: Parent dir tasks are not listed
       echo "Done"
     """
   And I'm in the ./subdir1 dir
-  When I run "oya tasks --recurse"
+  When I run "oya Oya.tasks --recurse"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run foo  # Do foo
+  oya foo  # Do foo
 
   """
 
@@ -180,12 +180,12 @@ Scenario: Imported packs tasks are listed
     packTask: |
       echo "this task is in pack"
     """
-  When I run "oya tasks"
+  When I run "oya Oya.tasks"
   Then the command succeeds
   And the command outputs to stdout
   """
   # in ./Oyafile
-  oya run foo.packTask  
-  oya run test          
+  oya foo.packTask  
+  oya test          
 
   """

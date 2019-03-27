@@ -22,7 +22,7 @@ import (
 )
 
 var importCmd = &cobra.Command{
-	Use:   "import URI",
+	Use:   "Oya.import URI",
 	Short: "Imports Oya pack in Oyafile",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

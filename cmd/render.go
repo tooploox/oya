@@ -23,7 +23,7 @@ import (
 
 // renderCmd represents the render command
 var renderCmd = &cobra.Command{
-	Use:          "render TEMPLATE",
+	Use:          "Oya.render TEMPLATE",
 	Short:        "Render a template FILE or DIRECTORY using values from an Oyafile",
 	SilenceUsage: true,
 	Args:         cobra.ExactArgs(1),

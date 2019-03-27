@@ -19,8 +19,8 @@ Scenario: It loads Values and Tasks from secrets.oya if present
     Secrets:
       bar: banana
     """
-  And I run "oya secrets encrypt"
-  When I run "oya run all"
+  And I run "oya Oya.secrets encrypt"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -35,7 +35,7 @@ Scenario: Encrypts secrets file
     Secrets:
       foo: SECRETPHRASE
     """
-  When I run "oya secrets encrypt"
+  When I run "oya Oya.secrets encrypt"
   Then the command succeeds
   And file ./secrets.oya does not contain
     """
@@ -48,8 +48,8 @@ Scenario: Views secrets file
     Secrets:
       foo: SECRETPHRASE
     """
-  And I run "oya secrets encrypt"
-  When I run "oya secrets view"
+  And I run "oya Oya.secrets encrypt"
+  When I run "oya Oya.secrets view"
   Then the command succeeds
   And the command outputs to stdout
   """

@@ -14,7 +14,7 @@ Scenario: Successfully run task
       fi
       echo "Done"
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -43,7 +43,7 @@ Scenario: Nested Oyafiles are not processed recursively by default
       touch Project2
       echo "Project2"
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -74,7 +74,7 @@ Scenario: Nested Oyafiles can be processed recursively
       touch Project2
       echo "Project2"
     """
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -92,7 +92,7 @@ Scenario: No Oyafile
     """
     Project: project
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command fails with error matching
   """
   .*no Oyafile project in.*
@@ -103,7 +103,7 @@ Scenario: Missing task
     """
     Project: project
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command fails with error
     """
     missing task "all"
@@ -119,7 +119,7 @@ Scenario: Script template
       foo="${Oya[value]}"
       echo $foo
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -138,7 +138,7 @@ Scenario: Ignore projects inside current project
     Project: foo
     all: echo "foo"
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -159,7 +159,7 @@ Scenario: Ignore errors in projects inside current project
        xxx: does not exist
     all: echo "foo"
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -189,7 +189,7 @@ Scenario: Running recursively
       echo "Project2"
     """
   And I'm in the ./project1 dir
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -221,7 +221,7 @@ Scenario: Running recursively
       echo "Project2"
     """
   And I'm in the ./project1 dir
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -245,7 +245,7 @@ Scenario: Running in a subdirectory
       echo "Project1"
     """
   And I'm in the ./project1 dir
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -265,7 +265,7 @@ Scenario: Allow empty Require, Import: Values
     foo: |
       echo "hello from foo"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And the command outputs to stdout
   """
