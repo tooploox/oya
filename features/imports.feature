@@ -20,7 +20,7 @@ Scenario: Import tasks from installed packs
       touch OK
       echo "Done"
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -48,7 +48,7 @@ Scenario: Import task using pack values
       bar="${Oya[foo]}"
       echo $bar
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -75,7 +75,7 @@ Scenario: Import task using BasePath
       bar=$(basename ${Oya[BasePath]})
       echo $bar
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -101,7 +101,7 @@ Scenario: Access pack values
     Values:
       bar: xxx
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -133,7 +133,7 @@ Scenario: Access current project values
       echo ${Oya[p1.foo]}
       echo ${Oya[foo]}
     """
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -163,7 +163,7 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
     all: |
       echo ${Oya[fruit]}
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -196,7 +196,7 @@ Scenario: Pack values are overriden in main Oyafile
       echo ${Oya[fruit]}
       echo ${Oya[wege]}
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -226,7 +226,7 @@ Scenario: Import tasks in a subdir Oyafile
       echo "all"
     """
   And I'm in the ./subdir dir
-  When I run "oya run --recurse foo.all"
+  When I run "oya --recurse foo.all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -253,7 +253,7 @@ Scenario: Import tasks from a subdirectory
       project1: /project1
     """
   And I'm in the ./project2 dir
-  When I run "oya run project1.echo"
+  When I run "oya project1.echo"
   Then the command succeeds
   And the command outputs to stdout
   """

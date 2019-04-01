@@ -8,7 +8,7 @@ Scenario: Get a pack
     """
     Project: project
     """
-  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
@@ -20,7 +20,7 @@ Scenario: Get a pack with invalid import
     Import:
       invalidPack: foo.com/fooba/fooba
     """
-  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
 
@@ -46,7 +46,7 @@ Scenario: Get two versions of the same pack
       fixtures: github.com/tooploox/oya-fixtures
     """
   When I'm in the ./project1 dir
-  And I run "oya run --recurse fixtures.version"
+  And I run "oya --recurse fixtures.version"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -54,7 +54,7 @@ Scenario: Get two versions of the same pack
 
   """
   When I'm in the ../project2 dir
-  And I run "oya run fixtures.version"
+  And I run "oya fixtures.version"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -68,6 +68,6 @@ Scenario: Get a pack from a private repo
     """
     Project: project
     """
-  When I run "oya get github.com/bilus/oya-fixtures-private@v1.0.0"
+  When I run "oya Oya.get github.com/bilus/oya-fixtures-private@v1.0.0"
   Then the command succeeds
   And file ./.oya/packs/github.com/bilus/oya-fixtures-private@v1.0.0/Oyafile exists

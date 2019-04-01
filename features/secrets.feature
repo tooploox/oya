@@ -43,7 +43,11 @@ Scenario: Encrypts secrets file
     """
 
 Scenario: Views secrets file
-  Given file ./secrets.oya containing
+  Given file ./Oyafile containing
+    """
+    Project: Secrets
+    """
+  And file ./secrets.oya containing
     """
     Secrets:
       foo: SECRETPHRASE

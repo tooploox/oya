@@ -17,7 +17,7 @@ Scenario: No changes
     all: |
       echo "Project1"
     """
-  When I run "oya run --changeset --recurse all"
+  When I run "oya --changeset --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -37,7 +37,7 @@ Scenario: Child marks itself as changed
     all: |
       echo "Root"
     """
-  When I run "oya run --changeset --recurse all"
+  When I run "oya --changeset --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -59,7 +59,7 @@ Scenario: Child marks parent as changed
     all: |
       echo "Root"
     """
-  When I run "oya run --changeset --recurse all"
+  When I run "oya --changeset --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -81,7 +81,7 @@ Scenario: Parent marks child as changed
     all: |
       echo "Project1"
     """
-  When I run "oya run --changeset --recurse all"
+  When I run "oya --changeset --recurse all"
   Then the command succeeds
   And the command outputs to stdout
   """

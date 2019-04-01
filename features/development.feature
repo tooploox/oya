@@ -24,7 +24,7 @@ Scenario: Use a local require
 
     version: echo 1.0.0
     """
-  When I run "oya run foo.version"
+  When I run "oya foo.version"
   Then the command succeeds
   And the command outputs to stdout
     """
@@ -53,5 +53,5 @@ Scenario: With local require oya doesn't attempt to lookup requirements remotely
 
     version: echo 1.0.0
     """
-  When I run "oya run foo.version"
+  When I run "oya foo.version"
   Then the command succeeds

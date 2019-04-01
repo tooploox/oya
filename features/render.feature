@@ -14,7 +14,7 @@ Scenario: Render a template
     """
     <%= foo %>
     """
-  When I run "oya render ./templates/file.txt"
+  When I run "oya Oya.render ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -32,7 +32,7 @@ Scenario: Render a template explicitly pointing to the Oyafile
     """
     <%= foo %>
     """
-  When I run "oya render -f ./Oyafile ./templates/file.txt"
+  When I run "oya Oya.render -f ./Oyafile ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -55,7 +55,7 @@ Scenario: Render a template directory
     """
     <%= bar %>
     """
-  When I run "oya render ./templates/"
+  When I run "oya Oya.render ./templates/"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -86,7 +86,7 @@ Scenario: Rendering values in specified scope pointing to imported pack
     """
     <%= fruit %>
     """
-  When I run "oya render --scope foo ./templates/file.txt"
+  When I run "oya Oya.render --scope foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -117,7 +117,7 @@ Scenario: Rendered values in specified scope can be overridden
     """
     <%= fruit %>
     """
-  When I run "oya render --scope foo ./templates/file.txt"
+  When I run "oya Oya.render --scope foo ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -142,13 +142,13 @@ Scenario: Imported tasks render using their own Oyafile scope by default
       fruit: orange
 
     render: |
-      oya render ./templates/file.txt
+      oya Oya.render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
     <%= fruit %>
     """
-  When I run "oya run foo.render"
+  When I run "oya foo.render"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -176,13 +176,13 @@ Scenario: Values in imported pack scope can be overridden
       fruit: orange
 
     render:
-      oya render ./templates/file.txt
+      oya Oya.render ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
     <%= fruit %>
     """
-  When I run "oya run foo.render"
+  When I run "oya foo.render"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -208,13 +208,13 @@ Scenario: Scope of the importing Oyafile can be optionally used
       fruit: orange
 
     render:
-      oya render --auto-scope=false ./templates/file.txt
+      oya Oya.render --auto-scope=false ./templates/file.txt
     """
   And file ./templates/file.txt containing
     """
     <%= fruit %>
     """
-  When I run "oya run foo.render"
+  When I run "oya foo.render"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -235,7 +235,7 @@ Scenario: Rendering values in specified scope
     """
     <%= fruit %>
     """
-  When I run "oya render --scope fruits ./templates/file.txt"
+  When I run "oya Oya.render --scope fruits ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -256,7 +256,7 @@ Scenario: Rendering values in specified nested scope
     """
     <%= fruit %>
     """
-  When I run "oya render --scope plants.fruits ./templates/file.txt"
+  When I run "oya Oya.render --scope plants.fruits ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -275,7 +275,7 @@ Scenario: Rendering one file to an output dir
     """
     <%= fruit %>
     """
-  When I run "oya render --output-dir ./foobar ./templates/file.txt"
+  When I run "oya Oya.render --output-dir ./foobar ./templates/file.txt"
   Then the command succeeds
   And file ./foobar/file.txt contains
   """
@@ -299,7 +299,7 @@ Scenario: Rendering a dir to an output dir
     """
     <%= culprit %>
     """
-  When I run "oya render --output-dir ./foobar ./templates/"
+  When I run "oya Oya.render --output-dir ./foobar ./templates/"
   Then the command succeeds
   And file ./foobar/file1.txt contains
   """
@@ -338,7 +338,7 @@ Scenario: Render dir excluding files and directories
     """
     <%= badvariable %>
     """
-  When I run "oya render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme/* ./templates/"
+  When I run "oya Oya.render --exclude excludeme.txt --exclude subdir/excludeme.txt --exclude excludeme/* ./templates/"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -381,7 +381,7 @@ Scenario: Render dir excluding using globbing
     """
     <%= badvariable %>
     """
-  When I run "oya render --exclude **excludeme.txt ./templates/"
+  When I run "oya Oya.render --exclude **excludeme.txt ./templates/"
   Then the command succeeds
   And file ./file.txt contains
   """
@@ -413,7 +413,7 @@ Scenario: Rendering a dir to an output dir outside project dir
     """
     <%= culprit %>
     """
-  When I run "oya render --output-dir /tmp/foobar ./templates/"
+  When I run "oya Oya.render --output-dir /tmp/foobar ./templates/"
   Then the command succeeds
   And file /tmp/foobar/file1.txt contains
   """

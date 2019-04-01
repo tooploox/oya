@@ -83,7 +83,6 @@ func init() {
 }
 
 func addTasksCommands(workDir string, recurse, changeset bool) error {
-	fmt.Println("workDir:", workDir)
 	installDir, err := project.InstallDir()
 	if err != nil {
 		return err
@@ -112,7 +111,6 @@ func addTasksCommands(workDir string, recurse, changeset bool) error {
 		}
 		err = o.Tasks.ForEach(func(taskName task.Name, task task.Task, meta task.Meta) error {
 			if !taskName.IsBuiltIn() {
-				fmt.Println(taskName)
 				rootCmd.AddCommand(createCmd(taskName, meta.Doc))
 			}
 			return nil

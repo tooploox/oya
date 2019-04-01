@@ -95,7 +95,9 @@ Scenario: No Oyafile
   When I run "oya all"
   Then the command fails with error matching
   """
-  .*no Oyafile project in.*
+  Error: unknown command "all" for "oya"
+  Run 'oya --help' for usage.
+  
   """
 
 Scenario: Missing task
@@ -106,7 +108,9 @@ Scenario: Missing task
   When I run "oya all"
   Then the command fails with error
     """
-    missing task "all"
+    Error: unknown command "all" for "oya"
+    Run 'oya --help' for usage.
+
     """
 
 Scenario: Script template
