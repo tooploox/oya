@@ -91,8 +91,8 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.oya.yaml)")
-	// rootCmd.PersistentFlags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
-	rootCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
+	rootCmd.PersistentFlags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
+	rootCmd.PersistentFlags().BoolP("changeset", "c", false, "Recursively process Oyafiles")
 }
 
 // initConfig reads in config file and ENV variables if set.

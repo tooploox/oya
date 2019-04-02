@@ -52,6 +52,7 @@ func execTask(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	return internal.Run(cwd, taskName, taskArgs, recurse, changeset, cmd.OutOrStdout(), cmd.OutOrStderr())
 }
 
@@ -64,8 +65,6 @@ func createCmd(name task.Name, desc string) *cobra.Command {
 		DisableFlagParsing: true,
 		RunE:               execTask,
 	}
-	cmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
-	cmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
 	return cmd
 }
 
@@ -75,14 +74,13 @@ func init() {
 		fmt.Println(err)
 	}
 	recurse := flagRecurse()
-	changeset := flagChangeset()
-	err = addTasksCommands(cwd, recurse, changeset)
+	err = addTasksCommands(cwd, recurse)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-func addTasksCommands(workDir string, recurse, changeset bool) error {
+func addTasksCommands(workDir string, recurse bool) error {
 	installDir, err := project.InstallDir()
 	if err != nil {
 		return err
@@ -95,7 +93,7 @@ func addTasksCommands(workDir string, recurse, changeset bool) error {
 	if err != nil {
 		return err
 	}
-	oyafiles, err := p.RunTargets(workDir, recurse, changeset)
+	oyafiles, err := p.RunTargets(workDir, recurse, false)
 	if err != nil {
 		return err
 	}
@@ -149,11 +147,6 @@ func detectFlags(args []string) ([]string, []string) {
 
 func flagRecurse() bool {
 	re := regexp.MustCompile(`^-r$|^--recurse$`)
-	return foundInArgs(re)
-}
-
-func flagChangeset() bool {
-	re := regexp.MustCompile(`^-c$|^--changeset$`)
 	return foundInArgs(re)
 }
 

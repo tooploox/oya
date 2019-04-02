@@ -15,7 +15,6 @@ import (
 	"github.com/DATA-DOG/godog/gherkin"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/tooploox/oya/pkg/task"
 )
 
 const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -34,6 +33,8 @@ func (c *SuiteContext) MustSetUp() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(projectDir)
+	fmt.Println(c.binDir)
 
 	// overrideOyaCmd(projectDir)
 	setEnv(projectDir)
@@ -66,11 +67,12 @@ func setEnv(projectDir string) {
 // to run oya tasks.
 // It builds oya to a temporary directory and use it to launch Oya in scripts.
 func overrideOyaCmd(projectDir string) {
-	executablePath := filepath.Join(projectDir, "_bin/oya")
-	oyaCmdOverride := fmt.Sprintf(
-		"function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
-		sourceFileDirectory(), executablePath, executablePath)
-	task.OyaCmdOverride = &oyaCmdOverride
+	// executablePath := filepath.Join(projectDir, "_bin/oya")
+	// "function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
+	// oyaCmdOverride := fmt.Sprintf(
+	// 	"function oya() { echo \"DUPAAAA\"; }")
+	// sourceFileDirectory(), executablePath, executablePath)
+	// task.OyaCmdOverride = &oyaCmdOverride
 }
 
 func (c *SuiteContext) writeFile(path, contents string) error {
@@ -154,14 +156,6 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 	return errors.Errorf("expected %v to not exist", path)
 }
 
-type OyaCmdError struct {
-	Message string
-}
-
-func (e *OyaCmdError) Error() string {
-	return fmt.Sprintf("%v", e.Message)
-}
-
 func (c *SuiteContext) execute(command string) error {
 	c.stdout.Reset()
 	c.stderr.Reset()
@@ -174,9 +168,13 @@ func (c *SuiteContext) execute(command string) error {
 	}()
 	cmdFlds := strings.Fields(command)
 	oyaBin := fmt.Sprintf("%v/%v", c.binDir, cmdFlds[0])
+	path := fmt.Sprintf("PATH=%v:%v", c.binDir, os.Getenv("PATH"))
+
 	cmd := exec.Command(oyaBin, cmdFlds[1:]...)
+	cmd.Env = append(os.Environ(), path)
 	cmd.Stdout = c.stdout
 	cmd.Stderr = c.stderr
+
 	err := cmd.Run()
 	if err != nil {
 		c.lastCommandErr = errors.New(c.stderr.String())

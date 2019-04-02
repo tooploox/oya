@@ -115,7 +115,7 @@ Scenario: Use plush helpers when rendering
        - 3
 
     foo: |
-      oya render template.txt
+      oya Oya.render template.txt
     """
   And file ./template.txt containing
     """
@@ -140,7 +140,7 @@ Scenario: Use sprig functions when rendering (http://masterminds.github.io/sprig
        - 3
 
     foo: |
-      oya render template.txt
+      oya Oya.render template.txt
     """
   And file ./template.txt containing
     """
