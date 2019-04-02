@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--  This site was created in Webflow. http://www.webflow.com  -->
-<!--  Last Published: Mon Mar 25 2019 08:42:36 GMT+0000 (UTC)  -->
-<html data-wf-page="5c877e35b774e4cf7d1f13d1" data-wf-site="5c877e35b774e483c91f13d0">
+<!--  Last Published: Wed Mar 27 2019 12:01:52 GMT+0000 (UTC)  -->
+<html data-wf-page="5c877e35b774e4cf7d1f13d1" data-wf-site="5c877e35b774e483c91f13d0" lang="en">
 <head>
   <meta charset="utf-8">
   <title>Oya</title>
@@ -18,18 +18,85 @@
   <link href="images/favicon-big.png" rel="apple-touch-icon">
   <style>
 body {
--webkit-font-smoothing: antialiased;
--moz-font-smoothing: antialiased;
--o-font-smoothing: antialiased;
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+/* Animations to copying of command snippets */
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
+}
+/* Snackbar Control */
+#snackbar.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
 }
 </style>
+  <script> 
+  function showCommandSnackbar() {
+  var snackbarDiv = document.getElementById("snackbar");
+  snackbarDiv.className += " show";
+  setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
+	}
+</script>
+  <script type="text/javascript">
+const ref = document.querySelector('style');
+const style = document.createElement('style');
+style.innerHTML = ".code:first-of-type:before { content: \"$ \"; display: inline; }";
+ref.parentNode.insertBefore(style, ref);
+function codeToClipboard(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("copy");
+}
+document.addEventListener('click', function (event) {
+  var target = event.target
+  var depth = 3
+  while(!target.matches('.code-block') || depth < 0) {
+    target = target.parentNode
+    depth--;
+  }
+  codeToClipboard(target)
+  showCommandSnackbar()
+}, false);
+</script>
 </head>
 <body>
-  <div class="top-line"></div><img src="images/pattern.svg" alt="" class="image-3">
+  <div class="top-line"></div>
+  <div id="snackbar" class="snackbar">Commands copied to your clipboard</div><img src="images/pattern.svg" alt="" class="pattern">
   <div class="container w-container">
-    <div class="logo-container"><img src="images/Logo.svg" alt="" class="image"></div>
+    <div class="logo-container"><a href="index.html" class="w-inline-block w--current"><img src="images/Logo.svg" alt="" class="image"></a></div>
     <p class="title">New projects without the buttache</p>
-    <p class="sub-title">Using <strong class="underlined-link">Oya packs</strong> containing <strong>reusable boilerplate &amp; scripts</strong>, you can <strong>bootstrap deployable projects</strong> that are a pleasure to work with</p>
+    <p class="sub-title">Using <a href="packs.html" class="link"><strong class="underlined-link">Oya packs</strong></a> containing <strong>reusable boilerplate &amp; scripts</strong>, you can <strong>bootstrap deployable projects</strong> that are a pleasure to work with</p>
     <div class="cta-buttons"><a data-w-id="27734c38-818a-d9fc-1f06-0e59cf105d65" href="https://github.com/tooploox/oya" target="_blank" class="cta-button github-button w-inline-block"><img src="images/github-icon.svg" data-w-id="a84c2626-de19-6696-7ff2-930f6f0d38b5" alt="" class="button-github-icon"><div data-w-id="d7880b0e-9280-38a4-6e77-3516ac5638d4" class="github-button-text">Open Github repo</div></a>
       <a data-w-id="20ef2a21-7ccb-a620-0210-252f86dbbd30" href="https://github.com/tooploox/oya/blob/master/TUTORIAL.md" target="_blank" class="cta-button doc-button w-inline-block">
         <div data-w-id="d8d9d949-c8dd-6221-f000-7fb8ff760d62" class="documentation-button-text">Open documentation</div><img src="images/documentation-arrow.svg" data-w-id="c00c2d20-8aaf-50c6-02cc-a0dd3d97e067" alt=""></a>
@@ -37,12 +104,15 @@ body {
     <div class="how-to-install">
       <h3 class="heading h3">How to install</h3>
       <h2 class="heading h2">Quick start</h2>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ curl</div>
-          <div class="code white">https://oya.sh/get</div>
-          <div class="code gray">| bash</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">curl </div>
+            <div class="code white">https://oya.sh/get </div>
+            <div class="code gray">| bash</div>
+          </div>
         </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
     </div>
     <div data-w-id="1cc4c61c-f5ac-bac7-b63b-c4ad3a31b108" class="features">
@@ -67,67 +137,76 @@ body {
       <h3 class="heading h3">Example usage</h3>
       <h2 class="heading h2">How to use Oya</h2>
       <div class="text-block">Creating project template</div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/scaffold</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">scaffold.generate</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/scaffold</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">scaffold.generate</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
       <div class="text-block">Generating Dockerfile</div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/docker</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">docker.generate</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/docker</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">docker.generate</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
       <div class="text-block">Deploying to k8s <span class="work-in-progress">– work in progress</span></div>
-      <div class="code-block">
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">init</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">import </div>
+            <div class="code white">github.com/tooploox/oya-packs/k8s</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.init</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.generate</div>
+          </div>
+          <div class="code-line">
+            <div class="code yellow">oya </div>
+            <div class="code blue">run </div>
+            <div class="code white">k8s.deploy</div>
+          </div>
         </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">import</div>
-          <div class="code white">github.com/tooploox/oya-packs/k8s</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.init</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.generate</div>
-        </div>
-        <div class="code-line">
-          <div class="code yellow">$ oya</div>
-          <div class="code blue">run</div>
-          <div class="code white">k8s.deploy</div>
-        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
       </div>
-      <div class="cta-packs"><a data-w-id="1bd0f877-cf9e-90de-f02f-3b41b352ad01" href="https://github.com/tooploox/oya" target="_blank" class="cta-button github-button w-inline-block"><img src="images/pacs-icon.svg" alt="" class="button-github-icon"><div class="github-button-text">Find packs you need</div></a>
+      <div class="cta-packs"><a data-w-id="1bd0f877-cf9e-90de-f02f-3b41b352ad01" href="packs.html" class="cta-button github-button w-inline-block"><img src="images/pacs-icon.svg" alt="" class="button-github-icon"><div class="github-button-text">Find packs you need</div></a>
         <div class="cta-packs-description">The biggest power of Oya is hidden in reusable packs combined with the most popular development enviroments and tools.</div>
       </div>
     </div>
@@ -205,9 +284,9 @@ body {
         <div class="footer-column w-col w-col-3">
           <div class="footer-section-title">Product</div>
           <a href="#" class="footer-link w-inline-block">
-            <div data-w-id="c63b04ec-8f0f-65c2-9f73-991d29ea82c6" class="footer-link-text">Install</div><img src="images/footer-arrow.svg" data-w-id="8360136b-3f1a-c591-ac1a-a3b0cbb5fd78" alt="" class="footer-link-arrow"></a>
-          <a href="#" class="footer-link w-inline-block">
-            <div class="footer-link-text">Tutorial</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+            <div class="footer-link-text">Install</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="packs.html" class="footer-link w-inline-block">
+            <div class="footer-link-text">Packs</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
           <a href="#" class="footer-link w-inline-block">
             <div class="footer-link-text">Documentation</div><img src="images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
         </div>
