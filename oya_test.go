@@ -33,12 +33,7 @@ func (c *SuiteContext) MustSetUp() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(projectDir)
-	fmt.Println(c.binDir)
-
-	// overrideOyaCmd(projectDir)
 	setEnv(projectDir)
-
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
 	c.stdout = bytes.NewBuffer(nil)
@@ -61,18 +56,6 @@ func setEnv(projectDir string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// overrideOyaCmd overrides `oya` command used by $Tasks in templates
-// to run oya tasks.
-// It builds oya to a temporary directory and use it to launch Oya in scripts.
-func overrideOyaCmd(projectDir string) {
-	// executablePath := filepath.Join(projectDir, "_bin/oya")
-	// "function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
-	// oyaCmdOverride := fmt.Sprintf(
-	// 	"function oya() { echo \"DUPAAAA\"; }")
-	// sourceFileDirectory(), executablePath, executablePath)
-	// task.OyaCmdOverride = &oyaCmdOverride
 }
 
 func (c *SuiteContext) writeFile(path, contents string) error {
@@ -166,6 +149,7 @@ func (c *SuiteContext) execute(command string) error {
 	defer func() {
 		os.Args = oldArgs
 	}()
+
 	cmdFlds := strings.Fields(command)
 	oyaBin := fmt.Sprintf("%v/%v", c.binDir, cmdFlds[0])
 	path := fmt.Sprintf("PATH=%v:%v", c.binDir, os.Getenv("PATH"))
@@ -285,6 +269,7 @@ func FeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
+	// TODO after all remove c.binDir
 }
 
 // sourceFileDirectory returns the current .go source file directory.

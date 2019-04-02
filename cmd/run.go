@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/tooploox/oya/cmd/internal"
 	"github.com/tooploox/oya/pkg/flags"
 	"github.com/tooploox/oya/pkg/project"
@@ -44,6 +44,7 @@ func execTask(cmd *cobra.Command, args []string) error {
 	if err := cmd.ParseFlags(cobraFlags); err != nil {
 		return err
 	}
+
 	recurse, err := cmd.Flags().GetBool("recurse")
 	if err != nil {
 		return err
@@ -131,18 +132,20 @@ func parseArgs(args []string) ([]string, internal.Args, error) {
 	return cobraFlags, taskArgs, err
 }
 
-// detectFlags processed args consisting of flags followed by positional arguments, splitting them.
-// For example this: ["--foo", "-b", "xxx", "--foo"] becomes: ["--foo", "-b"], ["xxx", "--foo"].
 func detectFlags(args []string) ([]string, []string) {
-	flags := make([]string, 0, len(args))
-	for i, arg := range args {
-		if strings.HasPrefix(arg, "-") {
-			flags = append(flags, arg)
-		} else {
-			return flags, args[i:]
+	var cobraFlags []string
+	taskFlags := args
+	rootCmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
+		flagShortName := fmt.Sprintf("-%v", flag.Shorthand)
+		flagFullName := fmt.Sprintf("--%v", flag.Name)
+		for i, arg := range taskFlags {
+			if arg == flagShortName || arg == flagFullName {
+				cobraFlags = append(cobraFlags, arg)
+				taskFlags = append(taskFlags[:i], taskFlags[i+1:]...)
+			}
 		}
-	}
-	return flags, nil
+	})
+	return cobraFlags, taskFlags
 }
 
 func flagRecurse() bool {
