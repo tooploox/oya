@@ -50,6 +50,10 @@
   font-weight: 400;
 }
 
+.sub-title.full-width {
+  width: 100%;
+}
+
 .title {
   width: 720px;
   margin-top: 100px;
@@ -815,6 +819,11 @@
 .html-embed {
   width: 20px;
   height: 20px;
+}
+
+.link-2 {
+  color: #fff;
+  text-decoration: none;
 }
 
 @media (max-width: 991px) {
