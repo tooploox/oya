@@ -25,12 +25,22 @@ type Oyafile struct {
 
 // DecodedOyafile is an Oyafile that has been loaded from YAML
 // but hasn't been parsed yet.
-type DecodedOyafile map[string]interface{}
+type DecodedOyafile map[interface{}]interface{}
 
-func (o *DecodedOyafile) Merge(values map[string]interface{}) {
+func (o *DecodedOyafile) Merge(values map[interface{}]interface{}) error {
+	// lhs, ok := template.ParseScope(*o)
+	// if !ok {
+	// 	return error.Error("Internal: incorrect scope")
+	// }
+	// rhs, ok := template.ParseScope(values)
+	// if !ok {
+	// 	return error.Error("Internal: incorrect scope")
+	// }
+
 	for k, v := range values {
 		(*o)[k] = v
 	}
+	return nil
 }
 
 func Load(oyafilePath, rootDir string) (*Oyafile, bool, error) {
@@ -81,6 +91,7 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	secs, err := secrets.Decrypt(raw.RootDir)
 	if err != nil {
 		if _, ok := err.(secrets.ErrNoSecretsFile); !ok {
@@ -92,16 +103,19 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 			if err != nil {
 				log.Warn(fmt.Sprintf("Secrets could not be parsed after loading from %v: %v", raw.RootDir, err))
 			}
-			decodedOyafile.Merge(decodedSecrets)
+			if err := decodedOyafile.Merge(decodedSecrets); err != nil {
+				return nil, err
+			}
 		}
 	}
+
 	return decodedOyafile, nil
 }
 
 func decodeYaml(content []byte) (DecodedOyafile, error) {
 	reader := bytes.NewReader(content)
 	decoder := yaml.NewDecoder(reader)
-	var of DecodedOyafile
+	var of map[interface{}]interface{}
 	err := decoder.Decode(&of)
 	if err != nil {
 		return nil, err
