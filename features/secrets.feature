@@ -16,8 +16,7 @@ Scenario: It loads Values and Tasks from secrets.oya if present
     """
   And file ./secrets.oya containing
     """
-    Secrets:
-      bar: banana
+    bar: banana
     """
   And I run "oya secrets encrypt"
   When I run "oya run all"
@@ -32,8 +31,7 @@ Scenario: It loads Values and Tasks from secrets.oya if present
 Scenario: Encrypts secrets file
   Given file ./secrets.oya containing
     """
-    Secrets:
-      foo: SECRETPHRASE
+    foo: SECRETPHRASE
     """
   When I run "oya secrets encrypt"
   Then the command succeeds
@@ -45,14 +43,43 @@ Scenario: Encrypts secrets file
 Scenario: Views secrets file
   Given file ./secrets.oya containing
     """
-    Secrets:
-      foo: SECRETPHRASE
+    foo: SECRETPHRASE
     """
   And I run "oya secrets encrypt"
   When I run "oya secrets view"
   Then the command succeeds
   And the command outputs to stdout
   """
-  Secrets:
-    foo: SECRETPHRASE
+  foo: SECRETPHRASE
+  """
+
+Scenario: It correctly merges secrets
+  Given file ./Oyafile containing
+    """
+    Project: Secrets
+    Values:
+      foo:
+        bar: xxx
+        baz: apple
+
+    all: |
+      echo ${Oya[foo.bar]}
+      echo ${Oya[foo.baz]}
+      echo ${Oya[foo.qux]}
+    """
+  And file ./secrets.oya containing
+    """
+    foo:
+      bar: banana
+      qux: peach
+    """
+  And I run "oya secrets encrypt"
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  banana
+  apple
+  peach
+
   """

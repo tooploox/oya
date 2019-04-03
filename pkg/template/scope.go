@@ -39,9 +39,28 @@ func (scope Scope) Merge(other Scope) Scope {
 		result[k] = v
 	}
 	for k, v := range other {
-		result[k] = v
+		existing, ok := result[k]
+		if !ok {
+			result[k] = v
+		} else {
+			result[k] = merge(existing, v)
+		}
+		result[k] = merge(existing, v)
 	}
 	return result
+}
+
+func merge(e, n interface{}) interface{} {
+	es, ok := ParseScope(e)
+	if !ok {
+		return n // Overwrite.
+	}
+	ns, ok := ParseScope(n)
+	if !ok {
+		return n // Overwrite.
+	}
+	// Merge:
+	return map[interface{}]interface{}(es.Merge(ns))
 }
 
 // Replace replaces contents of this scope with keys and values of the other one.

@@ -37,11 +37,6 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
-		case "Secrets":
-			err := parseValues(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
 		case "Project":
 			err := parseProject(value, oyafile)
 			if err != nil {
