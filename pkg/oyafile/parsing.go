@@ -21,7 +21,11 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	if err != nil {
 		return nil, err
 	}
-	for name, value := range of {
+	for nameI, value := range of {
+		name, ok := nameI.(string)
+		if !ok {
+			return nil, errors.Errorf("Incorrect value name: %v", name)
+		}
 		switch name {
 		case "Import":
 			err := parseImports(value, oyafile)
@@ -29,11 +33,6 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
 		case "Values":
-			err := parseValues(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Secrets":
 			err := parseValues(value, oyafile)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
@@ -133,7 +132,7 @@ func parseValues(value interface{}, o *Oyafile) error {
 	}
 	values, ok := value.(map[interface{}]interface{})
 	if !ok {
-		return fmt.Errorf("expected map of keys to values")
+		return fmt.Errorf("expected map of keys to values; got %T", value)
 	}
 	for k, v := range values {
 		key, ok := k.(string)

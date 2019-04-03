@@ -184,3 +184,40 @@ func ExampleScope_Flat() {
 	// foo.qux.2: 3
 	// foo.abc.123: true
 }
+
+func TestMerge(t *testing.T) {
+	testCases := []struct {
+		desc               string
+		lhs, rhs, expected template.Scope
+	}{
+		{
+			desc:     "empty scopes",
+			lhs:      template.Scope{},
+			rhs:      template.Scope{},
+			expected: template.Scope{},
+		},
+		{
+			desc:     "no overlapping keys",
+			lhs:      template.Scope{"foo": "bar"},
+			rhs:      template.Scope{"baz": "qux"},
+			expected: template.Scope{"foo": "bar", "baz": "qux"},
+		},
+		{
+			desc:     "overlapping keys",
+			lhs:      template.Scope{"foo": "xxx"},
+			rhs:      template.Scope{"baz": "qux", "foo": "bar"},
+			expected: template.Scope{"foo": "bar", "baz": "qux"},
+		},
+		{
+			desc:     "deep merge",
+			lhs:      template.Scope{"foo": map[interface{}]interface{}{"bar": "xxxxx", "baz": "orange"}},
+			rhs:      template.Scope{"foo": map[interface{}]interface{}{"bar": "apple", "qux": "peach"}},
+			expected: template.Scope{"foo": map[interface{}]interface{}{"bar": "apple", "baz": "orange", "qux": "peach"}},
+		},
+	}
+
+	for _, tc := range testCases {
+		actual := tc.lhs.Merge(tc.rhs)
+		tu.AssertObjectsEqual(t, tc.expected, actual)
+	}
+}
