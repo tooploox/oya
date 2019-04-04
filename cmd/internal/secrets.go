@@ -6,17 +6,24 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/kr/pty"
+	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/secrets"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 func SecretsView(workDir string, stdout, stderr io.Writer) error {
-	output, err := secrets.Decrypt(workDir)
+	// TODO: Require path
+	path := filepath.Join(workDir, "secrets.oya")
+	output, found, err := secrets.Decrypt(path)
 	if err != nil {
 		return err
+	}
+	if !found {
+		return errors.Errorf("secret file %q not found", path)
 	}
 	stdout.Write(output)
 	return nil

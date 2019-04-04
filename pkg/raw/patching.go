@@ -12,7 +12,7 @@ import (
 
 // flatMap maps each line of Oyafile to possibly multiple lines flattening the result. Does not write to the file.
 func (raw *Oyafile) flatMap(f func(line string) []string) error {
-	scanner := bufio.NewScanner(bytes.NewReader(raw.file))
+	scanner := bufio.NewScanner(bytes.NewReader(raw.oyafileContents))
 
 	output := bytes.NewBuffer(nil)
 	for scanner.Scan() {
@@ -24,7 +24,7 @@ func (raw *Oyafile) flatMap(f func(line string) []string) error {
 		}
 	}
 
-	raw.file = output.Bytes()
+	raw.oyafileContents = output.Bytes()
 	return nil
 }
 
@@ -112,11 +112,11 @@ func (raw *Oyafile) insertBeforeWithin(key string, rx *regexp.Regexp, lines ...s
 
 // concat appends one or more lines to the Oyafile. Does not write to the file.
 func (raw *Oyafile) concat(lines ...string) error {
-	output := bytes.NewBuffer(raw.file)
+	output := bytes.NewBuffer(raw.oyafileContents)
 	if err := writeLines(lines, output); err != nil {
 		return err
 	}
-	raw.file = output.Bytes()
+	raw.oyafileContents = output.Bytes()
 	return nil
 }
 
@@ -127,10 +127,10 @@ func (raw *Oyafile) prepend(lines ...string) error {
 	if err := writeLines(lines, output); err != nil {
 		return err
 	}
-	if _, err := output.Write(raw.file); err != nil {
+	if _, err := output.Write(raw.oyafileContents); err != nil {
 		return err
 	}
-	raw.file = output.Bytes()
+	raw.oyafileContents = output.Bytes()
 	return nil
 }
 
@@ -149,7 +149,7 @@ func writeLines(lines []string, output *bytes.Buffer) error {
 // containsLineMatching returns true if Oyafile matches the regular expression.
 // (?m) directive may be used to match file line by line
 func (raw *Oyafile) matches(rx *regexp.Regexp) bool {
-	return rx.MatchString(string(raw.file))
+	return rx.MatchString(string(raw.oyafileContents))
 }
 
 // write flushes in-memory Oyafile contents to disk.
@@ -158,7 +158,7 @@ func (raw *Oyafile) write() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(raw.Path, raw.file, info.Mode())
+	return ioutil.WriteFile(raw.Path, raw.oyafileContents, info.Mode())
 }
 
 func indent(lines []string, level int) []string {
