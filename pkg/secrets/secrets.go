@@ -5,10 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 )
-
-const SecretsFileName = "secrets.oya"
 
 func Decrypt(path string) ([]byte, bool, error) {
 	if ok, err := isSopsFile(path); !ok || err != nil {
@@ -28,30 +25,28 @@ func Decrypt(path string) ([]byte, bool, error) {
 	return decrypted, true, nil
 }
 
-func Encrypt(workDir string) error {
-	file := filepath.Join(workDir, SecretsFileName)
-	if alreadyEncrypted(file) {
-		return ErrSecretsAlreadyEncrypted{Path: file}
+func Encrypt(path string) error {
+	if alreadyEncrypted(path) {
+		return ErrSecretsAlreadyEncrypted{Path: path}
 	}
-	cmd := exec.Command("sops", "-e", file)
+	cmd := exec.Command("sops", "-e", path)
 	encoded, err := cmd.CombinedOutput()
 	if err != nil {
-		return ErrSecretsFailure{Path: file, CmdError: string(encoded)}
+		return ErrSecretsFailure{Path: path, CmdError: string(encoded)}
 	}
-	fi, err := os.Stat(file)
+	fi, err := os.Stat(path)
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(file, encoded, fi.Mode())
+	err = ioutil.WriteFile(path, encoded, fi.Mode())
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ViewCmd(workDir string) *exec.Cmd {
-	file := filepath.Join(workDir, SecretsFileName)
-	return exec.Command("sops", file)
+func ViewCmd(path string) *exec.Cmd {
+	return exec.Command("sops", path)
 }
 
 func isSopsFile(path string) (bool, error) {
@@ -68,9 +63,9 @@ func isSopsFile(path string) (bool, error) {
 	return ok, nil
 }
 
-func alreadyEncrypted(file string) bool {
+func alreadyEncrypted(path string) bool {
 	// Trying to decrypt and check if succeed
-	cmd := exec.Command("sops", "-d", file)
+	cmd := exec.Command("sops", "-d", path)
 	if err := cmd.Run(); err != nil {
 		return false
 	}
