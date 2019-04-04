@@ -3,7 +3,7 @@ Feature: Manage Secrets for oya
 Background:
    Given I'm in project dir
 
-Scenario: It loads Values and Tasks from secrets.oya if present
+Scenario: It loads values from secrets.oya if present
   Given file ./Oyafile containing
     """
     Project: Secrets
