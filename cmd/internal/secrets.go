@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
 	"github.com/kr/pty"
@@ -15,9 +14,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func SecretsView(workDir string, stdout, stderr io.Writer) error {
-	// TODO: Require path
-	path := filepath.Join(workDir, "secrets.oya")
+func SecretsView(path string, stdout, stderr io.Writer) error {
 	output, found, err := secrets.Decrypt(path)
 	if err != nil {
 		return err
@@ -29,16 +26,16 @@ func SecretsView(workDir string, stdout, stderr io.Writer) error {
 	return nil
 }
 
-func SecretsEdit(workDir string, stdout, stderr io.Writer) error {
-	viewCmd := secrets.ViewCmd(workDir)
+func SecretsEdit(path string, stdout, stderr io.Writer) error {
+	viewCmd := secrets.ViewCmd(path)
 	if err := terminalRun(viewCmd); err != nil {
 		return err
 	}
 	return nil
 }
 
-func SecretsEncrypt(workDir string, stdout, stderr io.Writer) error {
-	if err := secrets.Encrypt(workDir); err != nil {
+func SecretsEncrypt(path string, stdout, stderr io.Writer) error {
+	if err := secrets.Encrypt(path); err != nil {
 		return err
 	}
 	return nil
