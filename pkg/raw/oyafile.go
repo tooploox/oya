@@ -20,7 +20,8 @@ const DefaultName = "Oyafile"
 
 // Oyafile represents an unparsed Oyafile.
 type Oyafile struct {
-	Path    string // Path contains normalized absolute path.
+	Path    string // Path contains normalized absolute path to the Oyafile.
+	Dir     string // Dir contains normalized absolute path to the containing directory.
 	RootDir string // RootDir is the absolute, normalized path to the project root directory.
 	file    []byte // file contains Oyafile contents.
 }
@@ -61,8 +62,10 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	if err != nil {
 		return nil, err
 	}
+	normalizedOyafilePath := filepath.Clean(oyafilePath)
 	return &Oyafile{
-		Path:    oyafilePath,
+		Path:    normalizedOyafilePath,
+		Dir:     filepath.Dir(normalizedOyafilePath),
 		RootDir: rootDir,
 		file:    file,
 	}, nil
@@ -83,16 +86,16 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	}
 	decodedOyafile := DecodedOyafile(decodedOyafileI)
 
-	secs, err := secrets.Decrypt(raw.RootDir)
+	secs, err := secrets.Decrypt(raw.Dir)
 	if err != nil {
 		if _, ok := err.(secrets.ErrNoSecretsFile); !ok {
-			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v: %v", raw.RootDir, err))
+			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v: %v", raw.Dir, err))
 		}
 	} else {
 		if len(secs) > 0 {
 			decodedSecrets, err := decodeYaml(secs)
 			if err != nil {
-				log.Warn(fmt.Sprintf("Secrets could not be parsed after loading from %v: %v", raw.RootDir, err))
+				log.Warn(fmt.Sprintf("Secrets could not be parsed after loading from %v: %v", raw.Dir, err))
 			}
 			secrets, ok := template.ParseScope(decodedSecrets)
 			if !ok {
