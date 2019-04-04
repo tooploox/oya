@@ -3,27 +3,26 @@ package raw
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/pkg/secrets"
 	"github.com/tooploox/oya/pkg/template"
 	yaml "gopkg.in/yaml.v2"
 )
 
 const DefaultName = "Oyafile"
+const ValueFileExt = ".oya"
 
 // Oyafile represents an unparsed Oyafile.
 type Oyafile struct {
-	Path    string // Path contains normalized absolute path to the Oyafile.
-	Dir     string // Dir contains normalized absolute path to the containing directory.
-	RootDir string // RootDir is the absolute, normalized path to the project root directory.
-	file    []byte // file contains Oyafile contents.
+	Path            string // Path contains normalized absolute path to the Oyafile.
+	Dir             string // Dir contains normalized absolute path to the containing directory.
+	RootDir         string // RootDir is the absolute, normalized path to the project root directory.
+	oyafileContents []byte // file contains the main Oyafile contents.
 }
 
 // DecodedOyafile is an Oyafile that has been loaded from YAML
@@ -64,14 +63,74 @@ func New(oyafilePath, rootDir string) (*Oyafile, error) {
 	}
 	normalizedOyafilePath := filepath.Clean(oyafilePath)
 	return &Oyafile{
-		Path:    normalizedOyafilePath,
-		Dir:     filepath.Dir(normalizedOyafilePath),
-		RootDir: rootDir,
-		file:    file,
+		Path:            normalizedOyafilePath,
+		Dir:             filepath.Dir(normalizedOyafilePath),
+		RootDir:         rootDir,
+		oyafileContents: file,
 	}, nil
 }
 
 func (raw *Oyafile) Decode() (DecodedOyafile, error) {
+	mainOyafile, err := decodeOyafile(raw)
+	if err != nil {
+		return nil, err
+	}
+
+	paths, err := listFiles(raw.Dir, ValueFileExt)
+	if err != nil {
+		return nil, err
+	}
+	for _, path := range paths {
+		rawValueFile, found, err := Load(path, raw.RootDir)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			return nil, errors.Errorf("Internal error: %s file not found while loading", path)
+		}
+		valueFile, err := decodeOyafile(rawValueFile)
+		if err != nil {
+			return nil, err
+		}
+		values, ok := template.ParseScope(map[interface{}]interface{}(valueFile))
+		if !ok {
+			return nil, errors.Errorf("Internal: error parsing scope trying to merge values, unexpected type: %T", valueFile)
+		}
+		if err := mergeValues(&mainOyafile, values); err != nil {
+			return nil, err
+		}
+	}
+	return mainOyafile, nil
+}
+
+func listFiles(path, ext string) ([]string, error) {
+	var files []string
+	fileInfo, err := ioutil.ReadDir(path)
+	if err != nil {
+		return files, err
+	}
+	for _, file := range fileInfo {
+		path := file.Name()
+		if !file.IsDir() && filepath.Ext(path) == ext {
+			files = append(files, path)
+		}
+	}
+	return files, nil
+}
+
+func decodeOyafile(raw *Oyafile) (DecodedOyafile, error) {
+	decrypted, found, err := secrets.Decrypt(raw.Path)
+	if err != nil {
+		return nil, err
+	}
+	if found {
+		decodedSecrets, err := decodeYaml(decrypted)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error parsing secret file %q", raw.Path)
+		}
+		return decodedSecrets, nil
+	}
+
 	// YAML parser does not handle files without at least one node.
 	empty, err := isEmptyYAML(raw.Path)
 	if err != nil {
@@ -80,34 +139,11 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 	if empty {
 		return make(DecodedOyafile), nil
 	}
-	decodedOyafileI, err := decodeYaml(raw.file)
+	decodedOyafileI, err := decodeYaml(raw.oyafileContents)
 	if err != nil {
 		return nil, err
 	}
-	decodedOyafile := DecodedOyafile(decodedOyafileI)
-
-	secs, err := secrets.Decrypt(raw.Dir)
-	if err != nil {
-		if _, ok := err.(secrets.ErrNoSecretsFile); !ok {
-			log.Debug(fmt.Sprintf("Secrets could not be loaded at %v: %v", raw.Dir, err))
-		}
-	} else {
-		if len(secs) > 0 {
-			decodedSecrets, err := decodeYaml(secs)
-			if err != nil {
-				log.Warn(fmt.Sprintf("Secrets could not be parsed after loading from %v: %v", raw.Dir, err))
-			}
-			secrets, ok := template.ParseScope(decodedSecrets)
-			if !ok {
-				return nil, errors.Errorf("Internal: error parsing scope trying to merge secrets, unexpected type: %T", decodedSecrets)
-			}
-			if err := mergeSecrets(&decodedOyafile, secrets); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return decodedOyafile, nil
+	return DecodedOyafile(decodedOyafileI), nil
 }
 
 func decodeYaml(content []byte) (map[interface{}]interface{}, error) {
@@ -183,7 +219,7 @@ func fullPath(projectDir, name string) string {
 	return path.Join(projectDir, name)
 }
 
-func mergeSecrets(of *DecodedOyafile, secrets template.Scope) error {
+func mergeValues(of *DecodedOyafile, secrets template.Scope) error {
 	var values template.Scope
 	valuesI, ok := (*of)["Values"]
 	if ok {
