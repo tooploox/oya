@@ -23,7 +23,7 @@ func (p *Project) Require(pack pack.Pack) error {
 	if err != nil {
 		return err
 	}
-	p.InvalidateOyafileCache(p.RootDir)
+	p.invalidateOyafileCache(p.RootDir)
 
 	p.dependencies = nil // Force reload.
 	return nil

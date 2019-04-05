@@ -29,10 +29,6 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	if err != nil {
 		return err
 	}
-	values, err := p.Values()
-	if err != nil {
-		return err
-	}
 	tn := task.Name(taskName)
 
 	alias, _ := tn.Split()
@@ -43,7 +39,7 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
 	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
-		toScope(taskArgs).Merge(values), stdout, stderr)
+		toScope(taskArgs), stdout, stderr)
 }
 
 func toScope(taskArgs Args) template.Scope {
