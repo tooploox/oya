@@ -47,13 +47,13 @@ Scenario: It correctly merges values, processing *.oya alphabetically
       echo ${Oya[foo.baz]}
       echo ${Oya[foo.qux]}
     """
-  And file ./values1.oya containing
+  And file ./0_values.oya containing
     """
     foo:
       bar: banana
       qux: peach
     """
-  And file ./values2.oya containing
+  And file ./1_values.oya containing
     """
     foo:
       qux: coconut

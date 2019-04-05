@@ -30,10 +30,6 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	if err != nil {
 		return err
 	}
-	values, err := p.Values()
-	if err != nil {
-		return err
-	}
 	tn := task.Name(taskName)
 
 	// If OYA_SCOPE alias is present, prefix task with the alias.
@@ -62,7 +58,7 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	}
 
 	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
-		toScope(taskArgs).Merge(values), stdout, stderr)
+		toScope(taskArgs), stdout, stderr)
 }
 
 func toScope(taskArgs Args) template.Scope {
