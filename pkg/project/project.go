@@ -100,34 +100,22 @@ func (p *Project) RunTargets(workDir string, recurse, useChangeset bool) ([]*oya
 }
 
 func (p *Project) oneTargetIn(dir string) ([]*oyafile.Oyafile, error) {
-	o, err := p.oyafileIn(dir)
+	o, found, err := p.oyafileIn(dir)
 	if err != nil {
 		return nil, err
+	}
+	if !found {
+		return nil, ErrNoOyafile{Path: dir}
 	}
 	return []*oyafile.Oyafile{o}, nil
 }
 
-func (p *Project) oyafileIn(dir string) (*oyafile.Oyafile, error) {
-	o, found, err := oyafile.LoadFromDir(dir, p.RootDir)
-	if err != nil {
-		return nil, err
-	}
-	if !found {
-		return nil, ErrNoOyafile{Path: dir}
-	}
-	return o, nil
+func (p *Project) oyafileIn(dir string) (*oyafile.Oyafile, bool, error) {
+	return oyafile.LoadFromDir(dir, p.RootDir)
 }
 
-func (p *Project) rawOyafileIn(dir string) (*raw.Oyafile, error) {
-	o, found, err := raw.LoadFromDir(dir, p.RootDir)
-	if err != nil {
-		return nil, err
-	}
-	if !found {
-		return nil, ErrNoOyafile{Path: dir}
-	}
-
-	return o, nil
+func (p *Project) rawOyafileIn(dir string) (*raw.Oyafile, bool, error) {
+	return raw.LoadFromDir(dir, p.RootDir)
 }
 
 func (p *Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
@@ -135,16 +123,19 @@ func (p *Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
 }
 
 func (p *Project) Values() (template.Scope, error) {
-	oyafilePath := filepath.Join(p.RootDir, "Oyafile")
-	o, found, err := p.Oyafile(oyafilePath)
+	o, found, err := p.rawOyafileIn(p.RootDir)
 	if err != nil {
 		return template.Scope{}, err
 	}
 	if !found {
-		return template.Scope{}, ErrNoOyafile{Path: oyafilePath}
+		return template.Scope{}, ErrNoOyafile{Path: p.RootDir}
+	}
+	project, _, err := o.LookupKey("Project")
+	if err != nil {
+		return template.Scope{}, err
 	}
 	return template.Scope{
-		"Project": o.Project,
+		"Project": project,
 	}, nil
 }
 
