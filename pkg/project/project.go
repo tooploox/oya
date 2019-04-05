@@ -17,6 +17,9 @@ type Project struct {
 	RootDir      string
 	installDir   string
 	dependencies Deps
+
+	oyafileCache    map[string]*oyafile.Oyafile
+	rawOyafileCache map[string]*raw.Oyafile
 }
 
 func Detect(workDir, installDir string) (*Project, error) {
@@ -28,9 +31,11 @@ func Detect(workDir, installDir string) (*Project, error) {
 		return nil, ErrNoProject{Path: workDir}
 	}
 	return &Project{
-		RootDir:      detectedRootDir,
-		installDir:   installDir,
-		dependencies: nil, // lazily-loaded in Deps()
+		RootDir:         detectedRootDir,
+		installDir:      installDir,
+		dependencies:    nil, // lazily-loaded in Deps()
+		oyafileCache:    make(map[string]*oyafile.Oyafile),
+		rawOyafileCache: make(map[string]*raw.Oyafile),
 	}, nil
 }
 
@@ -111,14 +116,49 @@ func (p *Project) oneTargetIn(dir string) ([]*oyafile.Oyafile, error) {
 }
 
 func (p *Project) oyafileIn(dir string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.LoadFromDir(dir, p.RootDir)
+	normalizedDir := filepath.Clean(dir)
+	o, found := p.oyafileCache[normalizedDir]
+	if found {
+		return o, true, nil
+	}
+	o, found, err := oyafile.LoadFromDir(dir, p.RootDir)
+	if err != nil {
+		return nil, false, err
+	}
+	if found {
+		p.oyafileCache[normalizedDir] = o
+		return o, true, nil
+	}
+
+	return nil, false, nil
 }
 
 func (p *Project) rawOyafileIn(dir string) (*raw.Oyafile, bool, error) {
-	return raw.LoadFromDir(dir, p.RootDir)
+	// IMPORTANT: Call InvalidateOyafileCache after patching raw Oyafiles
+	// obtained using this method!
+	normalizedDir := filepath.Clean(dir)
+	o, found := p.rawOyafileCache[normalizedDir]
+	if found {
+		return o, true, nil
+	}
+	o, found, err := raw.LoadFromDir(dir, p.RootDir)
+	if err != nil {
+		return nil, false, err
+	}
+	if found {
+		p.rawOyafileCache[normalizedDir] = o
+		return o, true, nil
+	}
+	return nil, false, nil
+}
+
+func (p *Project) InvalidateOyafileCache(dir string) {
+	delete(p.oyafileCache, dir)
+	delete(p.rawOyafileCache, dir)
 }
 
 func (p *Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
+	// BUG(bilus): Uncached (but used only by Render).
 	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
