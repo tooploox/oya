@@ -130,7 +130,7 @@ func (p *Project) Values() (template.Scope, error) {
 	if !found {
 		return template.Scope{}, ErrNoOyafile{Path: p.RootDir}
 	}
-	project, _, err := o.LookupKey("Project")
+	project, _, err := o.Project()
 	if err != nil {
 		return template.Scope{}, err
 	}

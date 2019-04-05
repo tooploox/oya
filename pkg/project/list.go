@@ -76,7 +76,7 @@ func (p *Project) makeSkipFunc(startDir string) func(path string) (bool, error) 
 		}
 
 		// BUG(bilus): Clean up this magic string & logic duplication everywhere.
-		_, isProject, err := raw.LookupKey("Project")
+		_, isProject, err := raw.Project()
 		if err != nil {
 			return false, err
 		}

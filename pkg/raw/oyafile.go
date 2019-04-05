@@ -157,17 +157,17 @@ func decodeYaml(content []byte) (map[interface{}]interface{}, error) {
 	return of, nil
 }
 
-func (raw *Oyafile) LookupKey(key string) (interface{}, bool, error) {
-	of, err := raw.Decode()
+func (raw *Oyafile) Project() (interface{}, bool, error) {
+	of, err := decodeOyafile(raw)
 	if err != nil {
 		return nil, false, err
 	}
-	val, ok := of[key]
+	val, ok := of["Project"]
 	return val, ok, nil
 }
 
 func (raw *Oyafile) IsRoot() (bool, error) {
-	_, hasProject, err := raw.LookupKey("Project")
+	_, hasProject, err := raw.Project()
 	if err != nil {
 		return false, err
 	}
