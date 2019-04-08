@@ -35,3 +35,20 @@ Scenario: Pass flags and positional arguments to a task
   --other-switch = true
 
   """
+
+Scenario: Have args survive 'set' command (regression)
+  Given file ./Oyafile containing
+    """
+    Project: project
+    task: |
+      set -e
+      echo $1
+
+    """
+  When I run "oya run task arg"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  arg
+
+  """
