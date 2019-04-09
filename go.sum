@@ -306,3 +306,5 @@ k8s.io/helm v2.12.3+incompatible h1:wo1cdYjOnr5Z+LFuhtwIJaeQnec6D4gcg2H5UAKzY6w=
 k8s.io/helm v2.12.3+incompatible/go.mod h1:LZzlS4LQBHfciFOurYBFkCMTaZ0D1l+p0teMg7TSULI=
 mvdan.cc/sh v2.6.4+incompatible h1:eD6tDeh0pw+/TOTI1BBEryZ02rD2nMcFsgcvde7jffM=
 mvdan.cc/sh v2.6.4+incompatible/go.mod h1:IeeQbZq+x2SUGBensq/jge5lLQbS3XT2ktyp3wrt4x8=
+mvdan.cc/sh v2.6.5-0.20190408145316-ee3cf905f3a4+incompatible h1:B+CyU85Q5hl1Ake0Jf9VJWqRW2EzCyzTcFMaSdfkZGw=
+mvdan.cc/sh v2.6.5-0.20190408145316-ee3cf905f3a4+incompatible/go.mod h1:IeeQbZq+x2SUGBensq/jge5lLQbS3XT2ktyp3wrt4x8=
