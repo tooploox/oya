@@ -8,7 +8,7 @@ Scenario: Get a specific pack version
     """
     Project: project
     """
-  When I run "oya get github.com/tooploox/oya-fixtures@v1.0.0"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures@v1.0.0"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
@@ -29,7 +29,7 @@ Scenario: Get the latest pack version
     """
     Project: project
     """
-  When I run "oya get github.com/tooploox/oya-fixtures"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.1.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.1.0/VERSION contains
@@ -50,7 +50,7 @@ Scenario: Get pack from a multi-pack repo
     """
     Project: project
     """
-  When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
@@ -71,7 +71,7 @@ Scenario: Fetch only the package, not the entire repo
     """
     Project: project
     """
-  When I run "oya get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
+  When I run "oya Oya.get github.com/tooploox/oya-fixtures/pack1@v1.1.1"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/Oyafile does not exist
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack2@v1.1.0/VERSION does not exist
@@ -84,7 +84,7 @@ Scenario: Require pack
       github.com/tooploox/oya-fixtures: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures@v1.0.0/VERSION contains
@@ -101,7 +101,7 @@ Scenario: Require pack from multi-pack repo
       github.com/tooploox/oya-fixtures/pack1: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
@@ -119,7 +119,7 @@ Scenario: Require two packs from multi-pack repo
       github.com/tooploox/oya-fixtures/pack2: v1.1.2
     foo: echo "bar"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
@@ -143,8 +143,8 @@ Scenario: Get command does not upgrade pack by default
       github.com/tooploox/oya-fixtures/pack2: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
-  And I run "oya get github.com/tooploox/oya-fixtures/pack1"
+  When I run "oya foo"
+  And I run "oya Oya.get github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
@@ -170,8 +170,8 @@ Scenario: Upgrade single pack using get command
       github.com/tooploox/oya-fixtures/pack2: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
-  And I run "oya get -u github.com/tooploox/oya-fixtures/pack1"
+  When I run "oya foo"
+  And I run "oya Oya.get -u github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
@@ -204,7 +204,7 @@ Scenario: Upgrade pack by editing the Require section
       github.com/tooploox/oya-fixtures/pack2: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   And I modify file ./Oyafile to contain
     """
     Project: project
@@ -213,7 +213,7 @@ Scenario: Upgrade pack by editing the Require section
       github.com/tooploox/oya-fixtures/pack2: v1.0.0
     foo: echo "bar"
     """
-  And I run "oya run foo"
+  And I run "oya foo"
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
     """
@@ -234,7 +234,7 @@ Scenario: Generate requires from imports
     Import:
       pack2: github.com/tooploox/oya-fixtures/pack2
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.1.1/VERSION contains
@@ -275,7 +275,7 @@ Scenario: Preserve versions when generating requires from imports
     Import:
       pack2: github.com/tooploox/oya-fixtures/pack2
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/Oyafile exists
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack1@v1.0.0/VERSION contains
@@ -309,7 +309,7 @@ Scenario: Indirect requirements are downloaded
       github.com/tooploox/oya-fixtures/pack3: v1.0.0
     foo: echo "bar"
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./.oya/packs/github.com/tooploox/oya-fixtures/pack3@v1.0.0/Oyafile contains
     """
@@ -340,7 +340,7 @@ Scenario: Indirectly required higher version
     Import:
       pack1: github.com/tooploox/oya-fixtures/pack1
     """
-  When I run "oya run pack1.version"
+  When I run "oya pack1.version"
   Then the command succeeds
   And the command outputs to stdout
     """

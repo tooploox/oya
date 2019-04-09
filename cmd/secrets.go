@@ -8,7 +8,7 @@ import (
 )
 
 var secretsCmd = &cobra.Command{
-	Use:   "secrets",
+	Use:   "Oya.secrets",
 	Short: "Manage secrets in Oyafile.secrets",
 }
 

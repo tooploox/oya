@@ -23,7 +23,7 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get URI",
+	Use:   "Oya.get URI",
 	Short: "Get Oya pack from external repo",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

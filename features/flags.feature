@@ -19,7 +19,7 @@ Scenario: Pass flags and positional arguments to a task
       echo --value = ${Oya[Flags.value]}
       echo --other-switch = ${Oya[Flags.otherSwitch]}
     """
-  When I run "oya run task --switch positional1 --value=5 positional2 --other-switch"
+  When I run "oya task --switch positional1 --value=5 positional2 --other-switch"
   Then the command succeeds
   And the command outputs to stdout
   """

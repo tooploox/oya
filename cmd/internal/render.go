@@ -20,7 +20,7 @@ func (err ErrNoScope) Error() string {
 
 func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath string,
 	autoScope bool, scopePath string, stdout, stderr io.Writer) error {
-	installDir, err := installDir()
+	installDir, err := project.InstallDir()
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath
 	var values template.Scope
 	if found {
 		if autoScope && scopePath == "" {
-			scopePath, _ = lookupOyaScope()
+			scopePath, _ = project.LookupOyaScope()
 		}
 		if scopePath != "" {
 			values, err = o.Values.GetScopeAt(scopePath)

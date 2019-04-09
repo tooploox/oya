@@ -8,7 +8,7 @@ Scenario: Import a pack
     """
     Project: project
     """
-  When I run "oya import github.com/bilus/oya"
+  When I run "oya Oya.import github.com/bilus/oya"
   Then the command succeeds
   And file ./Oyafile contains
     """
@@ -22,17 +22,23 @@ Scenario: Import a pack to other already imported
   Given file ./Oyafile containing
     """
     Project: project
+    Require:
+      github.com/tooploox/oya/other: v0.0.2
+
     Import:
       other: github.com/tooploox/oya/other
 
     task: |
       echo "check"
     """
-  When I run "oya import github.com/tooploox/oya/next"
+  When I run "oya Oya.import github.com/tooploox/oya/next"
   Then the command succeeds
   And file ./Oyafile contains
     """
     Project: project
+    Require:
+      github.com/tooploox/oya/other: v0.0.2
+
     Import:
       next: github.com/tooploox/oya/next
       other: github.com/tooploox/oya/other
@@ -51,7 +57,7 @@ Scenario: Import a pack to empty Oyafile
     """
     """
   When I'm in the ./subdir dir
-  And I run "oya import github.com/tooploox/oya/next"
+  And I run "oya Oya.import github.com/tooploox/oya/next"
   Then the command succeeds
   And file ./subdir/Oyafile contains
     """
@@ -68,7 +74,7 @@ Scenario: Import a pack to Oyafile with other things
     task: |
       echo "check"
     """
-  When I run "oya import github.com/bilus/oya"
+  When I run "oya Oya.import github.com/bilus/oya"
   Then the command succeeds
   And file ./Oyafile contains
     """
@@ -91,7 +97,7 @@ Scenario: Import a pack which is already imported
     task: |
       echo "check"
     """
-  When I run "oya import github.com/bilus/oya"
+  When I run "oya Oya.import github.com/bilus/oya"
   Then the command fails with error matching
   """
   .*Pack already imported: github.com/bilus/oya.*

@@ -13,7 +13,7 @@ Scenario: Access Oyafile base directory
     all: |
       echo ${Oya[BasePath]}
     """
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -37,7 +37,7 @@ Scenario: Access pack base directory
     all: |
       echo ${Oya[BasePath]}
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -53,7 +53,7 @@ Scenario: Access Oyafile Project name
     all: |
       echo ${Oya[Project]}
     """
-  When I run "oya run all"
+  When I run "oya all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -71,7 +71,7 @@ Scenario: Access Oyafile Project name in nested dir
     all: |
       echo ${Oya[Project]}
     """
-  When I run "oya run --recurse all"
+  When I run "oya --recurse all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -95,7 +95,7 @@ Scenario: Access Oyafile Project name inside pack
     all: |
       echo ${Oya[Project]}
     """
-  When I run "oya run foo.all"
+  When I run "oya foo.all"
   Then the command succeeds
   And the command outputs to stdout text matching
   """
@@ -115,13 +115,13 @@ Scenario: Use plush helpers when rendering
        - 3
 
     foo: |
-      oya render template.txt
+      oya Oya.render template.txt
     """
   And file ./template.txt containing
     """
     <%= Len("box") %>
     """
-  When I run "oya run foo"
+  When I run "oya foo"
   Then the command succeeds
   And file ./template.txt contains
     """
@@ -140,13 +140,13 @@ Scenario: Use sprig functions when rendering (http://masterminds.github.io/sprig
        - 3
 
     foo: |
-      oya render template.txt
+      oya Oya.render template.txt
     """
   And file ./template.txt containing
     """
     <%= Upper(Join(", ", arr)) %>
     """
-  When I run "oya run foo bar baz qux"
+  When I run "oya foo bar baz qux"
   Then the command succeeds
   And file ./template.txt contains
     """

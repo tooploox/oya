@@ -17,85 +17,147 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
+	"regexp"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/tooploox/oya/cmd/internal"
 	"github.com/tooploox/oya/pkg/flags"
+	"github.com/tooploox/oya/pkg/project"
+	"github.com/tooploox/oya/pkg/task"
 )
 
-type ErrMissingTaskName struct{}
+func execTask(cmd *cobra.Command, args []string) error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	taskName := cmd.Use
+	cobraFlags, taskArgs, err := parseArgs(args)
+	if err != nil {
+		return err
+	}
+	// BUG(bilus): Yack. This is what has to be done to support arbitrary flags passed to tasks.
+	cmd.DisableFlagParsing = false
+	defer func() { cmd.DisableFlagParsing = true }()
+	if err := cmd.ParseFlags(cobraFlags); err != nil {
+		return err
+	}
 
-func (e ErrMissingTaskName) Error() string {
-	return fmt.Sprintf("missing TASK name")
+	recurse, err := cmd.Flags().GetBool("recurse")
+	if err != nil {
+		return err
+	}
+	changeset, err := cmd.Flags().GetBool("changeset")
+	if err != nil {
+		return err
+	}
+
+	return internal.Run(cwd, taskName, taskArgs, recurse, changeset, cmd.OutOrStdout(), cmd.OutOrStderr())
 }
 
-// runCmd represents the run command
-var runCmd = &cobra.Command{
-	Use:                "run TASK",
-	Short:              "Runs an Oya task",
-	Args:               cobra.ArbitraryArgs,
-	SilenceUsage:       true,
-	DisableFlagParsing: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		cobraFlags, taskName, taskArgs, err := parseArgs(args)
-		if err != nil {
-			return err
-		}
-		// BUG(bilus): Yack. This is what has to be done to support arbitrary flags passed to tasks.
-		cmd.DisableFlagParsing = false
-		defer func() { cmd.DisableFlagParsing = true }()
-		if err := cmd.ParseFlags(cobraFlags); err != nil {
-			return err
-		}
-		recurse, err := cmd.Flags().GetBool("recurse")
-		if err != nil {
-			return err
-		}
-		changeset, err := cmd.Flags().GetBool("changeset")
-		if err != nil {
-			return err
-		}
-		return internal.Run(cwd, taskName, taskArgs, recurse, changeset, cmd.OutOrStdout(), cmd.OutOrStderr())
-	},
+func createCmd(name task.Name, desc string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                string(name),
+		Short:              desc,
+		Args:               cobra.ArbitraryArgs,
+		SilenceUsage:       true,
+		DisableFlagParsing: true,
+		RunE:               execTask,
+	}
+	return cmd
 }
 
 func init() {
-	rootCmd.AddCommand(runCmd)
-	runCmd.Flags().BoolP("recurse", "r", false, "Recursively process Oyafiles")
-	runCmd.Flags().BoolP("changeset", "c", false, "Use the Changeset: directives")
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
+	recurse := flagRecurse()
+	err = addTasksCommands(cwd, recurse)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
-func parseArgs(args []string) ([]string, string, internal.Args, error) {
-	cobraFlags, rest := detectFlags(args)
-	if len(rest) == 0 {
-		return nil, "", internal.Args{}, ErrMissingTaskName{}
+func addTasksCommands(workDir string, recurse bool) error {
+	installDir, err := project.InstallDir()
+	if err != nil {
+		return err
 	}
-	taskName := rest[0]
-	allTaskArgs := rest[1:]
-	posArgs, flags, err := flags.Parse(allTaskArgs)
+	p, err := project.Detect(workDir, installDir)
+	if err != nil {
+		return err
+	}
+	err = p.InstallPacks()
+	if err != nil {
+		return err
+	}
+	oyafiles, err := p.RunTargets(workDir, recurse, false)
+	if err != nil {
+		return err
+	}
+	dependencies, err := p.Deps()
+	if err != nil {
+		return err
+	}
+
+	for _, o := range oyafiles {
+		err = o.Build(dependencies)
+		if err != nil {
+			return errors.Wrapf(err, "error in %v", o.Path)
+		}
+		err = o.Tasks.ForEach(func(taskName task.Name, task task.Task, meta task.Meta) error {
+			if !taskName.IsBuiltIn() {
+				rootCmd.AddCommand(createCmd(taskName, meta.Doc))
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func parseArgs(args []string) ([]string, internal.Args, error) {
+	cobraFlags, rest := detectFlags(args)
+	posArgs, flags, err := flags.Parse(rest)
 	taskArgs := internal.Args{
-		All:        rest[1:],
+		All:        rest,
 		Positional: posArgs,
 		Flags:      flags,
 	}
-	return cobraFlags, taskName, taskArgs, err
+	return cobraFlags, taskArgs, err
 }
 
-// detectFlags processed args consisting of flags followed by positional arguments, splitting them.
-// For example this: ["--foo", "-b", "xxx", "--foo"] becomes: ["--foo", "-b"], ["xxx", "--foo"].
 func detectFlags(args []string) ([]string, []string) {
-	flags := make([]string, 0, len(args))
-	for i, arg := range args {
-		if strings.HasPrefix(arg, "-") {
-			flags = append(flags, arg)
-		} else {
-			return flags, args[i:]
+	var cobraFlags []string
+	taskFlags := args
+	rootCmd.PersistentFlags().VisitAll(func(flag *pflag.Flag) {
+		flagShortName := fmt.Sprintf("-%v", flag.Shorthand)
+		flagFullName := fmt.Sprintf("--%v", flag.Name)
+		for i, arg := range taskFlags {
+			if arg == flagShortName || arg == flagFullName {
+				cobraFlags = append(cobraFlags, arg)
+				taskFlags = append(taskFlags[:i], taskFlags[i+1:]...)
+			}
+		}
+	})
+	return cobraFlags, taskFlags
+}
+
+func flagRecurse() bool {
+	re := regexp.MustCompile(`^-r$|^--recurse$`)
+	return foundInArgs(re)
+}
+
+func foundInArgs(re *regexp.Regexp) bool {
+	for _, arg := range os.Args {
+		if re.MatchString(arg) {
+			return true
 		}
 	}
-	return flags, nil
+	return false
 }

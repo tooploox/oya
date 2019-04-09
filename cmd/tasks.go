@@ -29,7 +29,7 @@ import (
 
 // tasksCmd represents the init command
 var tasksCmd = &cobra.Command{
-	Use:   "tasks",
+	Use:   "Oya.tasks",
 	Short: "List available tasks",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()

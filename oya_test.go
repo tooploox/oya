@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -14,13 +15,12 @@ import (
 	"github.com/DATA-DOG/godog/gherkin"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/tooploox/oya/cmd"
-	"github.com/tooploox/oya/pkg/task"
 )
 
 const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
 
 type SuiteContext struct {
+	binDir     string
 	projectDir string
 
 	lastCommandErr error
@@ -33,10 +33,7 @@ func (c *SuiteContext) MustSetUp() {
 	if err != nil {
 		panic(err)
 	}
-
-	overrideOyaCmd(projectDir)
 	setEnv(projectDir)
-
 	log.SetLevel(log.DebugLevel)
 	c.projectDir = projectDir
 	c.stdout = bytes.NewBuffer(nil)
@@ -59,17 +56,6 @@ func setEnv(projectDir string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// overrideOyaCmd overrides `oya` command used by $Tasks in templates
-// to run oya tasks.
-// It builds oya to a temporary directory and use it to launch Oya in scripts.
-func overrideOyaCmd(projectDir string) {
-	executablePath := filepath.Join(projectDir, "_bin/oya")
-	oyaCmdOverride := fmt.Sprintf(
-		"function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
-		sourceFileDirectory(), executablePath, executablePath)
-	task.OyaCmdOverride = &oyaCmdOverride
 }
 
 func (c *SuiteContext) writeFile(path, contents string) error {
@@ -156,15 +142,27 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 func (c *SuiteContext) execute(command string) error {
 	c.stdout.Reset()
 	c.stderr.Reset()
-	cmd.ResetFlags()
+	c.lastCommandErr = nil
 
 	oldArgs := os.Args
 	os.Args = strings.Fields(command)
 	defer func() {
 		os.Args = oldArgs
 	}()
-	cmd.SetOutput(c.stdout)
-	c.lastCommandErr = cmd.ExecuteE()
+
+	cmdFlds := strings.Fields(command)
+	oyaBin := fmt.Sprintf("%v/%v", c.binDir, cmdFlds[0])
+	path := fmt.Sprintf("PATH=%v:%v", c.binDir, os.Getenv("PATH"))
+
+	cmd := exec.Command(oyaBin, cmdFlds[1:]...)
+	cmd.Env = append(os.Environ(), path)
+	cmd.Stdout = c.stdout
+	cmd.Stderr = c.stderr
+
+	err := cmd.Run()
+	if err != nil {
+		c.lastCommandErr = errors.New(c.stderr.String())
+	}
 	return nil
 }
 
@@ -236,8 +234,23 @@ func (c *SuiteContext) theCommandOutputsTextMatching(target string, expected *gh
 	return nil
 }
 
+func (c *SuiteContext) CompileOya() {
+	binDir, err := ioutil.TempDir("", "oya-bin")
+	if err != nil {
+		panic(err)
+	}
+	binPath := filepath.Join(binDir, "oya")
+	cmd := exec.Command("go", "build", "-o", binPath, "oya.go")
+	err = cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+	c.binDir = binDir
+}
+
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
+	c.CompileOya()
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
@@ -256,6 +269,7 @@ func FeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
+	// TODO after all remove c.binDir
 }
 
 // sourceFileDirectory returns the current .go source file directory.
