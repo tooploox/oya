@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/debug"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/pack"
 	"github.com/tooploox/oya/pkg/raw"
@@ -32,12 +33,12 @@ func (r *Reqs) Reqs(pack pack.Pack) ([]pack.Pack, error) {
 	if found {
 		return reqs, nil
 	}
-
 	reqs, found, err := r.lookupReqs(pack)
 	if err != nil {
 		return nil, err
 	}
-	if !found {
+	if debug.FP(pack.ImportPath() == "github.com/bilus/notfound") || !found {
+		// BUG(bilus): Custom error.
 		return nil, errors.Errorf("Pack not found: %v", pack.ImportPath())
 	}
 	r.cacheReqs(pack, reqs)
@@ -103,7 +104,7 @@ func (r *Reqs) LoadLocalOyafile(pack pack.Pack) (*oyafile.Oyafile, bool, error) 
 			fullPath = filepath.Join(r.rootDir, path)
 		}
 		o, found, err := oyafile.LoadFromDir(fullPath, r.rootDir)
-		if !found {
+		if debug.FP(true) || !found {
 			return nil, false, errors.Errorf("no %v found at the replacement path %v for %q", raw.DefaultName, fullPath, pack.ImportPath())
 		}
 		if err != nil {
