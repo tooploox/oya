@@ -4,8 +4,7 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/go-distributed/gog/log"
-	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/raw"
 	"github.com/tooploox/oya/pkg/task"
@@ -59,13 +58,14 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 
 	foundAtLeastOneTask := false
 	for _, o := range targets {
+		// TODO: Better errors
 		err = o.Build(dependencies)
 		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
+			return err
 		}
 		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
 		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
+			return err
 		}
 		if found {
 			foundAtLeastOneTask = found
@@ -105,38 +105,14 @@ func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oy
 }
 
 func (p *Project) oneTargetIn(dir string) ([]*oyafile.Oyafile, error) {
-	o, err := p.oyafileIn(dir)
+	o, ok, err := p.oyafileIn(dir)
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, ErrNoOyafile{Path: dir}
 	}
 	return []*oyafile.Oyafile{o}, nil
-}
-
-func (p *Project) oyafileIn(dir string) (*oyafile.Oyafile, error) {
-	o, found, err := oyafile.LoadFromDir(dir, p.RootDir)
-	if err != nil {
-		return nil, err
-	}
-	if !found {
-		return nil, ErrNoOyafile{Path: dir}
-	}
-	return o, nil
-}
-
-func (p *Project) rawOyafileIn(dir string) (*raw.Oyafile, error) {
-	o, found, err := raw.LoadFromDir(dir, p.RootDir)
-	if err != nil {
-		return nil, err
-	}
-	if !found {
-		return nil, ErrNoOyafile{Path: dir}
-	}
-
-	return o, nil
-}
-
-func (p *Project) Oyafile(oyafilePath string) (*oyafile.Oyafile, bool, error) {
-	return oyafile.Load(oyafilePath, p.RootDir)
 }
 
 func (p *Project) Values() (template.Scope, error) {

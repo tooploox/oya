@@ -96,7 +96,16 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 		return false, nil
 	}
 
-	return true, task.Exec(oyafile.Dir, args, scope, stdout, stderr)
+	err := task.Exec(oyafile.Dir, args, scope, stdout, stderr)
+	if err != nil {
+		return true, ErrTaskFail{
+			Cause:       err,
+			OyafilePath: oyafile.Path,
+			TaskName:    taskName,
+			Args:        args,
+		}
+	}
+	return true, nil
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

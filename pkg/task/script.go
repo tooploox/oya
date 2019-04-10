@@ -11,6 +11,17 @@ import (
 	"mvdan.cc/sh/syntax"
 )
 
+type ErrScriptFail struct {
+	Script       string
+	ExitCode     int
+	Message      string
+	Line, Column uint
+}
+
+func (e ErrScriptFail) Error() string {
+	return e.Message
+}
+
 // OyaCmdOverride is used in tests, to override the path to the current oya executable.
 // It is used to invoke other tasks from a task body.
 // When tests are run, the current process executable path points to the test runner
@@ -26,24 +37,34 @@ type Script struct {
 func (s Script) Exec(workDir string, args []string, values template.Scope, stdout, stderr io.Writer) error {
 	scope := values.Merge(*s.Scope)
 	defines := defines(scope)
-	script := strings.Join(defines, "; ") + ";\n" + s.Script
+	head := strings.Join(defines, "; ") + ";"
 	if OyaCmdOverride != nil {
-		script = *OyaCmdOverride + "; " + script
+		head = *OyaCmdOverride + "; " + head
 	}
-
+	headLines := uint(strings.Count(head, "\n") + 1)
+	script := head + "\n" + s.Script
 	file, err := syntax.NewParser().Parse(strings.NewReader(script), "")
 	if err != nil {
-		return err
+		switch err := err.(type) {
+		case syntax.ParseError:
+			return s.errScriptFail(err.Pos, headLines, err, -1)
+		default:
+			return err
+		}
 	}
-	r, _ := interp.New(interp.StdIO(nil, stdout, stderr),
+	r, err := interp.New(interp.StdIO(nil, stdout, stderr),
 		interp.Module(interp.DefaultExec),
 		interp.Dir(workDir),
 		interp.Env(nil),
 		interp.Params(toParams(args)...))
+	if err != nil {
+		return err
+	}
+
 	ctx := context.Background()
 	for _, stmt := range file.Stmts {
 		err := r.Run(ctx, stmt)
-		switch err.(type) {
+		switch err := err.(type) {
 		case nil:
 			// Continue with next statement in script.
 		case interp.ExitStatus:
@@ -54,17 +75,26 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		case interp.ShellExitStatus:
 			// Shell interpreter exited.
 			// Either early return (due to "exit" or "set -e"), or task is finished.
-			errCode := err.(interp.ShellExitStatus)
+			errCode := int(err)
 			if errCode != 0 {
-				return fmt.Errorf("task exited with code %d", errCode)
+				return s.errScriptFail(stmt.Pos(), headLines, err, errCode)
 			}
 			return nil
 		default:
-			// BUG(bilus): Add line error.
-			return err // set -e
+			return s.errScriptFail(stmt.Pos(), headLines, err, -1)
 		}
 	}
 	return nil
+}
+
+func (s Script) errScriptFail(pos syntax.Pos, headLines uint, err error, exitCode int) error {
+	return ErrScriptFail{
+		Script:   s.Script,
+		ExitCode: exitCode,
+		Message:  err.Error(),
+		Line:     pos.Line() - headLines,
+		Column:   pos.Col(),
+	}
 }
 
 func defines(scope template.Scope) []string {
