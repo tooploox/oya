@@ -12,10 +12,14 @@ import (
 	"github.com/tooploox/oya/pkg/task"
 )
 
+var HEADER_FMT = "--- %v ---------------------- %v\n"
+
 func HandleError(err error) {
 	switch err := err.(type) {
 	case oyafile.ErrTaskFail:
 		handleTaskFail(err)
+	case ErrRenderFail:
+		handleRenderFail(err)
 	default:
 		logrus.Println(err)
 		os.Stderr.WriteString("Error: ")
@@ -23,6 +27,11 @@ func HandleError(err error) {
 		os.Stderr.WriteString("\n")
 		os.Exit(1)
 	}
+}
+
+func formatHeader(out *bytes.Buffer, title, path string) {
+	// BUG(bilus): Auto-size to keep the same width
+	fmt.Fprintf(out, HEADER_FMT, title, path)
 }
 
 func handleTaskFail(err oyafile.ErrTaskFail) {
@@ -42,7 +51,7 @@ func handleTaskFail(err oyafile.ErrTaskFail) {
 }
 
 func formatTaskFail(out *bytes.Buffer, err oyafile.ErrTaskFail) {
-	fmt.Fprintf(out, "--- RUN ERROR ---------------------- %v\n", err.OyafilePath)
+	formatHeader(out, "RUN ERROR", err.OyafilePath)
 	var showArgs string
 	if len(err.Args) > 0 {
 		showArgs = fmt.Sprintf(" invoked with arguments %q", strings.Join(err.Args, " "))
@@ -75,4 +84,20 @@ func formatScriptFail(out *bytes.Buffer, err task.ErrScriptFail) {
 
 func colMarker(col uint) string {
 	return strings.Repeat(" ", int(col)-1) + "^"
+}
+
+func handleRenderFail(err ErrRenderFail) {
+	out := bytes.Buffer{}
+	formatRenderFail(&out, err)
+	os.Stderr.Write(out.Bytes())
+	os.Exit(1)
+}
+
+func formatRenderFail(out *bytes.Buffer, err ErrRenderFail) {
+	formatHeader(out, "RENDER ERROR", err.TemplatePath)
+	fmt.Fprint(out, "Error rendering template\n")
+	out.WriteString("\n")
+	out.WriteString("  ")
+	out.WriteString(err.Cause.Error())
+	out.WriteString("\n\n")
 }
