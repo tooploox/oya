@@ -42,7 +42,7 @@ func (t plushTemplate) RenderString(scope Scope) (string, error) {
 	for k, v := range scope {
 		ks, ok := k.(string)
 		if !ok {
-			return "", errors.Errorf("Expected all scope keys to be strings, unexpected: %v", k)
+			return "", errors.Errorf("Internal error: Expected all scope keys to be strings, unexpected: %v", k)
 		}
 		context.Set(ks, v)
 	}
