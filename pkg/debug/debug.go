@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	logrus "github.com/sirupsen/logrus"
-	"github.com/tooploox/oya/pkg/oyafile"
 )
 
 func FP(cond bool) bool {
@@ -33,15 +32,6 @@ func FP(cond bool) bool {
 		debug.PrintStack()
 	}
 	return failure
-}
-
-func LogOyafiles(msg string, oyafiles []*oyafile.Oyafile) {
-	if logrus.GetLevel() == logrus.DebugLevel {
-		logrus.Debug(msg)
-		for _, o := range oyafiles {
-			logrus.Debugf("  %v", o.Dir)
-		}
-	}
 }
 
 type FailurePoint struct {
