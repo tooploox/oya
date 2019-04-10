@@ -103,9 +103,20 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 			OyafilePath: oyafile.Path,
 			TaskName:    taskName,
 			Args:        args,
+			ImportPath:  oyafile.detectImportPath(taskName),
 		}
 	}
 	return true, nil
+}
+
+func (oyafile Oyafile) detectImportPath(taskName task.Name) *types.ImportPath {
+	alias, _ := taskName.Split()
+	importPath, ok := oyafile.Imports[alias]
+	if ok {
+		return &importPath
+	} else {
+		return nil
+	}
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

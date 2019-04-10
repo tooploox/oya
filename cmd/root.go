@@ -113,12 +113,15 @@ func handleError(err error) {
 }
 
 func handleTaskFail(err oyafile.ErrTaskFail) {
-	fmt.Fprintf(os.Stderr, "--- ERROR ---------------------- %v\n", err.OyafilePath)
+	fmt.Fprintf(os.Stderr, "--- RUN ERROR ---------------------- %v\n", err.OyafilePath)
 	var showArgs string
 	if len(err.Args) > 0 {
 		showArgs = fmt.Sprintf(" invoked with arguments %q", strings.Join(err.Args, " "))
 	}
 	fmt.Fprintf(os.Stderr, "Error in task %q%v: %v\n", string(err.TaskName), showArgs, err.Cause.Error())
+	if err.ImportPath != nil {
+		fmt.Fprintf(os.Stderr, "  (task imported from %v)\n", *err.ImportPath)
+	}
 	switch cause := err.Cause.(type) {
 	case task.ErrScriptFail:
 		fmt.Fprintf(os.Stderr, "\n%s\n\n", pinpointScriptFail(cause))

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type ErrTaskFail struct {
@@ -11,6 +12,7 @@ type ErrTaskFail struct {
 	OyafilePath string
 	TaskName    task.Name
 	Args        []string
+	ImportPath  *types.ImportPath
 }
 
 func (e ErrTaskFail) Error() string {
