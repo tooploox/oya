@@ -23,17 +23,13 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"math"
 	"os"
-	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/tooploox/oya/pkg/oyafile"
-	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/cmd/internal"
 )
 
 var cfgFile string
@@ -58,7 +54,7 @@ to quickly create a Cobra application.`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		handleError(err)
+		internal.HandleError(err)
 	}
 }
 
@@ -97,64 +93,6 @@ func resetFlagsRecurse(cmd *cobra.Command) {
 	for _, child := range cmd.Commands() {
 		resetFlagsRecurse(child)
 	}
-}
-
-func handleError(err error) {
-	switch err := err.(type) {
-	case oyafile.ErrTaskFail:
-		handleTaskFail(err)
-	default:
-		logrus.Println(err)
-		os.Stderr.WriteString("Error: ")
-		os.Stderr.WriteString(err.Error())
-		os.Stderr.WriteString("\n")
-		os.Exit(1)
-	}
-}
-
-func handleTaskFail(err oyafile.ErrTaskFail) {
-	fmt.Fprintf(os.Stderr, "--- RUN ERROR ---------------------- %v\n", err.OyafilePath)
-	var showArgs string
-	if len(err.Args) > 0 {
-		showArgs = fmt.Sprintf(" invoked with arguments %q", strings.Join(err.Args, " "))
-	}
-	fmt.Fprintf(os.Stderr, "Error in task %q%v: %v\n", string(err.TaskName), showArgs, err.Cause.Error())
-	if err.ImportPath != nil {
-		fmt.Fprintf(os.Stderr, "  (task imported from %v)\n", *err.ImportPath)
-	}
-	switch cause := err.Cause.(type) {
-	case task.ErrScriptFail:
-		fmt.Fprintf(os.Stderr, "\n%s\n\n", pinpointScriptFail(cause))
-		os.Exit(cause.ExitCode)
-	default:
-		os.Exit(1)
-	}
-}
-
-func pinpointScriptFail(err task.ErrScriptFail) string {
-	output := make([]string, 0, 3)
-	lines := strings.Split(err.Script, "\n")
-	var start uint = 1
-	if err.Line > 1 {
-		start = err.Line - 1
-	}
-	digits := int(math.Log10(float64(err.Line)) + 1)
-	lineFmt := fmt.Sprintf("%%v %%%vv %%v", digits)
-	for i := start; i <= err.Line; i++ {
-		var marker string
-		if i == err.Line {
-			marker = ">"
-		} else {
-			marker = " "
-		}
-		output = append(output, fmt.Sprintf(lineFmt, marker, i, lines[i-1]))
-	}
-	output = append(output, fmt.Sprintf(lineFmt, " ", " ", colMarker(err.Column)))
-	return strings.Join(output, "\n")
-}
-
-func colMarker(col uint) string {
-	return strings.Repeat(" ", int(col)-1) + "^"
 }
 
 func init() {
