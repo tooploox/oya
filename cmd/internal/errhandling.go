@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/deptree"
+	"github.com/tooploox/oya/pkg/mvs"
 	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/raw"
 	"github.com/tooploox/oya/pkg/task"
 )
 
@@ -20,12 +23,10 @@ func HandleError(err error) {
 		handleTaskFail(err)
 	case ErrRenderFail:
 		handleRenderFail(err)
+	case deptree.ErrExplodingDeps:
+		handleErrExplodingDeps(err)
 	default:
-		logrus.Println(err)
-		os.Stderr.WriteString("Error: ")
-		os.Stderr.WriteString(err.Error())
-		os.Stderr.WriteString("\n")
-		os.Exit(1)
+		handleUnknownErr(err)
 	}
 }
 
@@ -40,6 +41,8 @@ func handleTaskFail(err oyafile.ErrTaskFail) {
 	switch cause := err.Cause.(type) {
 	case task.ErrScriptFail:
 		out.WriteString("\n")
+		out.WriteString("Cause: \n")
+		out.WriteString("\n")
 		formatScriptFail(&out, cause)
 		out.WriteString("\n")
 		os.Stderr.Write(out.Bytes())
@@ -51,7 +54,7 @@ func handleTaskFail(err oyafile.ErrTaskFail) {
 }
 
 func formatTaskFail(out *bytes.Buffer, err oyafile.ErrTaskFail) {
-	formatHeader(out, "RUN ERROR", err.OyafilePath)
+	formatHeader(out, "SCRIPT ERROR", err.OyafilePath)
 	var showArgs string
 	if len(err.Args) > 0 {
 		showArgs = fmt.Sprintf(" invoked with arguments %q", strings.Join(err.Args, " "))
@@ -97,7 +100,40 @@ func formatRenderFail(out *bytes.Buffer, err ErrRenderFail) {
 	formatHeader(out, "RENDER ERROR", err.TemplatePath)
 	fmt.Fprint(out, "Error rendering template\n")
 	out.WriteString("\n")
-	out.WriteString("  ")
+	out.WriteString("Cause: ")
 	out.WriteString(err.Cause.Error())
 	out.WriteString("\n\n")
+}
+
+func handleUnknownErr(err error) {
+	out := bytes.Buffer{}
+	formatHeader(&out, "ERROR", "")
+	fmt.Fprintf(&out, "Error: %v\n", err.Error())
+	os.Stderr.Write(out.Bytes())
+	os.Exit(1)
+}
+
+func handleErrExplodingDeps(err deptree.ErrExplodingDeps) {
+	out := bytes.Buffer{}
+	formatHeader(&out, "DEPS ERROR", err.ProjectRootDir)
+	fmt.Fprint(&out, "Error getting dependencies\n")
+	switch cause := err.Cause.(type) {
+	case mvs.ErrResolvingReqs:
+		traceCount := len(cause.Trace)
+		if traceCount > 0 {
+			for i := range cause.Trace {
+				j := traceCount - i - 1
+				fmt.Fprintf(&out, "  required by %v\n", cause.Trace[j])
+			}
+			fmt.Fprintf(&out, "  required by %v\n", filepath.Join(err.ProjectRootDir, raw.DefaultName))
+		}
+	default:
+
+	}
+	out.WriteString("\n")
+	out.WriteString("Cause: ")
+	out.WriteString(err.Cause.Error())
+	out.WriteString("\n\n")
+	os.Stderr.Write(out.Bytes())
+	os.Exit(1)
 }

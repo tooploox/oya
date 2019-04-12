@@ -62,6 +62,7 @@ func (l *GithubRepo) AvailableVersions() ([]semver.Version, error) {
 
 func (l *GithubRepo) clone() (*git.Repository, error) {
 	var lastErr error
+	var lastUri string
 	for _, uri := range l.repoUris {
 		fs := memfs.New()
 		storer := memory.NewStorage()
@@ -72,9 +73,10 @@ func (l *GithubRepo) clone() (*git.Repository, error) {
 			return repo, nil
 		}
 		lastErr = err
+		lastUri = uri
 
 	}
-	return nil, lastErr
+	return nil, toErrClone(lastUri, lastErr)
 }
 
 // LatestVersion returns the latest available pack version based on tags in the remote Github repo.

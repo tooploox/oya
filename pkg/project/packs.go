@@ -70,6 +70,13 @@ func (p *Project) InstallPacks() error {
 	)
 }
 
+func (p *Project) wrapInstallErr(err error) error {
+	return ErrInstallingPacks{
+		Cause:          err,
+		ProjectRootDir: p.RootDir,
+	}
+}
+
 func (p *Project) FindRequiredPack(importPath types.ImportPath) (pack.Pack, bool, error) {
 	deps, err := p.Deps()
 	if err != nil {
@@ -103,6 +110,7 @@ func (p *Project) Deps() (Deps, error) {
 		return nil, err
 	}
 	err = ldr.Explode()
+
 	if err != nil {
 		return nil, err
 	}

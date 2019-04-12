@@ -19,6 +19,10 @@ func (p ImportPath) Host() Host {
 	return HostUnknown
 }
 
+func (p ImportPath) String() string {
+	return string(p)
+}
+
 type Host int
 
 const (

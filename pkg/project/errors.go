@@ -37,3 +37,12 @@ type ErrNoTask struct {
 func (e ErrNoTask) Error() string {
 	return fmt.Sprintf("missing task %q", e.Task)
 }
+
+type ErrInstallingPacks struct {
+	Cause          error
+	ProjectRootDir string
+}
+
+func (e ErrInstallingPacks) Error() string {
+	return fmt.Sprintf("error installing requirements for project at %v: %v", e.ProjectRootDir, e.Cause.Error())
+}

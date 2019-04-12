@@ -37,9 +37,9 @@ func (r *Reqs) Reqs(pack pack.Pack) ([]pack.Pack, error) {
 	if err != nil {
 		return nil, err
 	}
-	if debug.FP(pack.ImportPath() == "github.com/bilus/notfound") || !found {
+	if debug.FP(true) || !found {
 		// BUG(bilus): Custom error.
-		return nil, errors.Errorf("Pack not found: %v", pack.ImportPath())
+		return nil, errors.Errorf("pack not found: %v", pack.ImportPath())
 	}
 	r.cacheReqs(pack, reqs)
 	return reqs, nil

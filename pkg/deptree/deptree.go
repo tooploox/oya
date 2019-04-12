@@ -1,6 +1,8 @@
 package deptree
 
 import (
+	"fmt"
+
 	"github.com/tooploox/oya/pkg/deptree/internal"
 	"github.com/tooploox/oya/pkg/mvs"
 	"github.com/tooploox/oya/pkg/oyafile"
@@ -8,11 +10,21 @@ import (
 	"github.com/tooploox/oya/pkg/types"
 )
 
+type ErrExplodingDeps struct {
+	Cause          error
+	ProjectRootDir string
+}
+
+func (e ErrExplodingDeps) Error() string {
+	return fmt.Sprintf("error resolving dependencies of project at %v: %v", e.ProjectRootDir, e.Cause.Error())
+}
+
 // DependencyTree defines a project's dependencies, allowing for loading them.
 type DependencyTree struct {
 	installDirs  []string
 	dependencies []pack.Pack
 	reqs         *internal.Reqs
+	rootDir      string
 }
 
 // New returns a new dependency tree.
@@ -23,6 +35,7 @@ func New(rootDir string, installDirs []string, dependencies []pack.Pack) (*Depen
 		installDirs:  installDirs,
 		dependencies: dependencies,
 		reqs:         internal.NewReqs(rootDir, installDirs),
+		rootDir:      rootDir,
 	}, nil
 }
 
@@ -31,7 +44,10 @@ func New(rootDir string, installDirs []string, dependencies []pack.Pack) (*Depen
 func (dt *DependencyTree) Explode() error {
 	list, err := mvs.List(dt.dependencies, dt.reqs)
 	if err != nil {
-		return err
+		return ErrExplodingDeps{
+			Cause:          err,
+			ProjectRootDir: dt.rootDir,
+		}
 	}
 	dt.dependencies = list
 	return nil
