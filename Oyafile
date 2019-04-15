@@ -1,3 +1,4 @@
+# -*- mode: yaml -*-
 Project: project
 Require:
   github.com/tooploox/oya-fixtures: v1.1.0
