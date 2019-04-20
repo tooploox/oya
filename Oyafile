@@ -49,7 +49,7 @@ testKeysRemove: |
 
 lint.Doc: Lint files
 lint: |
-  ./node_modules/.bin/remark .
+  ./node_modules/.bin/remark -f .
 
 lintFix.Doc: Lint files and apply fixes where possible
 lintFix: |
