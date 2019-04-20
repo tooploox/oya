@@ -272,3 +272,17 @@ Scenario: Allow empty Require, Import: Values
   hello from foo
 
   """
+
+Scenario: Commands exits with non-zero code
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+   test: |
+       exit 1
+    """
+  When I run "oya run test"
+  Then the command fails with error matching
+    """
+    task exited with code 1
+    """

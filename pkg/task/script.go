@@ -41,14 +41,22 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		interp.Env(nil),
 		interp.Params(toParams(args)...))
 	ctx := context.Background()
-StmtLoop:
 	for _, stmt := range file.Stmts {
 		err := r.Run(ctx, stmt)
 		switch err.(type) {
 		case nil:
 		case interp.ExitStatus:
+			errCode := err.(interp.ExitStatus)
+			if errCode != 0 {
+				return fmt.Errorf("task exited with code %d", errCode)
+			}
+			return nil
 		case interp.ShellExitStatus:
-			break StmtLoop
+			errCode := err.(interp.ShellExitStatus)
+			if errCode != 0 {
+				return fmt.Errorf("task exited with code %d", errCode)
+			}
+			return nil
 		default:
 			// BUG(bilus): Add line error.
 			return err // set -e
