@@ -46,11 +46,6 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		switch err.(type) {
 		case nil:
 		case interp.ExitStatus:
-			errCode := err.(interp.ExitStatus)
-			if errCode != 0 {
-				return fmt.Errorf("task exited with code %d", errCode)
-			}
-			return nil
 		case interp.ShellExitStatus:
 			errCode := err.(interp.ShellExitStatus)
 			if errCode != 0 {
