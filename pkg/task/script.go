@@ -45,8 +45,15 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		err := r.Run(ctx, stmt)
 		switch err.(type) {
 		case nil:
+			// Continue with next statement in script.
 		case interp.ExitStatus:
+			// Sub-command exited.
+			// Disregard, as either:
+			//   - "set -e" is in effect -> and shell will exit if needed,
+			//   - or not -> and exit status should be ignored anyway
 		case interp.ShellExitStatus:
+			// Shell interpreter exited.
+			// Either early return (due to "exit" or "set -e"), or task is finished.
 			errCode := err.(interp.ShellExitStatus)
 			if errCode != 0 {
 				return fmt.Errorf("task exited with code %d", errCode)
