@@ -272,3 +272,51 @@ Scenario: Allow empty Require, Import: Values
   hello from foo
 
   """
+
+Scenario: Task exits with non-zero code
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+   test: |
+       exit 1
+    """
+  When I run "oya run test"
+  Then the command fails with error matching
+    """
+    task exited with code 1
+    """
+
+Scenario: Command in task exits with non-zero code
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+   test: |
+       bash -c 'exit 1'
+       echo "hello after exit 1"
+    """
+  When I run "oya run test"
+  Then the command succeeds
+  And the command outputs to stdout
+  """
+  hello after exit 1
+
+  """
+
+
+Scenario: Command in task exits with non-zero code when set -e is in effect
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+   test: |
+       set -e
+       bash -c 'exit 1'
+       echo "hello after exit 1"
+    """
+  When I run "oya run test"
+  Then the command fails with error matching
+    """
+    task exited with code 1
+    """
