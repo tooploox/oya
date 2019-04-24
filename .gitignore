@@ -27,3 +27,6 @@ oya
 
 ### Go builds ###
 /dist/
+
+### Node ###
+/node_modules/
