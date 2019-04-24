@@ -49,7 +49,7 @@ testKeysRemove: |
 release: |
   go get -u github.com/mitchellh/gox
   go get -u github.com/tcnksm/ghr
-  gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_${CIRCLE_TAG}_{{.OS}}_{{.Arch}}"
+  gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_${CIRCLE_TAG}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${CIRCLE_TAG}"
   gzip dist/*
   sha256sum dist/oya_${CIRCLE_TAG}_{darwin,linux}_* | tee dist/oya_${CIRCLE_TAG}_SHA256SUMS
   if [ "$CIRCLE_TAG" ]; then
