@@ -36,9 +36,9 @@ get_os() {
 
 get_arch() {
     archstr=`uname -m`
-    if [[ "$archstr" == 'x86_64' || "$archstr" == 'x86' ]]; then
+    if [[ "$archstr" == 'x86' ]]; then
         arch='386'
-    elif [[ "$archstr" == 'AMD64' ]]; then
+    elif [[ "$archstr" == 'x86_64' || "$archstr" == 'AMD64' ]]; then
          arch='amd64'
     else
         echo "Sorry Oya doesn't support ${archstr} architecture yet! :("
