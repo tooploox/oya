@@ -2,39 +2,37 @@
 
 ## Contributing
 
-1. Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
-2. Checkout oya outside GOHOME.
-3. Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
-4. Run acceptance tests: `godog`.
-5. Run tests: `go test ./...`.
-6. Run Oya: `go run oya.go`.
-
-
+1.  Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
+2.  Checkout oya outside GOHOME.
+3.  Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
+4.  Run acceptance tests: `godog`.
+5.  Run tests: `go test ./...`.
+6.  Run Oya: `go run oya.go`.
 
 # Documentation below is a draft and is likely incompatible with the current version.
 
-
 ## Usage
 
-1. Install oya and its dependencies:
+1.  Install oya and its dependencies:
 
         curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
 
-1. Initialize project to use a certain CI/CD tool and workflow. Example:
+2.  Initialize project to use a certain CI/CD tool and workflow. Example:
 
-        oya init jenkins-monorepo
+         oya init jenkins-monorepo
 
-   It boostraps configuration for Jenkins pipelines supporting the 1.a workflow
-   (see Workflows below), an Oyafile and supporting scripts and compatible
-   generators.
+    It boostraps configuration for Jenkins pipelines supporting the 1.a workflow
+    (see Workflows below), an Oyafile and supporting scripts and compatible
+    generators.
 
-1. Define a task you can run:
+3.  Define a task you can run:
 
-        mkdir app1
-        cat > Oyafile
-        build: echo "Hello, world"
+    ```yaml
+    # ./Oyafile
+    build: echo "Hello, world"
+    ```
 
-1. Run the task:
+4.  Run the task:
 
         oya run build
         Hello, world
@@ -43,19 +41,21 @@ The task in the above example is called "build" but there's nothing special abou
 
 ## Plugins
 
-oya vendor p github.com/tooploox/oya/packs/circleci-helm-platform
+    oya vendor p github.com/tooploox/oya/packs/circleci-helm-platform
 
-installs into vendor/
-symlinks vendor/p to it
-symlinks all in vendor/p/bin/ to oya/bin/p
+installs into `vendor/`
+symlinks `vendor/p` to it
+symlinks all in `vendor/p/bin/` to `oya/bin/p`
 
-cd delivery/broadcasts/Oyafile
-oya p/generate/docker
+    cd delivery/broadcasts/Oyafile
+    oya p/generate/docker
 
-delivery/broadcasts/Oyafile
+```yaml
+# ./delivery/broadcasts/Oyafile
 
 Import:
-  - github.com/tooploox/oya/packs/jenkins-monorepo
+
+-   github.com/tooploox/oya/packs/jenkins-monorepo
 
 --
 
@@ -67,7 +67,7 @@ buildDocker:
 
 buildChart:
   jm/buildChart
-
+```
 
 ## How it works
 
@@ -76,7 +76,6 @@ A directory is included in the build process if contains an Oyafile regardless o
 For example, to set up a CI/CD pipeline in a mono-repository containing several
 microservices, you'd put each microservice in its directory, each with its own
 Oyafile containing the tasks necessary to support the CI/CD workflow.
-
 
 Imagine you have the following file structure:
 
@@ -103,10 +102,8 @@ Finally, Oya executes the task you specified for every directory marked as
 changed, starting from the top directory. Going back to our example, it would
 generate the following output:
 
-```
-Top-level directory
-Sub-directory
-```
+    Top-level directory
+    Sub-directory
 
 As you say, tasks and their corresponding scripts are defined in `Oyafile`s.
 Their names must be camel-case yaml identifiers, starting with a lower-case
@@ -114,16 +111,14 @@ letter. Built-in tasks start with capital letters.
 
 More realistic example of an `Oyafile`:
 
-```
-build: docker build .
-test: pytest
-```
+    build: docker build .
+    test: pytest
 
 ## Changesets
 
 TODO
 
-   * `Changeset` -- (optional) modifies the current changeset (see Changesets).
+-   `Changeset` -- (optional) modifies the current changeset (see Changesets).
 
 Oya first walks all directories to build the changeset: a list of directories
 containing an Oyafile that are marked as "changed".
@@ -131,45 +126,45 @@ containing an Oyafile that are marked as "changed".
 It then walks the list,
 running the matching task in each. CI/CD tool-specific script outputting list of
 modified files in buildable directories given the current task name.
-     - each path must be normalized and prefixed with `+`
-     - cannot be overriden, only valid for top-level Oyafile
-     - in the future, you'll be able to override for a buildable directory and
+     \- each path must be normalized and prefixed with `+`
+     \- cannot be overriden, only valid for top-level Oyafile
+     \- in the future, you'll be able to override for a buildable directory and
        use `-` to exclude directories, `+` to include additional ones, and use
        wildcards, this will allow e.g. forcing running tests for all apps when
        you change a shared directory
-     - git diff --name-only origin/master...$branch
-     - https://dzone.com/articles/build-test-and-deploy-apps-independently-from-a-mo
-     - https://stackoverflow.com/questions/6260383/how-to-get-list-of-changed-files-since-last-build-in-jenkins-hudson/9473207#9473207
+     \- git diff --name-only origin/master...$branch
+     \- <https://dzone.com/articles/build-test-and-deploy-apps-independently-from-a-mo>
+     \- <https://stackoverflow.com/questions/6260383/how-to-get-list-of-changed-files-since-last-build-in-jenkins-hudson/9473207#9473207>
 
 Generation of the changeset is controlled by the optional changeset key in
 Oyafiles, which can point to a script executed to generate the changeset:
 
-1. No directive -- includes all directories containing on Oyafile.
-2. Directive pointing to a script.
+1.  No directive -- includes all directories containing on Oyafile.
+2.  Directive pointing to a script.
 
 .oyaignore lists files whose changes do not trigger build for the containing
 buildable directory
 
 ## Features/ideas
 
-1. Generators based on packs. https://github.com/Flaque/thaum + draft pack
-   plugin
+1.  Generators based on packs. <https://github.com/Flaque/thaum> + draft pack
+    plugin
 
 ## Workflows
 
 ### Repo structure
 
-1. Mono-repo:
-   - Each app has its own directory
-   - There is a directory/file containing deployment configuration
+1.  Mono-repo:
+    -   Each app has its own directory
+    -   There is a directory/file containing deployment configuration
 
-2. Multi-repo:
-   - Each app has its own repo
-   - Deployment configurations in its own repo
+2.  Multi-repo:
+    -   Each app has its own repo
+    -   Deployment configurations in its own repo
 
-3. Mix:
-   - Some/all apps share repos, some may have their own
-   - Deployment configurations in its own repo
+3.  Mix:
+    -   Some/all apps share repos, some may have their own
+    -   Deployment configurations in its own repo
 
 > Also submodules tried for NT/Switchboard and eventually ditched.
 
@@ -181,50 +176,48 @@ b. Each environment has its own branch
 
 ### Evaluation
 
-| Workflow | Projects    | Pros                                       | Cons                                                    |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 1.a      | E           | "Can share code"                           | Merge order dependent [1]                               |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 1.b      | C           | Single checkout                            | Complex automation [2]                                  |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 2.a      |             | Same as 2.b                                | Same as 2.b plus need to detect which directory changed |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 2.b      | S           | Better isolation [3] Simple automation [4] | More process overhead [5]                               |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 3.a      | P           | Can divide up a project however you like   | Complex automation [2]                                  |
-|----------|-------------|--------------------------------------------|---------------------------------------------------------|
-| 3.b      | P           | Simple deployment automation               | Same as 3.a                                             |
+| Workflow   | Projects      | Pros                                         | Cons                                                      |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 1.a        | E             | "Can share code"                             | Merge order dependent¹                                    |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 1.b        | C             | Single checkout                              | Complex automation²                                       |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 2.a        |               | Same as 2.b                                  | Same as 2.b plus need to detect which directory changed   |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 2.b        | S             | Better isolation³  Simple automation⁴        | More process overhead⁵                                    |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 3.a        | P             | Can divide up a project however you like     | Complex automation²                                       |
+| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
+| 3.b        | P             | Simple deployment automation                 | Same as 3.a                                               |
 
-* [1] Code gets merged from branch to branch; works for small team.
-* [2] Need to detect what changed between commits. Many CI/CD tools allow only
-  one configuration per repo and require coding around the limitations, example:
-  https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/13
-* [3] No way to just share code, need to package into libraries. Great for
-  microservices and must have for large teams.
-* [4] Just put a CI/CD config into the root.
-* [5] No way to just share code, need to package into libraries. Bad for small
-  teams wanting to quickly prototype.
+¹
+: Code gets merged from branch to branch; works for small team.
 
+²
+: Need to detect what changed between commits. Many CI/CD tools allow only one configuration per repo and require coding around the limitations, example: <https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/13>
 
---
+³
+: No way to just share code, need to package into libraries. Great for microservices and must have for large teams.
+
+⁴
+: Just put a CI/CD config into the root.
+
+⁵
+: No way to just share code, need to package into libraries. Bad for small teams wanting to quickly prototype.
 
 ## Adding CircleCI integration
 
-1. Install Oya
+1.  Install Oya
 
-```
-curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
-```
+        curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
 
-2. Initialize project
+2.  Initialize project
 
-```
-oya init
-oya +github.com/bilus/oya-packs/circleci
-oya vendor
-```
+        oya init
+        oya +github.com/bilus/oya-packs/circleci
+        oya vendor
 
-3. Push to git
+3.  Push to git
 
 ## Secrets
 
