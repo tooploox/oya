@@ -16,6 +16,9 @@ jobs:
           key: v1-pkg-cache
           paths:
             - "/go/pkg"
+      - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      - run: sudo apt update && sudo apt install nodejs
+      - run: npm i
       - run: ./oya run testKeysImport
       - run: ./oya run test -t "~@nocircleci"
       - run: ./oya run testKeysRemove
