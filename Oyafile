@@ -1,3 +1,4 @@
+# -*- mode: yaml -*-
 Project: project
 Require:
   github.com/tooploox/oya-fixtures: v1.1.0
@@ -19,6 +20,7 @@ install: |
 
 test.Doc: Run tests.
 test: |
+  set -e
   go test -v ./... && \
   godog $@
 
@@ -45,6 +47,15 @@ testKeysRemove: |
 
     echo "Oya test PGP Key deleted"
   fi
+
+lint.Doc: Lint files
+lint: |
+  set -e
+  ./node_modules/.bin/remark -f .
+
+lintFix.Doc: Lint files and apply fixes where possible
+lintFix: |
+  ./node_modules/.bin/remark . -o
 
 release: |
   go get -u github.com/mitchellh/gox
