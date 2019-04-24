@@ -20,6 +20,7 @@ install: |
 
 test.Doc: Run tests.
 test: |
+  set -e
   go test -v ./... && \
   godog $@
 
@@ -49,6 +50,7 @@ testKeysRemove: |
 
 lint.Doc: Lint files
 lint: |
+  set -e
   ./node_modules/.bin/remark -f .
 
 lintFix.Doc: Lint files and apply fixes where possible
