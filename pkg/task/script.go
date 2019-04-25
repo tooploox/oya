@@ -6,16 +6,15 @@ import (
 	"io"
 	"strings"
 
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/template"
 	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/syntax"
 )
 
 type ErrScriptFail struct {
-	Script       string
-	ExitCode     int
-	Message      string
-	Line, Column uint
+	ExitCode int
+	Message  string
 }
 
 func (e ErrScriptFail) Error() string {
@@ -88,13 +87,19 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 }
 
 func (s Script) errScriptFail(pos syntax.Pos, headLines uint, err error, exitCode int) error {
-	return ErrScriptFail{
-		Script:   s.Script,
-		ExitCode: exitCode,
-		Message:  err.Error(),
-		Line:     pos.Line() - headLines,
-		Column:   pos.Col(),
-	}
+	return errors.New(
+		ErrScriptFail{
+			ExitCode: exitCode,
+			Message:  err.Error(), // Simplify error trace.
+		},
+		errors.Location{
+			Line: pos.Line() - headLines,
+			Col:  pos.Col(),
+			Snippet: errors.Snippet{
+				Lines: strings.Split(s.Script, "\n"),
+			},
+		},
+	)
 }
 
 func defines(scope template.Scope) []string {

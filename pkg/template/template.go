@@ -1,13 +1,22 @@
 package template
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/gobwas/glob"
+	"github.com/tooploox/oya/pkg/errors"
 )
+
+type ErrRenderFail struct {
+}
+
+func (e ErrRenderFail) Error() string {
+	return "render error"
+}
 
 // Template represents a template that can be rendered using provided values.
 type Template interface {
@@ -52,9 +61,25 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 
 		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
 		if err != nil {
-			return err
+			return errors.Wrap(err,
+				ErrRenderFail{},
+				errors.Location{
+					Name:        path,
+					VerboseName: fmt.Sprintf("in template %v", path),
+				},
+			)
 		}
-		return renderFile(path, filePath, values)
+		err = renderFile(path, filePath, values)
+		if err != nil {
+			return errors.Wrap(err,
+				ErrRenderFail{},
+				errors.Location{
+					Name:        path,
+					VerboseName: fmt.Sprintf("in template %v", path),
+				},
+			)
+		}
+		return nil
 	})
 }
 

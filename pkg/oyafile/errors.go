@@ -8,7 +8,6 @@ import (
 )
 
 type ErrTaskFail struct {
-	Cause       error
 	OyafilePath string
 	TaskName    task.Name
 	Args        []string
@@ -16,5 +15,5 @@ type ErrTaskFail struct {
 }
 
 func (e ErrTaskFail) Error() string {
-	return fmt.Sprintf("task %v failed in %v: %v", string(e.TaskName), e.OyafilePath, e.Cause.Error())
+	return fmt.Sprintf("task failed")
 }

@@ -1,6 +1,7 @@
 package oyafile
 
 import (
+	"fmt"
 	"io"
 	"path"
 	"path/filepath"
@@ -8,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/raw"
 	"github.com/tooploox/oya/pkg/semver"
 	"github.com/tooploox/oya/pkg/task"
@@ -98,13 +99,24 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 
 	err := task.Exec(oyafile.Dir, args, scope, stdout, stderr)
 	if err != nil {
-		return true, ErrTaskFail{
-			Cause:       err,
-			OyafilePath: oyafile.Path,
-			TaskName:    taskName,
-			Args:        args,
-			ImportPath:  oyafile.detectImportPath(taskName),
-		}
+		return true, errors.Wrap(
+			err,
+			ErrTaskFail{
+				OyafilePath: oyafile.Path,
+				TaskName:    taskName,
+				Args:        args,
+				ImportPath:  oyafile.detectImportPath(taskName),
+			},
+			errors.Location{
+				VerboseName: fmt.Sprintf("in file %q", oyafile.Path),
+				Name:        oyafile.Path,
+			},
+			errors.Location{
+				VerboseName: fmt.Sprintf("in task %q", taskName),
+				Name:        fmt.Sprintf("%s", taskName),
+			},
+		)
+
 	}
 	return true, nil
 }

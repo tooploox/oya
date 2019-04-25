@@ -9,16 +9,6 @@ import (
 	"github.com/tooploox/oya/pkg/template"
 )
 
-type ErrRenderFail struct {
-	Cause        error
-	OyafilePath  string
-	TemplatePath string
-}
-
-func (e ErrRenderFail) Error() string {
-	return fmt.Sprintf("error in %v: %v", e.TemplatePath, e.Cause.Error())
-}
-
 type ErrNoScope struct {
 	Scope       string
 	OyafilePath string
@@ -75,13 +65,5 @@ func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath
 		}
 	}
 
-	err = template.RenderAll(templatePath, excludedPaths, outputPath, values)
-	if err != nil {
-		return ErrRenderFail{
-			Cause:        err,
-			OyafilePath:  oyafilePath,
-			TemplatePath: templatePath,
-		}
-	}
-	return nil
+	return template.RenderAll(templatePath, excludedPaths, outputPath, values)
 }
