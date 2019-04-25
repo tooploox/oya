@@ -2,6 +2,7 @@
 
 OYA_URL="https://github.com/tooploox/oya"
 OYA_TAGS_URL="https://api.github.com/repos/tooploox/oya/tags"
+verifySHA=true
 
 check_sops() {
     printf " Sops -> "
@@ -15,9 +16,21 @@ check_sops() {
     fi
 }
 
+check_sha256sum() {
+    printf " Sha256sum -> "
+    if hash sha256sum 2>/dev/null; then
+        printf "OK\n"
+    else
+        printf "FAIL\n"
+        echo "WARN: Command sha256sum not found. Oya binaries checksum will not be verified!"
+        verifySHA=false
+    fi
+}
+
 check_deps() {
     echo "Checking required tools:"
     check_sops
+    check_sha256sum
 }
 
 get_os() {
@@ -98,6 +111,10 @@ get_package() {
 }
 
 verify_sha() {
+    if [[ "$verifySHA" == false ]]; then
+        return
+    fi
+    echo " Checking SHA checksum."
     _url=$1; _dir=$2; _file=$3
     curl -sSL ${_url} > ${_dir}/shasums ||
         {
