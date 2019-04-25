@@ -13,7 +13,7 @@ func Import(workDir, uri string, stdout, stderr io.Writer) error {
 	uriArr := strings.Split(uri, "/")
 	alias := uriArr[len(uriArr)-1]
 
-	installDir, err := project.InstallDir()
+	installDir, err := InstallDir()
 	if err != nil {
 		return wrapErr(err, uri)
 	}

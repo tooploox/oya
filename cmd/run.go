@@ -82,7 +82,7 @@ func init() {
 }
 
 func addTasksCommands(workDir string, recurse bool) error {
-	installDir, err := project.InstallDir()
+	installDir, err := internal.InstallDir()
 	if err != nil {
 		return err
 	}

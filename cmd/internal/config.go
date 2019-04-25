@@ -1,4 +1,4 @@
-package project
+package internal
 
 import (
 	"os"
@@ -25,10 +25,10 @@ func InstallDir() (string, error) {
 	return filepath.Join(homeDir, ".oya", "packs"), nil
 }
 
-func LookupOyaScope() (string, bool) {
+func lookupOyaScope() (string, bool) {
 	return os.LookupEnv("OYA_SCOPE")
 }
 
-func SetOyaScope(scope string) error {
+func setOyaScope(scope string) error {
 	return os.Setenv("OYA_SCOPE", scope)
 }

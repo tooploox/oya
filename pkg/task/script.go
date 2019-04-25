@@ -36,7 +36,6 @@ StmtLoop:
 		err := r.Run(ctx, stmt)
 		switch err.(type) {
 		case nil:
-		// case interp.ExitStatus:
 		case interp.ShellExitStatus:
 			break StmtLoop
 		default:

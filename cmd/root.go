@@ -38,9 +38,6 @@ var rootCmd = &cobra.Command{
 	Use:   "oya",
 	Short: "Oya is a task manager and runner",
 	Long:  "Oya takes the pain out of bootstrapping new deployable projects with packaged boilerplate & scripts.",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

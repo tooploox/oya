@@ -15,7 +15,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
-	installDir, err := project.InstallDir()
+	installDir, err := InstallDir()
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ type Args struct {
 }
 
 func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdout, stderr io.Writer) error {
-	installDir, err := project.InstallDir()
+	installDir, err := InstallDir()
 	if err != nil {
 		return err
 	}
@@ -36,11 +36,11 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	tn := task.Name(taskName)
 
 	alias, _ := tn.Split()
-	oldOyaScope, _ := project.LookupOyaScope()
-	if err := project.SetOyaScope(alias.String()); err != nil {
+	oldOyaScope, _ := lookupOyaScope()
+	if err := setOyaScope(alias.String()); err != nil {
 		return err
 	}
-	defer project.SetOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
+	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
 	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
 		toScope(taskArgs).Merge(values), stdout, stderr)

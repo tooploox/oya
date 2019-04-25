@@ -41,10 +41,10 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
-	// err := os.RemoveAll(c.projectDir)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func setEnv(projectDir string) {
@@ -234,7 +234,7 @@ func (c *SuiteContext) theCommandOutputsTextMatching(target string, expected *gh
 	return nil
 }
 
-func (c *SuiteContext) CompileOya() {
+func compileOya() string {
 	binDir, err := ioutil.TempDir("", "oya-bin")
 	if err != nil {
 		panic(err)
@@ -245,12 +245,18 @@ func (c *SuiteContext) CompileOya() {
 	if err != nil {
 		panic(err)
 	}
-	c.binDir = binDir
+	return binDir
+}
+
+func (c *SuiteContext) cleanUp() {
+	err := os.RemoveAll(c.binDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func FeatureContext(s *godog.Suite) {
-	c := SuiteContext{}
-	c.CompileOya()
+	c := SuiteContext{binDir: compileOya()}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
@@ -269,7 +275,7 @@ func FeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
-	// TODO after all remove c.binDir
+	s.AfterSuite(func() { c.cleanUp() })
 }
 
 // sourceFileDirectory returns the current .go source file directory.
