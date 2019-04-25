@@ -20,8 +20,19 @@
 
 package main
 
-import "github.com/tooploox/oya/cmd"
+import (
+	"fmt"
+	"time"
+
+	"github.com/tooploox/oya/cmd"
+)
+
+var buildVersion string
 
 func main() {
+	if buildVersion == "" {
+		buildVersion = fmt.Sprintf("build-%s", time.Now().Format("20060102.150405"))
+	}
+	cmd.SetOyaVersion(buildVersion)
 	cmd.Execute()
 }

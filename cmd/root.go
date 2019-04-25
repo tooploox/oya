@@ -56,6 +56,10 @@ func Execute() {
 	}
 }
 
+func SetOyaVersion(ver string) {
+	rootCmd.Version = ver
+}
+
 // ExecuteE executes a command same as Execute but returns error.
 func ExecuteE() error {
 	_, err := rootCmd.ExecuteC()
