@@ -32,3 +32,7 @@ func lookupOyaScope() (string, bool) {
 func setOyaScope(scope string) error {
 	return os.Setenv("OYA_SCOPE", scope)
 }
+
+func lookupOyaCmd() (string, bool) {
+	return os.LookupEnv("OYA_CMD")
+}

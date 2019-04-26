@@ -42,6 +42,12 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	}
 	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
+	oyaCmd, found := lookupOyaCmd()
+	if found {
+		// Tests only.
+		task.OyaCmdOverride = &oyaCmd
+	}
+
 	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
 		toScope(taskArgs).Merge(values), stdout, stderr)
 }
