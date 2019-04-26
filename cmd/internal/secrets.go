@@ -9,29 +9,33 @@ import (
 	"syscall"
 
 	"github.com/kr/pty"
+	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/secrets"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func SecretsView(workDir string, stdout, stderr io.Writer) error {
-	output, err := secrets.Decrypt(workDir)
+func SecretsView(path string, stdout, stderr io.Writer) error {
+	output, found, err := secrets.Decrypt(path)
 	if err != nil {
 		return err
+	}
+	if !found {
+		return errors.Errorf("secret file %q not found", path)
 	}
 	stdout.Write(output)
 	return nil
 }
 
-func SecretsEdit(workDir string, stdout, stderr io.Writer) error {
-	viewCmd := secrets.ViewCmd(workDir)
+func SecretsEdit(path string, stdout, stderr io.Writer) error {
+	viewCmd := secrets.ViewCmd(path)
 	if err := terminalRun(viewCmd); err != nil {
 		return err
 	}
 	return nil
 }
 
-func SecretsEncrypt(workDir string, stdout, stderr io.Writer) error {
-	if err := secrets.Encrypt(workDir); err != nil {
+func SecretsEncrypt(path string, stdout, stderr io.Writer) error {
+	if err := secrets.Encrypt(path, path); err != nil {
 		return err
 	}
 	return nil

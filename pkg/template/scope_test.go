@@ -214,6 +214,28 @@ func TestMerge(t *testing.T) {
 			rhs:      template.Scope{"foo": map[interface{}]interface{}{"bar": "apple", "qux": "peach"}},
 			expected: template.Scope{"foo": map[interface{}]interface{}{"bar": "apple", "baz": "orange", "qux": "peach"}},
 		},
+		{
+			desc: "very deep merge",
+			lhs: template.Scope{"root": map[interface{}]interface{}{
+				"foo": map[interface{}]interface{}{
+					"bar": "xxxxx",
+					"baz": "orange",
+				}},
+			},
+			rhs: template.Scope{"root": map[interface{}]interface{}{
+				"foo": map[interface{}]interface{}{
+					"bar": "apple",
+					"qux": "peach",
+				}},
+			},
+			expected: template.Scope{"root": map[interface{}]interface{}{
+				"foo": map[interface{}]interface{}{
+					"bar": "apple",
+					"baz": "orange",
+					"qux": "peach",
+				}},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

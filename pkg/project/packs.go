@@ -11,14 +11,19 @@ import (
 )
 
 func (p *Project) Require(pack pack.Pack) error {
-	raw, err := p.rawOyafileIn(p.RootDir)
+	raw, found, err := p.rawOyafileIn(p.RootDir)
 	if err != nil {
 		return err
 	}
+	if !found {
+		return ErrNoOyafile{Path: p.RootDir}
+	}
+
 	err = raw.AddRequire(pack)
 	if err != nil {
 		return err
 	}
+	p.invalidateOyafileCache(p.RootDir)
 
 	p.dependencies = nil // Force reload.
 	return nil
@@ -78,10 +83,14 @@ func (p *Project) Deps() (Deps, error) {
 		return p.dependencies, nil
 	}
 
-	o, err := p.oyafileIn(p.RootDir)
+	o, found, err := p.oyafileIn(p.RootDir)
 	if err != nil {
 		return nil, err
 	}
+	if !found {
+		return nil, ErrNoOyafile{Path: p.RootDir}
+	}
+
 	installDirs := []string{
 		p.installDir,
 	}

@@ -3,7 +3,7 @@ Feature: Manage Secrets for oya
 Background:
    Given I'm in project dir
 
-Scenario: It loads Values and Tasks from secrets.oya if present
+Scenario: It loads values from secrets.oya if present
   Given file ./Oyafile containing
     """
     Project: Secrets
@@ -18,7 +18,7 @@ Scenario: It loads Values and Tasks from secrets.oya if present
     """
     bar: banana
     """
-  And I run "oya secrets encrypt"
+  And I run "oya secrets encrypt secrets.oya"
   When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout
@@ -33,7 +33,7 @@ Scenario: Encrypts secrets file
     """
     foo: SECRETPHRASE
     """
-  When I run "oya secrets encrypt"
+  When I run "oya secrets encrypt secrets.oya"
   Then the command succeeds
   And file ./secrets.oya does not contain
     """
@@ -45,8 +45,8 @@ Scenario: Views secrets file
     """
     foo: SECRETPHRASE
     """
-  And I run "oya secrets encrypt"
-  When I run "oya secrets view"
+  And I run "oya secrets encrypt secrets.oya"
+  When I run "oya secrets view secrets.oya"
   Then the command succeeds
   And the command outputs to stdout
   """
@@ -73,7 +73,7 @@ Scenario: It correctly merges secrets
       bar: banana
       qux: peach
     """
-  And I run "oya secrets encrypt"
+  And I run "oya secrets encrypt secrets.oya"
   When I run "oya run all"
   Then the command succeeds
   And the command outputs to stdout

@@ -7,22 +7,16 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/oyafile"
-	"github.com/tooploox/oya/pkg/raw"
 	"k8s.io/helm/pkg/ignore"
 )
 
 func (p *Project) Oyafiles() ([]*oyafile.Oyafile, error) {
-	return listOyafiles(p.RootDir, p.RootDir)
+	return p.List(p.RootDir)
 }
 
 func (p *Project) List(startDir string) ([]*oyafile.Oyafile, error) {
-	return listOyafiles(startDir, p.RootDir)
-}
-
-// TODO: Cleanup, should probably be Project.List.
-func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
-	skip := makeSkipFunc(startDir, rootDir)
-	ignore, err := makeIgnoreFunc(rootDir)
+	skip := p.makeSkipFunc(startDir)
+	ignore, err := p.makeIgnoreFunc()
 	if err != nil {
 		return nil, errors.Wrapf(err, "error setting up ignores in %v", startDir)
 	}
@@ -41,7 +35,7 @@ func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
 		if doSkip {
 			return filepath.SkipDir
 		}
-		oyafile, ok, err := oyafile.LoadFromDir(path, rootDir)
+		oyafile, ok, err := p.oyafileIn(path)
 		if err != nil {
 			return errors.Wrapf(err, "error loading Oyafile from %v", path)
 		}
@@ -64,16 +58,16 @@ func listOyafiles(startDir, rootDir string) ([]*oyafile.Oyafile, error) {
 // true if the entire subdirectory should be ignored.
 // Similar to makeIgnoreFunc but does not parse Oyafile, thus allowing
 // for broken Oyafile projects nested under the current project.
-func makeSkipFunc(startDir, rootDir string) func(path string) (bool, error) {
+func (p *Project) makeSkipFunc(startDir string) func(path string) (bool, error) {
 	return func(path string) (bool, error) {
 		// Exclude projects nested under the current project.
 
-		raw, ok, err := raw.LoadFromDir(path, rootDir)
-		if !ok {
-			return false, nil
-		}
+		raw, found, err := p.rawOyafileIn(path)
 		if err != nil {
 			return false, err
+		}
+		if !found {
+			return false, nil
 		}
 
 		isRoot, err := raw.IsRoot()
@@ -82,7 +76,7 @@ func makeSkipFunc(startDir, rootDir string) func(path string) (bool, error) {
 		}
 
 		// BUG(bilus): Clean up this magic string & logic duplication everywhere.
-		_, isProject, err := raw.LookupKey("Project")
+		_, isProject, err := raw.Project()
 		if err != nil {
 			return false, err
 		}
@@ -94,13 +88,13 @@ func makeSkipFunc(startDir, rootDir string) func(path string) (bool, error) {
 // makeIgnoreFunc returns a function that given an oyafile returns true if its containing directory tree should be recursively ignored.
 // It uses an array of relative paths under "Ignore:" key in the project's root Oyafile.
 // BUG(bilus): We should probably make it more intuitive by supporting Ignore: directives in nested dirs as well as the root dir.
-func makeIgnoreFunc(rootDir string) (func(*oyafile.Oyafile) (bool, error), error) {
-	o, ok, err := oyafile.LoadFromDir(rootDir, rootDir)
+func (p *Project) makeIgnoreFunc() (func(*oyafile.Oyafile) (bool, error), error) {
+	o, ok, err := p.oyafileIn(p.RootDir)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error looking for Ignore: directive")
 	}
 	if !ok {
-		return nil, errors.Errorf("No oyafile found at %v", rootDir)
+		return nil, errors.Errorf("No oyafile found at %v", p.RootDir)
 	}
 	ignore, err := ignore.Parse(strings.NewReader(o.Ignores()))
 	if err != nil {

@@ -1,57 +1,71 @@
 package secrets
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 )
 
-const SecretsFileName = "secrets.oya"
-
-func Decrypt(workDir string) ([]byte, error) {
-	var output []byte
-	file := filepath.Join(workDir, SecretsFileName)
-	if _, err := os.Stat(file); err != nil {
-		return output, ErrNoSecretsFile{FileName: SecretsFileName, OyafilePath: workDir}
+func Decrypt(path string) ([]byte, bool, error) {
+	if ok, err := isSopsFile(path); !ok || err != nil {
+		return nil, false, err
 	}
-	decryptCmd := exec.Command("sops", "-d", file)
+
+	var output []byte
+	if _, err := os.Stat(path); err != nil {
+		return output, false, ErrNoSecretsFile{Path: path}
+	}
+	decryptCmd := exec.Command("sops", "-d", path)
 	decrypted, err := decryptCmd.CombinedOutput()
 	if err != nil {
-		return output, ErrSecretsFailure{FileName: SecretsFileName, OyafilePath: workDir, CmdError: string(decrypted)}
+		return output, false,
+			ErrSecretsFailure{Path: path, CmdError: string(decrypted)}
 	}
-	return decrypted, nil
+	return decrypted, true, nil
 }
 
-func Encrypt(workDir string) error {
-	file := filepath.Join(workDir, SecretsFileName)
-	if alreadyEncrypted(file) {
-		return ErrSecretsAlreadyEncrypted{FileName: SecretsFileName, OyafilePath: workDir}
+func Encrypt(inputPath, outputPath string) error {
+	if alreadyEncrypted(inputPath) {
+		return ErrSecretsAlreadyEncrypted{Path: inputPath}
 	}
-	cmd := exec.Command("sops", "-e", file)
+	cmd := exec.Command("sops", "-e", inputPath)
 	encoded, err := cmd.CombinedOutput()
 	if err != nil {
-		return ErrSecretsFailure{FileName: SecretsFileName, OyafilePath: workDir, CmdError: string(encoded)}
+		return ErrSecretsFailure{Path: inputPath, CmdError: string(encoded)}
 	}
-	fi, err := os.Stat(file)
+	fi, err := os.Stat(inputPath)
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(file, encoded, fi.Mode())
+	err = ioutil.WriteFile(outputPath, encoded, fi.Mode())
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ViewCmd(workDir string) *exec.Cmd {
-	file := filepath.Join(workDir, SecretsFileName)
-	return exec.Command("sops", file)
+func ViewCmd(path string) *exec.Cmd {
+	return exec.Command("sops", path)
 }
 
-func alreadyEncrypted(file string) bool {
+func isSopsFile(path string) (bool, error) {
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	dec := json.NewDecoder(jsonFile)
+	var v map[string]interface{}
+	if err := dec.Decode(&v); err != nil {
+		return false, nil // Yes, ignoring error.
+	}
+	_, ok := v["sops"]
+	return ok, nil
+}
+
+func alreadyEncrypted(path string) bool {
 	// Trying to decrypt and check if succeed
-	cmd := exec.Command("sops", "-d", file)
+	cmd := exec.Command("sops", "-d", path)
 	if err := cmd.Run(); err != nil {
 		return false
 	}
