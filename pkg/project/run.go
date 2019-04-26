@@ -3,7 +3,6 @@ package project
 import (
 	"io"
 
-	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/task"
 	"github.com/tooploox/oya/pkg/template"
@@ -18,7 +17,7 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	}
 	scope = scope.Merge(values)
 
-	targets, err := p.RunTargets(workDir, recurse, useChangeset)
+	targets, err := p.ListTargets(workDir, recurse, useChangeset)
 	if err != nil {
 		return err
 	}
@@ -36,11 +35,11 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	for _, o := range targets {
 		err = o.Build(dependencies)
 		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
+			return err
 		}
 		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
 		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
+			return err
 		}
 		if found {
 			foundAtLeastOneTask = found
@@ -54,7 +53,7 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	return nil
 }
 
-func (p *Project) RunTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
 	if useChangeset {
 		changes, err := p.Changeset(workDir)
 		if err != nil {

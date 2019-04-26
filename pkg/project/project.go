@@ -1,14 +1,10 @@
 package project
 
 import (
-	"io"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/raw"
-	"github.com/tooploox/oya/pkg/task"
-	"github.com/tooploox/oya/pkg/template"
 )
 
 // TODO: Duplicated in oyafile module.
@@ -35,97 +31,6 @@ func Detect(workDir, installDir string) (*Project, error) {
 		dependencies:    nil, // lazily-loaded in Deps()
 		oyafileCache:    make(map[string]*oyafile.Oyafile),
 		rawOyafileCache: make(map[string]*raw.Oyafile),
-	}, nil
-}
-
-func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
-	args []string, scope template.Scope, stdout, stderr io.Writer) error {
-	log.Debugf("Task %q at %v", taskName, workDir)
-
-	targets, err := p.ListTargets(workDir, recurse, useChangeset)
-	if err != nil {
-		return err
-	}
-
-	if len(targets) == 0 {
-		return nil
-	}
-
-	dependencies, err := p.Deps()
-	if err != nil {
-		return err
-	}
-
-	foundAtLeastOneTask := false
-	for _, o := range targets {
-		// TODO: Better errors
-		err = o.Build(dependencies)
-		if err != nil {
-			return err
-		}
-		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
-		if err != nil {
-			return err
-		}
-		if found {
-			foundAtLeastOneTask = found
-		}
-	}
-	if !foundAtLeastOneTask {
-		return ErrNoTask{
-			Task: taskName,
-		}
-	}
-	return nil
-}
-
-func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
-	if useChangeset {
-		changes, err := p.Changeset(workDir)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(changes) == 0 {
-			return nil, nil
-		}
-
-		if !recurse {
-			return p.oneTargetIn(workDir)
-		} else {
-			return changes, nil
-		}
-	} else {
-		if !recurse {
-			return p.oneTargetIn(workDir)
-		} else {
-			return p.List(workDir)
-		}
-	}
-}
-
-func (p *Project) oneTargetIn(dir string) ([]*oyafile.Oyafile, error) {
-	o, ok, err := p.oyafileIn(dir)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return nil, ErrNoOyafile{Path: dir}
-	}
-	return []*oyafile.Oyafile{o}, nil
-}
-
-func (p *Project) Values() (template.Scope, error) {
-	oyafilePath := filepath.Join(p.RootDir, "Oyafile")
-	o, found, err := p.Oyafile(oyafilePath)
-	if err != nil {
-		return template.Scope{}, err
-	}
-	if !found {
-		return template.Scope{}, ErrNoOyafile{Path: oyafilePath}
-	}
-	return template.Scope{
-		"Project": o.Project,
 	}, nil
 }
 
