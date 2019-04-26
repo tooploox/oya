@@ -8,6 +8,7 @@ import (
 	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/task"
 	"github.com/tooploox/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 type Args struct {
@@ -36,16 +37,27 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	tn := task.Name(taskName)
 
 	alias, _ := tn.Split()
-	oldOyaScope, _ := lookupOyaScope()
-	if err := setOyaScope(alias.String()); err != nil {
+	passedOyaScope, found := lookupOyaScope()
+	// BUG(bilus): Refactor using tn.Aliased
+	var newOyaScope string
+	if len(passedOyaScope) > 0 {
+		newOyaScope = passedOyaScope + "." + alias.String()
+	} else {
+		newOyaScope = alias.String()
+	}
+	if err := setOyaScope(newOyaScope); err != nil {
 		return err
 	}
-	defer setOyaScope(oldOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
+	defer setOyaScope(passedOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
 	oyaCmd, found := lookupOyaCmd()
 	if found {
 		// Tests only.
 		task.OyaCmdOverride = &oyaCmd
+	}
+
+	if len(passedOyaScope) > 0 {
+		tn = tn.Aliased(types.Alias(passedOyaScope))
 	}
 
 	return p.Run(workDir, tn, recurse, changeset, taskArgs.All,
