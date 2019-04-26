@@ -26,7 +26,6 @@ func (e Error) Trace() []Location {
 func (e Error) Print(out io.Writer) {
 	fmt.Fprintln(out, "Error:", e.err)
 	if len(e.trace) > 0 {
-		// fmt.Fprintln(out, "Location:")
 		fmt.Fprintln(out)
 		for _, location := range e.trace {
 			fmt.Fprintf(out, "  ")

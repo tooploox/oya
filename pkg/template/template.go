@@ -61,7 +61,8 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 
 		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
 		if err != nil {
-			return errors.Wrap(err,
+			return errors.Wrap(
+				err,
 				ErrRenderFail{},
 				errors.Location{
 					Name:        path,
