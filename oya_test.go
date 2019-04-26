@@ -15,7 +15,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/cmd"
-	"github.com/tooploox/oya/pkg/task"
 )
 
 const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -69,7 +68,7 @@ func overrideOyaCmd(projectDir string) {
 	oyaCmdOverride := fmt.Sprintf(
 		"function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
 		sourceFileDirectory(), executablePath, executablePath)
-	task.OyaCmdOverride = &oyaCmdOverride
+	os.Setenv("OYA_CMD", oyaCmdOverride)
 }
 
 func (c *SuiteContext) writeFile(path, contents string) error {

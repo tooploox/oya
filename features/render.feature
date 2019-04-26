@@ -188,39 +188,6 @@ Scenario: Values in imported pack scope can be overridden
   """
   banana
   """
-Scenario: Scope of the importing Oyafile can be optionally used
-  Given file ./Oyafile containing
-    """
-    Project: project
-
-    Require:
-      github.com/test/foo: v0.0.1
-
-    Import:
-      foo: github.com/test/foo
-
-    Values:
-      fruit: apple
-    """
-  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
-    """
-    Values:
-      fruit: orange
-
-    render:
-      oya render --auto-scope=false ./templates/file.txt
-    """
-  And file ./templates/file.txt containing
-    """
-    <%= fruit %>
-    """
-  When I run "oya run foo.render"
-  Then the command succeeds
-  And file ./file.txt contains
-  """
-  apple
-  """
-
 
 Scenario: Rendering values in specified scope
   Given file ./Oyafile containing
