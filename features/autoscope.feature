@@ -196,7 +196,63 @@ Scenario: Tasks use the scope of the imported Oyafile to run other tasks
 
   """
 
-# TODO: Render called via nested oya runs.
+Scenario: Render called via nested oya runs uses the nested import's scope
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+
+    Values:
+      fruit: apple
+
+    foo: |
+      oya run foo.foo
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    Project: pack-foo
+
+    Require:
+      github.com/test/bar: v0.0.1
+
+    Import:
+      bar: github.com/test/bar
+
+    Values:
+      fruit: orange
+
+    foo: |
+      oya run bar.foo
+    """
+  And file ./.oya/packs/github.com/test/bar@v0.0.1/Oyafile containing
+    """
+    Project: pack-bar
+
+    Values:
+      fruit: peach
+
+    foo: |
+      oya run bar
+
+    bar: |
+      set -e
+      oya render ./templates/file.txt
+    """
+  And file ./templates/file.txt containing
+    """
+    <%= fruit %>
+    """
+  When I run "oya run foo"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  peach
+  """
 
 # BUG(bilus): Scenario: Tasks can optionally use the importing Oyafile scope to render values
 # BUG(bilus): Scenario: Tasks can optionally use the importing Oyafile scope to run other tasks
