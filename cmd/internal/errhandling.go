@@ -14,7 +14,9 @@ var HEADER_FMT = "---------------------- %v ---------------------- %v\n"
 func HandleError(err error) {
 	switch err := err.(type) {
 	case errors.Error:
+		fmt.Fprintln(os.Stderr, "---------------------------------------------------------------")
 		handleError(err)
+		os.Exit(1) // BUG(bilus): propagate exit code.
 	default:
 		handleUnknownErr(err)
 	}
@@ -22,11 +24,10 @@ func HandleError(err error) {
 
 func handleError(err errors.Error) {
 	out := os.Stderr
-	fmt.Fprintln(out, "---------------------------------------------------------------")
 	if cause := err.Cause(); cause != nil {
 		cause, ok := cause.(errors.Error)
 		if ok {
-			cause.Print(out)
+			handleError(cause)
 
 		} else {
 			fmt.Fprintln(out, "Error:", cause)
@@ -34,11 +35,9 @@ func handleError(err errors.Error) {
 
 		fmt.Fprintln(out)
 		fmt.Fprintln(out, "---------------------------------------------------------------")
-
 	}
 	err.Print(out)
 	fmt.Fprintln(out)
-	os.Exit(1) // BUG(bilus): propagate exit code.
 }
 
 func formatHeader(out io.Writer, title, path string) {

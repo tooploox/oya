@@ -99,21 +99,17 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 
 	err := task.Exec(oyafile.Dir, args, scope, stdout, stderr)
 	if err != nil {
+		err = oyafile.enrichError(err, taskName, args)
+
 		return true, errors.Wrap(
 			err,
 			ErrTaskFail{
-				OyafilePath: oyafile.Path,
-				TaskName:    taskName,
-				Args:        args,
-				ImportPath:  oyafile.detectImportPath(taskName),
+				TaskName: taskName,
+				Args:     args,
 			},
 			errors.Location{
 				VerboseName: fmt.Sprintf("in file %q", oyafile.Path),
 				Name:        oyafile.Path,
-			},
-			errors.Location{
-				VerboseName: fmt.Sprintf("in task %q", taskName),
-				Name:        fmt.Sprintf("%s", taskName),
 			},
 		)
 
@@ -121,14 +117,26 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 	return true, nil
 }
 
-func (oyafile Oyafile) detectImportPath(taskName task.Name) *types.ImportPath {
-	alias, _ := taskName.Split()
-	importPath, ok := oyafile.Imports[alias]
-	if ok {
-		return &importPath
-	} else {
-		return nil
+func (oyafile Oyafile) enrichError(err error, taskName task.Name, args []string) error {
+	alias, name := taskName.Split()
+	if alias.IsEmpty() {
+		return err
 	}
+	importPath, ok := oyafile.Imports[alias]
+	if !ok {
+		return err
+	}
+	return errors.Wrap(
+		err,
+		ErrTaskFail{
+			TaskName: task.Name(name),
+			Args:     args,
+		},
+		errors.Location{
+			Name:        importPath.String(),
+			VerboseName: fmt.Sprintf("in %v imported as %q", importPath, alias),
+		},
+	)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {
