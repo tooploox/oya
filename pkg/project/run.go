@@ -3,7 +3,6 @@ package project
 import (
 	"io"
 
-	"github.com/go-distributed/gog/log"
 	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/task"
@@ -12,7 +11,6 @@ import (
 
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
 	args []string, scope template.Scope, stdout, stderr io.Writer) error {
-	log.Debugf("Task %q at %v", taskName, workDir)
 
 	values, err := p.values()
 	if err != nil {
