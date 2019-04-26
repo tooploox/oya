@@ -25,20 +25,20 @@ func Decrypt(path string) ([]byte, bool, error) {
 	return decrypted, true, nil
 }
 
-func Encrypt(path string) error {
-	if alreadyEncrypted(path) {
-		return ErrSecretsAlreadyEncrypted{Path: path}
+func Encrypt(inputPath, outputPath string) error {
+	if alreadyEncrypted(inputPath) {
+		return ErrSecretsAlreadyEncrypted{Path: inputPath}
 	}
-	cmd := exec.Command("sops", "-e", path)
+	cmd := exec.Command("sops", "-e", inputPath)
 	encoded, err := cmd.CombinedOutput()
 	if err != nil {
-		return ErrSecretsFailure{Path: path, CmdError: string(encoded)}
+		return ErrSecretsFailure{Path: inputPath, CmdError: string(encoded)}
 	}
-	fi, err := os.Stat(path)
+	fi, err := os.Stat(inputPath)
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(path, encoded, fi.Mode())
+	err = ioutil.WriteFile(outputPath, encoded, fi.Mode())
 	if err != nil {
 		return err
 	}

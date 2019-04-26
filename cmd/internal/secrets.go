@@ -35,7 +35,7 @@ func SecretsEdit(path string, stdout, stderr io.Writer) error {
 }
 
 func SecretsEncrypt(path string, stdout, stderr io.Writer) error {
-	if err := secrets.Encrypt(path); err != nil {
+	if err := secrets.Encrypt(path, path); err != nil {
 		return err
 	}
 	return nil
