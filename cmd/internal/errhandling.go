@@ -3,14 +3,12 @@ package internal
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/tooploox/oya/pkg/errors"
 )
 
-func HandleError(err error) {
-	out := os.Stderr
+func HandleError(out io.Writer, err error) {
 	printSep(out)
 	switch err := err.(type) {
 	case errors.Error:
@@ -18,7 +16,6 @@ func HandleError(err error) {
 	default:
 		printUnknownErr(out, err)
 	}
-	os.Exit(1) // BUG(bilus): propagate exit code.
 }
 
 func printSep(out io.Writer) {
