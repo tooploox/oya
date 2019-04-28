@@ -21,7 +21,7 @@ Scenario: Pass flags and positional arguments to a task
     """
   When I run "oya run task --switch positional1 --value=5 positional2 --other-switch"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   --switch
   positional1
@@ -47,7 +47,7 @@ Scenario: Have args survive 'set' command (regression)
     """
   When I run "oya run task arg"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   arg
 

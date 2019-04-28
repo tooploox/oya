@@ -48,7 +48,7 @@ Scenario: Get two versions of the same pack
   When I'm in the ./project1 dir
   And I run "oya run --recurse fixtures.version"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   1.0.0
 
@@ -56,7 +56,7 @@ Scenario: Get two versions of the same pack
   When I'm in the ../project2 dir
   And I run "oya run fixtures.version"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   1.1.0
 

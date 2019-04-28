@@ -342,7 +342,7 @@ Scenario: Indirectly required higher version
     """
   When I run "oya run pack1.version"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
     """
     1.1.1
 

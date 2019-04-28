@@ -15,7 +15,7 @@ Scenario: Access Oyafile base directory
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout text matching
+  And the command outputs text matching
   """
   ^.*subdir
 
@@ -39,7 +39,7 @@ Scenario: Access pack base directory
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout text matching
+  And the command outputs text matching
   """
   ^.*github.com/test/foo@v0.0.1
 
@@ -55,7 +55,7 @@ Scenario: Access Oyafile Project name
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout text matching
+  And the command outputs text matching
   """
   project
 
@@ -73,7 +73,7 @@ Scenario: Access Oyafile Project name in nested dir
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout text matching
+  And the command outputs text matching
   """
   project
 
@@ -97,7 +97,7 @@ Scenario: Access Oyafile Project name inside pack
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout text matching
+  And the command outputs text matching
   """
   project
 

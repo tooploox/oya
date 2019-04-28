@@ -12,10 +12,10 @@ Scenario: Single Oyafile
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
-  oya run build  
+  oya run build
 
   """
 
@@ -29,10 +29,10 @@ Scenario: Show only user-defined
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
-  oya run build  
+  oya run build
 
   """
 
@@ -50,10 +50,10 @@ Scenario: Subdirectories are not recursed by default
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
-  oya run build  
+  oya run build
 
   """
 
@@ -71,13 +71,13 @@ Scenario: Subdirectories can be recursed
     """
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
-  oya run build  
+  oya run build
 
   # in ./subdir1/Oyafile
-  oya run build  
+  oya run build
 
   """
 
@@ -93,7 +93,7 @@ Scenario: Docstring prints
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
   oya run build  # Build it
@@ -121,7 +121,7 @@ Scenario: Doc strings are properly aligned
     """
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
   oya run build    # Build it
@@ -154,7 +154,7 @@ Scenario: Parent dir tasks are not listed
   And I'm in the ./subdir1 dir
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
   oya run foo  # Do foo
@@ -182,10 +182,10 @@ Scenario: Imported packs tasks are listed
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   # in ./Oyafile
-  oya run foo.packTask  
-  oya run test          
+  oya run foo.packTask
+  oya run test
 
   """

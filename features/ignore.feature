@@ -15,7 +15,7 @@ Scenario: Empty .oyaignore
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
   subdir
@@ -36,7 +36,7 @@ Scenario: Ignore file
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
 
@@ -60,7 +60,7 @@ Scenario: Wildcard ignore
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
 

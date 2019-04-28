@@ -213,28 +213,11 @@ func (c *SuiteContext) theCommandOutputs(expected *gherkin.DocString) error {
 	return nil
 }
 
-func (c *SuiteContext) theCommandOutputsTo(target string, expected *gherkin.DocString) error {
-	actual := c.stdout.String()
-	if actual != expected.Content {
-		return fmt.Errorf("unexpected %v output: %q expected: %q", target, actual, expected.Content)
-	}
-	return nil
-}
-
 func (c *SuiteContext) theCommandOutputsTextMatching(expected *gherkin.DocString) error {
 	actual := c.stdout.String()
 	rx := regexp.MustCompile(expected.Content)
 	if !rx.MatchString(actual) {
 		return fmt.Errorf("unexpected %v; expected to match: %q", actual, expected.Content)
-	}
-	return nil
-}
-
-func (c *SuiteContext) theCommandOutputsTextMatchingTo(target string, expected *gherkin.DocString) error {
-	actual := c.stdout.String()
-	rx := regexp.MustCompile(expected.Content)
-	if !rx.MatchString(actual) {
-		return fmt.Errorf("unexpected %v output: %q expected to match: %q", target, actual, expected.Content)
 	}
 	return nil
 }
@@ -255,9 +238,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command fails with error$`, c.theCommandFailsWithError)
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs$`, c.theCommandOutputs)
-	s.Step(`^the command outputs to (stdout)$`, c.theCommandOutputsTo)
 	s.Step(`^the command outputs text matching$`, c.theCommandOutputsTextMatching)
-	s.Step(`^the command outputs to (stdout) text matching$`, c.theCommandOutputsTextMatchingTo)
 	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })

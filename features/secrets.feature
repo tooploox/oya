@@ -21,7 +21,7 @@ Scenario: It loads values from secrets.oya if present
   And I run "oya secrets encrypt secrets.oya"
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   bar
   banana
@@ -48,7 +48,7 @@ Scenario: Views secrets file
   And I run "oya secrets encrypt secrets.oya"
   When I run "oya secrets view secrets.oya"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   foo: SECRETPHRASE
   """
@@ -76,7 +76,7 @@ Scenario: It correctly merges secrets
   And I run "oya secrets encrypt secrets.oya"
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   banana
   apple

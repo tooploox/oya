@@ -25,7 +25,7 @@ Scenario: It loads values from *.oya
     """
   When I run "oya run showValues"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   apple
   banana
@@ -60,7 +60,7 @@ Scenario: It correctly merges values, processing *.oya alphabetically
     """
   When I run "oya run showValues"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   banana
   apple

@@ -26,7 +26,7 @@ Scenario: Use a local require
     """
   When I run "oya run foo.version"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
     """
     1.0.0
 
