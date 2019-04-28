@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/pack"
 	"github.com/tooploox/oya/pkg/semver"
@@ -114,23 +115,32 @@ func (l *GithubRepo) InstallPath(version semver.Version, installDir string) stri
 func (l *GithubRepo) checkout(version semver.Version) (*object.Commit, error) {
 	r, err := l.clone()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
+		return nil, l.wrapCheckoutError(err, version)
 	}
 	tree, err := r.Worktree()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
+		return nil, l.wrapCheckoutError(err, version)
 	}
 	err = tree.Checkout(&git.CheckoutOptions{
 		Branch: plumbing.NewTagReferenceName(l.makeRef(version)),
 	})
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
+		return nil, l.wrapCheckoutError(err, version)
 	}
 	ref, err := r.Head()
 	if err != nil {
-		return nil, ErrCheckout{ImportPath: l.importPath, ImportVersion: version, GitMsg: err.Error()}
+		return nil, l.wrapCheckoutError(err, version)
 	}
 	return r.CommitObject(ref.Hash())
+}
+
+func (l *GithubRepo) wrapCheckoutError(err error, version semver.Version) error {
+	return errors.Wrap(err,
+		ErrCheckout{
+			ImportPath:    l.importPath,
+			ImportVersion: version,
+		},
+	)
 }
 
 // Install downloads & copies the specified version of the path to the output directory,
@@ -299,7 +309,9 @@ func (l *GithubRepo) isOutsidePack(relPath string) (bool, error) {
 
 func toErrClone(url string, err error) error {
 	if err == transport.ErrAuthenticationRequired {
-		return ErrClone{RepoUrl: url, GitMsg: "Repository not found or private"}
+		return errors.Wrap(
+			errors.Errorf("Repository not found or private"),
+			ErrClone{RepoUrl: url})
 	}
-	return ErrClone{RepoUrl: url, GitMsg: err.Error()}
+	return errors.Wrap(err, ErrClone{RepoUrl: url})
 }

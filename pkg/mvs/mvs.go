@@ -4,18 +4,17 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/mvs/internal"
 	"github.com/tooploox/oya/pkg/pack"
 	"github.com/tooploox/oya/pkg/types"
 )
 
 type ErrResolvingReqs struct {
-	Cause error
-	Trace []string
 }
 
 func (e ErrResolvingReqs) Error() string {
-	return fmt.Sprintf("error resolving reqs: %v", e.Cause.Error())
+	return "problem getting requirements"
 }
 
 type Reqs interface {
@@ -35,7 +34,7 @@ func Hash(pack pack.Pack) string {
 }
 
 type Job struct {
-	Trace []string
+	Trace []errors.Location
 	Pack  pack.Pack
 }
 
@@ -76,16 +75,17 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 			reqs, err := reqs.Reqs(crnt)
 			if err != nil {
 				mtx.Lock()
-				firstErr = ErrResolvingReqs{
-					Cause: err,
-					Trace: trace,
-				}
+				firstErr = errors.Wrap(
+					err,
+					ErrResolvingReqs{},
+					trace...,
+				)
 				mtx.Unlock()
 				return
 			}
 
 			for _, req := range reqs {
-				queue.Add(Job{append(trace, crnt.ImportPath().String()), req})
+				queue.Add(Job{append(trace, toLocation(crnt)), req})
 			}
 		})
 
@@ -100,10 +100,18 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 	return packs, nil
 }
 
-func duplicate(trace []string) []string {
-	dup := make([]string, len(trace))
+func duplicate(trace []errors.Location) []errors.Location {
+	dup := make([]errors.Location, len(trace))
 	for i, t := range trace {
 		dup[i] = t
 	}
 	return dup
+}
+
+func toLocation(pack pack.Pack) errors.Location {
+	importPath := pack.ImportPath()
+	return errors.Location{
+		Name:        importPath.String(),
+		VerboseName: fmt.Sprintf("required by %v", importPath),
+	}
 }
