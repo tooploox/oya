@@ -9,12 +9,12 @@ import (
 )
 
 func HandleError(out io.Writer, err error) {
-	printSep(out)
 	switch err := err.(type) {
 	case errors.Error:
-		printError(out, err)
+		printErrorWithTrace(out, err)
 	default:
-		printUnknownErr(out, err)
+		printSep(out)
+		printError(out, err)
 	}
 }
 
@@ -24,21 +24,16 @@ func printSep(out io.Writer) {
 	fmt.Fprintln(out, strings.Repeat(sepChar, sepWidth))
 }
 
-func printError(out io.Writer, err errors.Error) {
+func printErrorWithTrace(out io.Writer, err errors.Error) {
 	if cause := err.Cause(); cause != nil {
-		if causeError, ok := cause.(errors.Error); ok {
-			printError(out, causeError)
-		} else {
-			fmt.Fprintln(out, "Error:", cause)
-			fmt.Fprintln(out)
-		}
-
-		printSep(out)
+		HandleError(out, cause)
 	}
+	printSep(out)
 	err.Print(out)
 	fmt.Fprintln(out)
 }
 
-func printUnknownErr(out io.Writer, err error) {
-	fmt.Fprintf(out, "Error: %v\n", err.Error())
+func printError(out io.Writer, err error) {
+	fmt.Fprintln(out, "Error:", err)
+	fmt.Fprintln(out)
 }
