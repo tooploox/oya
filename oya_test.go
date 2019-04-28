@@ -41,10 +41,10 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
-	// err := os.RemoveAll(c.projectDir)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err := os.RemoveAll(c.projectDir)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func setEnv(projectDir string) {
