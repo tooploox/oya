@@ -11,10 +11,10 @@ import (
 	"github.com/tooploox/oya/pkg/types"
 )
 
-type ErrExplodingDeps struct {
+type ErrResolvingDeps struct {
 }
 
-func (e ErrExplodingDeps) Error() string {
+func (e ErrResolvingDeps) Error() string {
 	return "error resolving dependencies"
 }
 
@@ -45,7 +45,7 @@ func (dt *DependencyTree) Explode() error {
 	if err != nil {
 		return errors.Wrap(
 			err,
-			ErrExplodingDeps{},
+			ErrResolvingDeps{},
 			errors.Location{
 				Name:        dt.rootDir,
 				VerboseName: fmt.Sprintf("project at %q", dt.rootDir),
