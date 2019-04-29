@@ -22,8 +22,9 @@ const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
 type SuiteContext struct {
 	projectDir string
 
-	lastCommandErr error
-	stdout         *bytes.Buffer
+	lastCommandErr      error
+	lastCommandExitCode int
+	stdout              *bytes.Buffer
 }
 
 func (c *SuiteContext) MustSetUp() {
@@ -160,7 +161,7 @@ func (c *SuiteContext) execute(command string) error {
 		os.Args = oldArgs
 	}()
 	cmd.SetOutput(c.stdout)
-	c.lastCommandErr = cmd.ExecuteE()
+	c.lastCommandExitCode, c.lastCommandErr = cmd.ExecuteE()
 	return nil
 }
 
@@ -222,6 +223,13 @@ func (c *SuiteContext) theCommandOutputsTextMatching(expected *gherkin.DocString
 	return nil
 }
 
+func (c *SuiteContext) theCommandExitCodeIs(expectedExitCode int) error {
+	if c.lastCommandExitCode != expectedExitCode {
+		return errors.Errorf("unexpected exit code from the last command: %v; expected: %v", c.lastCommandExitCode, expectedExitCode)
+	}
+	return nil
+}
+
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
@@ -239,6 +247,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command fails with error matching$`, c.theCommandFailsWithErrorMatching)
 	s.Step(`^the command outputs$`, c.theCommandOutputs)
 	s.Step(`^the command outputs text matching$`, c.theCommandOutputsTextMatching)
+	s.Step(`^the command exit code is (.+)$`, c.theCommandExitCodeIs)
 	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
 
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })

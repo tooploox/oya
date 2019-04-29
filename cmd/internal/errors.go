@@ -6,9 +6,15 @@ import (
 	"strings"
 
 	"github.com/tooploox/oya/pkg/errors"
+	"github.com/tooploox/oya/pkg/task"
 )
 
-func HandleError(out io.Writer, err error) {
+func HandleError(out io.Writer, err error) int {
+	PrintError(out, err)
+	return ExitCode(err)
+}
+
+func PrintError(out io.Writer, err error) {
 	switch err := err.(type) {
 	case errors.Error:
 		printErrorWithTrace(out, err)
@@ -16,6 +22,14 @@ func HandleError(out io.Writer, err error) {
 		printSep(out)
 		printError(out, err)
 	}
+}
+
+func ExitCode(err error) int {
+	var sfe task.ErrScriptFail
+	if errors.As(err, &sfe) {
+		return sfe.ExitCode
+	}
+	return 1
 }
 
 func printSep(out io.Writer) {
@@ -26,7 +40,7 @@ func printSep(out io.Writer) {
 
 func printErrorWithTrace(out io.Writer, err errors.Error) {
 	if cause := err.Cause(); cause != nil {
-		HandleError(out, cause)
+		PrintError(out, cause)
 	}
 	printSep(out)
 	err.Print(out)

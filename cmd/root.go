@@ -54,8 +54,8 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := ExecuteE(); err != nil {
-		os.Exit(1) // BUG(bilus): propagate exit code.
+	if exitCode, err := ExecuteE(); err != nil {
+		os.Exit(exitCode)
 	}
 }
 
@@ -64,12 +64,12 @@ func SetOyaVersion(ver string) {
 }
 
 // ExecuteE executes a command same as Execute but returns error.
-func ExecuteE() error {
+func ExecuteE() (int, error) {
 	_, err := rootCmd.ExecuteC()
 	if err != nil {
-		internal.HandleError(rootCmd.OutOrStderr(), err)
+		return internal.HandleError(rootCmd.OutOrStderr(), err), err
 	}
-	return err
+	return 0, nil
 }
 
 // SetOutput overrides cobra output (for testing).

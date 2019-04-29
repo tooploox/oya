@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"reflect"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -61,6 +62,32 @@ func Wrapf(cause error, fmt string, args ...interface{}) error {
 
 func Errorf(fmt string, args ...interface{}) error {
 	return errors.Errorf(fmt, args...)
+}
+
+func As(err error, target interface{}) bool {
+	if err == nil {
+		return false
+	}
+	if target == nil {
+		panic("errors: target cannot be nil")
+	}
+	val := reflect.ValueOf(target)
+	typ := val.Type()
+	if typ.Kind() != reflect.Ptr || val.IsNil() {
+		panic("errors: target must be a non-nil pointer")
+	}
+	switch err := err.(type) {
+	case Error:
+		targetType := typ.Elem()
+		wrappedErr := err.err
+		if reflect.TypeOf(wrappedErr).AssignableTo(targetType) {
+			val.Elem().Set(reflect.ValueOf(wrappedErr))
+			return true
+		}
+		return As(err.Cause(), target)
+	default:
+		return false
+	}
 }
 
 type Location struct {

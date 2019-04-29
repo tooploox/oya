@@ -292,6 +292,7 @@ Scenario: Task exits with non-zero code
     > 1\\| exit 27
 
     """
+  And the command exit code is 27
 
 Scenario: Command in task exits with non-zero code
   Given file ./Oyafile containing
@@ -309,6 +310,7 @@ Scenario: Command in task exits with non-zero code
   hello after exit 27
 
   """
+  And the command exit code is 0
 
 
 Scenario: Command in task exits with non-zero code when set -e is in effect
@@ -332,3 +334,4 @@ Scenario: Command in task exits with non-zero code when set -e is in effect
       1\\| set -e
     > 2\\| bash -c 'exit 27'
     """
+  And the command exit code is 27
