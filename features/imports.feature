@@ -22,7 +22,7 @@ Scenario: Import tasks from installed packs
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Done
 
@@ -50,7 +50,7 @@ Scenario: Import task using pack values
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   xxx
 
@@ -77,7 +77,7 @@ Scenario: Import task using BasePath
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   foo@v0.0.1
 
@@ -103,7 +103,7 @@ Scenario: Access pack values
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   xxx
 
@@ -135,7 +135,7 @@ Scenario: Access current project values
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
   project1
@@ -165,7 +165,7 @@ Scenario: Pack values can be set from project Oyafile prefixed with pack alias
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   banana
 
@@ -198,7 +198,7 @@ Scenario: Pack values are overriden in main Oyafile
     """
   When I run "oya run foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   banana
   broccoli
@@ -228,7 +228,7 @@ Scenario: Import tasks in a subdir Oyafile
   And I'm in the ./subdir dir
   When I run "oya run --recurse foo.all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   all
 
@@ -255,7 +255,7 @@ Scenario: Import tasks from a subdirectory
   And I'm in the ./project2 dir
   When I run "oya run project1.echo"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   project1
 

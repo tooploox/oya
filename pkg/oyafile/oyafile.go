@@ -1,6 +1,7 @@
 package oyafile
 
 import (
+	"fmt"
 	"io"
 	"path"
 	"path/filepath"
@@ -8,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/pkg/errors"
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/raw"
 	"github.com/tooploox/oya/pkg/semver"
 	"github.com/tooploox/oya/pkg/task"
@@ -96,7 +97,46 @@ func (oyafile Oyafile) RunTask(taskName task.Name, args []string, scope template
 		return false, nil
 	}
 
-	return true, task.Exec(oyafile.Dir, args, scope, stdout, stderr)
+	err := task.Exec(oyafile.Dir, args, scope, stdout, stderr)
+	if err != nil {
+		err = oyafile.enrichError(err, taskName, args)
+
+		return true, errors.Wrap(
+			err,
+			ErrTaskFail{
+				TaskName: taskName,
+				Args:     args,
+			},
+			errors.Location{
+				VerboseName: fmt.Sprintf("in file %q", oyafile.Path),
+				Name:        oyafile.Path,
+			},
+		)
+
+	}
+	return true, nil
+}
+
+func (oyafile Oyafile) enrichError(err error, taskName task.Name, args []string) error {
+	alias, name := taskName.Split()
+	if alias.IsEmpty() {
+		return err
+	}
+	importPath, ok := oyafile.Imports[alias]
+	if !ok {
+		return err
+	}
+	return errors.Wrap(
+		err,
+		ErrTaskFail{
+			TaskName: task.Name(name),
+			Args:     args,
+		},
+		errors.Location{
+			Name:        importPath.String(),
+			VerboseName: fmt.Sprintf("in %v imported as %q", importPath, alias),
+		},
+	)
 }
 
 func (oyafile Oyafile) Equals(other Oyafile) bool {

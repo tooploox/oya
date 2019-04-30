@@ -12,10 +12,10 @@ Scenario: Single Oyafile
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  
+  oya run build\s+
 
   """
 
@@ -29,10 +29,10 @@ Scenario: Show only user-defined
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  
+  oya run build\s+
 
   """
 
@@ -50,10 +50,10 @@ Scenario: Subdirectories are not recursed by default
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  
+  oya run build\s+
 
   """
 
@@ -71,13 +71,13 @@ Scenario: Subdirectories can be recursed
     """
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  
+  oya run build\s+
 
   # in ./subdir1/Oyafile
-  oya run build  
+  oya run build\s+
 
   """
 
@@ -93,10 +93,10 @@ Scenario: Docstring prints
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  # Build it
+  oya run build  # Build it.*
 
   """
 
@@ -121,11 +121,11 @@ Scenario: Doc strings are properly aligned
     """
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build    # Build it
-  oya run testAll  # Run all tests
+  oya run build    # Build it.*
+  oya run testAll  # Run all tests.*
 
   # in ./subdir1/Oyafile
   oya run foo  # Do foo
@@ -154,7 +154,7 @@ Scenario: Parent dir tasks are not listed
   And I'm in the ./subdir1 dir
   When I run "oya tasks --recurse"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
   oya run foo  # Do foo
@@ -182,10 +182,10 @@ Scenario: Imported packs tasks are listed
     """
   When I run "oya tasks"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs text matching
   """
   # in ./Oyafile
-  oya run foo.packTask  
-  oya run test          
+  oya run foo.packTask\s+
+  oya run test\s+
 
   """

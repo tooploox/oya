@@ -145,7 +145,7 @@ Scenario: Tasks use the scope of the imported Oyafile to render values
     """
   When I run "oya run foo.bar"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   orange
 
@@ -190,7 +190,7 @@ Scenario: Tasks use the scope of the imported Oyafile to run other tasks
     """
   When I run "oya run foo"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Success
 

@@ -4,10 +4,18 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/mvs/internal"
 	"github.com/tooploox/oya/pkg/pack"
 	"github.com/tooploox/oya/pkg/types"
 )
+
+type ErrResolvingReqs struct {
+}
+
+func (e ErrResolvingReqs) Error() string {
+	return "problem getting requirements"
+}
 
 type Reqs interface {
 	Reqs(pack pack.Pack) ([]pack.Pack, error)
@@ -26,7 +34,8 @@ func Hash(pack pack.Pack) string {
 }
 
 type Job struct {
-	pack.Pack
+	Trace []errors.Location
+	Pack  pack.Pack
 }
 
 func (j Job) Payload() interface{} {
@@ -43,20 +52,21 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 	latest := make(map[types.ImportPath]pack.Pack)
 	queue := internal.Work{}
 	for _, r := range required {
-		queue.Add(Job{r})
+		queue.Add(Job{nil, r})
 	}
 	var firstErr error
 	queue.Do(10,
-		func(job internal.Job) {
+		func(j internal.Job) {
 			if firstErr != nil {
 				return
 			}
-			mtx.Lock()
-			crnt, ok := job.Payload().(pack.Pack)
+			job, ok := j.(Job)
 			if !ok {
-				mtx.Unlock()
 				panic("Internal error: expected pack.Pack passed to work queue")
 			}
+			crnt := job.Pack
+			trace := duplicate(job.Trace)
+			mtx.Lock()
 			if l, ok := latest[crnt.ImportPath()]; !ok || Hash(max(l, crnt)) != Hash(l) {
 				latest[crnt.ImportPath()] = crnt
 			}
@@ -64,12 +74,18 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 
 			reqs, err := reqs.Reqs(crnt)
 			if err != nil {
-				firstErr = err
+				mtx.Lock()
+				firstErr = errors.Wrap(
+					err,
+					ErrResolvingReqs{},
+					trace...,
+				)
+				mtx.Unlock()
 				return
 			}
 
 			for _, req := range reqs {
-				queue.Add(Job{req})
+				queue.Add(Job{append(trace, toLocation(crnt)), req})
 			}
 		})
 
@@ -82,4 +98,20 @@ func List(required []pack.Pack, reqs Reqs) ([]pack.Pack, error) {
 		packs = append(packs, pack)
 	}
 	return packs, nil
+}
+
+func duplicate(trace []errors.Location) []errors.Location {
+	dup := make([]errors.Location, len(trace))
+	for i, t := range trace {
+		dup[i] = t
+	}
+	return dup
+}
+
+func toLocation(pack pack.Pack) errors.Location {
+	importPath := pack.ImportPath()
+	return errors.Location{
+		Name:        importPath.String(),
+		VerboseName: fmt.Sprintf("required by %v", importPath),
+	}
 }

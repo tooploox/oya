@@ -29,6 +29,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/tooploox/oya/cmd/internal"
 )
 
 var cfgFile string
@@ -46,13 +47,15 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
+	SilenceErrors: true,
+	SilenceUsage:  true,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+	if exitCode, err := ExecuteE(); err != nil {
+		os.Exit(exitCode)
 	}
 }
 
@@ -61,9 +64,12 @@ func SetOyaVersion(ver string) {
 }
 
 // ExecuteE executes a command same as Execute but returns error.
-func ExecuteE() error {
+func ExecuteE() (int, error) {
 	_, err := rootCmd.ExecuteC()
-	return err
+	if err != nil {
+		return internal.HandleError(rootCmd.OutOrStderr(), err), err
+	}
+	return 0, nil
 }
 
 // SetOutput overrides cobra output (for testing).

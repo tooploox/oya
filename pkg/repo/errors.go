@@ -28,22 +28,20 @@ func (err ErrNoTaggedVersions) Error() string {
 // ErrClone indacates problem during repository clone (doesn't exist or private)
 type ErrClone struct {
 	RepoUrl string
-	GitMsg  string
 }
 
 func (err ErrClone) Error() string {
-	return fmt.Sprintf("cloning pack %v - %q", err.RepoUrl, err.GitMsg)
+	return fmt.Sprintf("failed to clone repository %v", err.RepoUrl)
 }
 
 // ErrCheckout indicates problem during repository checkout for ex. unknown version
 type ErrCheckout struct {
 	ImportPath    types.ImportPath
 	ImportVersion semver.Version
-	GitMsg        string
 }
 
 func (err ErrCheckout) Error() string {
-	return fmt.Sprintf("checking out pack %v@%v - %q", err.ImportPath, err.ImportVersion, err.GitMsg)
+	return fmt.Sprintf("failed to get pack %v@%v", err.ImportPath, err.ImportVersion)
 }
 
 // ErrNoRootOyafile indicates that pack's root Oyafile is missing.

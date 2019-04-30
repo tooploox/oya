@@ -19,7 +19,7 @@ Scenario: No changes
     """
   When I run "oya run --changeset --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   """
 
@@ -39,7 +39,7 @@ Scenario: Child marks itself as changed
     """
   When I run "oya run --changeset --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Root
 
@@ -61,7 +61,7 @@ Scenario: Child marks parent as changed
     """
   When I run "oya run --changeset --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Root
 
@@ -83,7 +83,7 @@ Scenario: Parent marks child as changed
     """
   When I run "oya run --changeset --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Project1
 

@@ -27,7 +27,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 	if err != nil {
 		return err
 	}
-	oyafiles, err := p.RunTargets(workDir, recurse, changeset)
+	oyafiles, err := p.ListTargets(workDir, recurse, changeset)
 	if err != nil {
 		return err
 	}

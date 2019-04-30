@@ -16,7 +16,7 @@ Scenario: Successfully run task
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Done
 
@@ -45,7 +45,7 @@ Scenario: Nested Oyafiles are not processed recursively by default
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Root
 
@@ -76,7 +76,7 @@ Scenario: Nested Oyafiles can be processed recursively
     """
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Root
   Project1
@@ -94,9 +94,9 @@ Scenario: No Oyafile
     """
   When I run "oya run all"
   Then the command fails with error matching
-  """
-  .*no Oyafile project in.*
-  """
+    """
+    .*no Oyafile project in.*
+    """
 
 Scenario: Missing task
   Given file ./Oyafile containing
@@ -121,7 +121,7 @@ Scenario: Script template
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   some value
 
@@ -140,7 +140,7 @@ Scenario: Ignore projects inside current project
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
 
@@ -161,7 +161,7 @@ Scenario: Ignore errors in projects inside current project
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   main
 
@@ -191,7 +191,7 @@ Scenario: Running recursively
   And I'm in the ./project1 dir
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Project1
 
@@ -223,7 +223,7 @@ Scenario: Running recursively
   And I'm in the ./project1 dir
   When I run "oya run --recurse all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Project1
 
@@ -247,7 +247,7 @@ Scenario: Running in a subdirectory
   And I'm in the ./project1 dir
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   Project1
 
@@ -267,7 +267,7 @@ Scenario: Allow empty Require, Import: Values
     """
   When I run "oya run foo"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
   hello from foo
 
@@ -278,31 +278,39 @@ Scenario: Task exits with non-zero code
     """
     Project: project
 
-   test: |
-       exit 1
+    test: |
+      exit 27
     """
   When I run "oya run test"
-  Then the command fails with error matching
+  Then the command fails
+  And the command outputs text matching
     """
-    task exited with code 1
+    Error: exit status 27
+
+      at line 1, column 1
+
+    > 1\\| exit 27
+
     """
+  And the command exit code is 27
 
 Scenario: Command in task exits with non-zero code
   Given file ./Oyafile containing
     """
     Project: project
 
-   test: |
-       bash -c 'exit 1'
-       echo "hello after exit 1"
+    test: |
+       bash -c 'exit 27'
+       echo "hello after exit 27"
     """
   When I run "oya run test"
   Then the command succeeds
-  And the command outputs to stdout
+  And the command outputs
   """
-  hello after exit 1
+  hello after exit 27
 
   """
+  And the command exit code is 0
 
 
 Scenario: Command in task exits with non-zero code when set -e is in effect
@@ -310,13 +318,20 @@ Scenario: Command in task exits with non-zero code when set -e is in effect
     """
     Project: project
 
-   test: |
+    test: |
        set -e
-       bash -c 'exit 1'
-       echo "hello after exit 1"
+       bash -c 'exit 27'
+       echo "hello after exit 27"
     """
   When I run "oya run test"
-  Then the command fails with error matching
+  Then the command fails
+  And the command outputs text matching
     """
-    task exited with code 1
+    Error: exit status 27
+
+      at line 2, column 1
+
+      1\\| set -e
+    > 2\\| bash -c 'exit 27'
     """
+  And the command exit code is 27

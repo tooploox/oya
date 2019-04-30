@@ -10,6 +10,10 @@ func (a Alias) String() string {
 	return string(a)
 }
 
+func (a Alias) IsEmpty() bool {
+	return len(string(a)) == 0
+}
+
 type ImportPath string
 
 func (p ImportPath) Host() Host {
@@ -17,6 +21,10 @@ func (p ImportPath) Host() Host {
 		return HostGithub
 	}
 	return HostUnknown
+}
+
+func (p ImportPath) String() string {
+	return string(p)
 }
 
 type Host int

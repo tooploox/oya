@@ -32,13 +32,13 @@ func (r *Reqs) Reqs(pack pack.Pack) ([]pack.Pack, error) {
 	if found {
 		return reqs, nil
 	}
-
 	reqs, found, err := r.lookupReqs(pack)
 	if err != nil {
 		return nil, err
 	}
 	if !found {
-		return nil, errors.Errorf("Pack not found: %v", pack.ImportPath())
+		// BUG(bilus): Custom error.
+		return nil, errors.Errorf("pack not found: %v", pack.ImportPath())
 	}
 	r.cacheReqs(pack, reqs)
 	return reqs, nil
