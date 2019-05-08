@@ -8,13 +8,15 @@ Scenario: Import a pack
     """
     Project: project
     """
-  When I run "oya import github.com/bilus/oya"
+  When I run "oya import github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
   And file ./Oyafile contains
     """
     Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
     Import:
-      oya: github.com/bilus/oya
+      pack1: github.com/tooploox/oya-fixtures/pack1
 
     """
 
@@ -23,19 +25,22 @@ Scenario: Import a pack to other already imported
     """
     Project: project
     Import:
-      other: github.com/tooploox/oya/other
+      pack1: github.com/tooploox/oya-fixtures/pack1
 
     task: |
       echo "check"
     """
-  When I run "oya import github.com/tooploox/oya/next"
+  When I run "oya import github.com/tooploox/oya-fixtures/pack2"
   Then the command succeeds
   And file ./Oyafile contains
     """
     Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack2: v1.1.2
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
     Import:
-      next: github.com/tooploox/oya/next
-      other: github.com/tooploox/oya/other
+      pack2: github.com/tooploox/oya-fixtures/pack2
+      pack1: github.com/tooploox/oya-fixtures/pack1
 
     task: |
       echo "check"
@@ -51,12 +56,12 @@ Scenario: Import a pack to empty Oyafile
     """
     """
   When I'm in the ./subdir dir
-  And I run "oya import github.com/tooploox/oya/next"
+  And I run "oya import github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
   And file ./subdir/Oyafile contains
     """
     Import:
-      next: github.com/tooploox/oya/next
+      pack1: github.com/tooploox/oya-fixtures/pack1
 
     """
 
@@ -68,13 +73,15 @@ Scenario: Import a pack to Oyafile with other things
     task: |
       echo "check"
     """
-  When I run "oya import github.com/bilus/oya"
+  When I run "oya import github.com/tooploox/oya-fixtures/pack1"
   Then the command succeeds
   And file ./Oyafile contains
     """
     Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
     Import:
-      oya: github.com/bilus/oya
+      pack1: github.com/tooploox/oya-fixtures/pack1
 
     task: |
       echo "check"

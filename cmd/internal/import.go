@@ -34,5 +34,5 @@ func Import(workDir, uri string, stdout, stderr io.Writer) error {
 		return err
 	}
 
-	return nil
+	return proj.InstallPacks()
 }
