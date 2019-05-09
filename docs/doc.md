@@ -38,7 +38,7 @@ Oya can help with maintaining this project.
 
 # 1. Oya helps with project build and run
 
-Final code can be found here https://github.com/tooploox/oya-example/tree/master/sample
+Final code can be found [here]( https://github.com/tooploox/oya-example/tree/master/sample)
 
 1.1 Install Oya
 1.2 Project
@@ -54,7 +54,7 @@ Final code can be found here https://github.com/tooploox/oya-example/tree/master
 
     $ curl https://oya.sh/get | bash
 
-This will install latest version of oya. You can say which version you want with `$ curl https://oya.sh/get | bash -s v0.0.7` for example. For release versions check https://github.com/tooploox/oya/releases .
+This will install latest version of oya. You can say which version you want with `$ curl https://oya.sh/get | bash -s v0.0.7` for example. For release versions check [releases](https://github.com/tooploox/oya/releases) .
 
 Now we can setup Oya Project.
 
@@ -124,7 +124,7 @@ As a default our server starts at 80 port, but it might change. Let’s keep por
 
 ## 1.5 Render
 
-Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more here https://github.com/gobuffalo/plush.
+Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more [here](https://github.com/gobuffalo/plush).
 
 We can generate `index.html` for our http server. We need a template file.
 
@@ -182,8 +182,8 @@ One exceptions is `secrets.oya` which needs to be encrypted before use.
 ## 1.7 Secrets
 
 Ok, but what if i have some confidential values ?
-Oya uses SOPS (https://github.com/mozilla/sops) to help with secrets management. 
-First you need to configure SOPS for encryption method, check https://github.com/mozilla/sops/blob/master/README.rst#usage.
+Oya uses [SOPS](https://github.com/mozilla/sops) to help with secrets management. 
+First you need to configure SOPS for [encryption methods](https://github.com/mozilla/sops/blob/master/README.rst#usage).
 For our example we can use PGP key.
 
     $ export SOPS_PGP_FP="317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -243,7 +243,7 @@ You can access secret value with  `${Oya[magical_spell]}` from task.
 
 # 2. Project structure - Recursive Oya.
 
-Example code: https://github.com/tooploox/oya-example/tree/master/recurse
+[Example code](https://github.com/tooploox/oya-example/tree/master/recurse)
 
 Ok, but what if i want to create frontend APP in other language, how can we separate it.
 We have a golang server and http files in one place. In Oyafile we’re building golang and generating html. It is not a best practice. 
@@ -378,15 +378,4 @@ We can easily generate Dockerfile, update it, and build our project.
 Each oya project is a pack itself, all you need to do is push it to git and tag it version `name/v0.0.1`. Import it as before with `$ oya import github.com/tooploox/oya-packs/name` oya should automatically resolve newest version and add `Require` to your oyafile.
 
 …. 😕 need decent example…. from life … something what everyone does all over again …. for each setup … hmmm.. help
-
-
-
-----------
-
-NOTES:
-PACK development
-
-- use ELM for templates  ?
-- create sample ELM pack with elm install and “compile” commands /?
-- VERSIONING show packs versioning. ?
 
