@@ -108,6 +108,266 @@ body {
         </div>
       </div>
     </div>
+
+
+    <!-- start tutorial -->
+<h1 id="oya-howto">Oya HOWTO</h1>
+<p>Examples : Web server<br>We have a simple http server written in Go.</p>
+<pre><code>$ tree
+.
+├── public
+│   └── index.html
+└── app.go
+
+1 directory, 2 files
+
+$ cat app.go
+package main
+
+import (
+        &quot;fmt&quot;
+        &quot;net/http&quot;
+        &quot;os&quot;
+)
+
+func main() {
+        port := os.Getenv(&quot;PORT&quot;)
+        if port == &quot;&quot; {
+                port = &quot;80&quot;
+        }
+        fileServer := http.FileServer(http.Dir(&quot;public/&quot;))
+        http.Handle(&quot;/&quot;, fileServer)
+
+        fmt.Printf(&quot;Starting server :%v\n&quot;, port)
+        http.ListenAndServe(fmt.Sprintf(&quot;:%v&quot;, port), nil)
+}
+</code></pre><p>Oya can help with maintaining this project.</p>
+<h1 id="1-oya-helps-with-project-build-and-run">1. Oya helps with project build and run</h1>
+<p>Final code can be found here <a href="https://github.com/tooploox/oya-example/tree/master/sample">https://github.com/tooploox/oya-example/tree/master/sample</a></p>
+<p>1.1 Install Oya<br>1.2 Project<br>1.3 Tasks<br>1.4 Values<br>1.5 Render<br>1.6 .oya files<br>1.7 Secrets</p>
+<h2 id="1-1-install-oya">1.1 Install Oya</h2>
+<pre><code>$ curl https://oya.sh/get | bash
+</code></pre><p>This will install latest version of oya. You can say which version you want with <code>$ curl https://oya.sh/get | bash -s v0.0.7</code> for example. For release versions check <a href="https://github.com/tooploox/oya/releases">https://github.com/tooploox/oya/releases</a> .</p>
+<p>Now we can setup Oya Project.</p>
+<h2 id="1-2-project">1.2 Project</h2>
+<p>Typically, a project will contain an <code>Oyafile</code> in its root directory. An <code>Oyafile</code> is a YAML file containing Oya configuration and the  <code>Project:</code> directive to indicate that this is the project root. You can create Oyafile by hand or with init command, let’s do this:</p>
+<pre><code>$ oya init
+$ cat Oyafile
+Project: project
+</code></pre><p>Let’s rename our project to <code>OyaExample</code></p>
+<h2 id="1-3-tasks">1.3 Tasks</h2>
+<p>Oya task is a bash script defined as a Oyafile key.<br>Tasks in Oyafile are defined as a yaml keys, with pipe at the beginning line and bash code in following.<br>Our server is golang app so before starting it needs to be compiled.<br>So lets add <code>build</code> and <code>start</code> tasks.</p>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+
+build: |
+  go build app.go
+
+start: |
+  ./server
+</code></pre><p>To list available tasks use tasks command:</p>
+<pre><code>$ oya tasks
+# in ./Oyafile
+oya run build
+oya run start
+</code></pre><p>Execute task</p>
+<pre><code>oya run build
+oya run start
+</code></pre><h2 id="1-4-values">1.4 Values</h2>
+<p>Values are defined in <code>Oyafile</code> as a list under uppercase key <code>Values</code>. Values can be accessed from tasks with <code>${Oya[value_name]}</code>.<br>As a default our server starts at 80 port, but it might change. Let’s keep port as a Value in <code>Oyafile</code> to easier management.</p>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+
+build: |
+  go build server.go
+
+start: |
+  export PORT=${Oya[port]}
+  ./server
+</code></pre><h2 id="1-5-render">1.5 Render</h2>
+<p>Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more here <a href="https://github.com/gobuffalo/plush">https://github.com/gobuffalo/plush</a>.</p>
+<p>We can generate <code>index.html</code> for our http server. We need a template file.</p>
+<pre><code>$ cat template/index.html
+&lt;h1&gt;&lt;%= title %&gt;&lt;/h1&gt;
+</code></pre><p>Let’s add our title under  <code>Value:</code></p>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+  title: Hello from Oya
+...
+</code></pre><p>Render output into <code>public/</code> dir so our server can see it.</p>
+<pre><code>$ oya render template/index.html -o public
+$ cat public/index.html
+&lt;h1&gt;Hello from Oya&lt;/h1&gt;
+</code></pre><p>Let’s add a task <code>generate</code> to do it for us.</p>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+  title: Hello from Oya
+
+build: |
+  go build app.go
+
+start: |
+  export PORT=${Oya[port]}
+  ./app
+
+generate: |
+  oya render template/index.html -o public
+</code></pre><p><code>$ oya run generate</code> will generate <code>index.html</code> for us.</p>
+<h2 id="1-6-oya-files">1.6 .oya files</h2>
+<p>Inside a project you can have many files with named <code>*.oya</code> they will be read as a Value files, expected syntax is a pair of  <code>key: value</code>. </p>
+<p>One exceptions is <code>secrets.oya</code> which needs to be encrypted before use. </p>
+<h2 id="1-7-secrets">1.7 Secrets</h2>
+<p>Ok, but what if i have some confidential values ?<br>Oya uses SOPS (<a href="https://github.com/mozilla/sops">https://github.com/mozilla/sops</a>) to help with secrets management.<br>First you need to configure SOPS for encryption method, check <a href="https://github.com/mozilla/sops/blob/master/README.rst#usage">https://github.com/mozilla/sops/blob/master/README.rst#usage</a>.<br>For our example we can use PGP key.</p>
+<pre><code>$ export SOPS_PGP_FP=&quot;317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202&quot;
+</code></pre><p>Oya secrets commands:</p>
+<pre><code>$ oya secrets --help
+...
+  edit        Edit secrets file
+  encrypt     Encrypt secrets file
+  view        View secrets
+...
+</code></pre><p><strong>First run:</strong></p>
+<p>First you need to create <code>secrets.oya</code> file. with <code>key: value</code> in each line. And encrypt it. (You can also go straight to edit with <code>$ oya secrets edit secrets.oya</code>).</p>
+<pre><code>$ cat secrets.oya
+magical_spell: hokus pokus czary mary
+$ oya secrets encrypt secrets.oya
+</code></pre><p>Done your secrets are safe. Check how secrets.oya looks like.</p>
+<pre><code>$ cat secrets.oya
+{
+        &quot;data&quot;: &quot;ENC[AES256_GCM,data:XXXX=,tag:XXXX==,type:str]&quot;,
+        &quot;sops&quot;: {
+                ...
+                &quot;pgp&quot;: [...],
+                ...
+        }
+}%
+</code></pre><p>We can see only sops metadata, our data are safe and encrypted.</p>
+<p>To view or edit use:</p>
+<pre><code>$ oya secrets view secrets.oya
+magical_spell: hokus pokus czary mary
+$ oya secrets edit secrets.oya
+</code></pre><p>You can access secret value with  <code>${Oya[magical_spell]}</code> from task.</p>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+...
+spell: |
+  echo ${Oya[magical_spell]}
+
+$ oya run spell
+hokus pokus czary mary
+</code></pre><h1 id="2-project-structure-recursive-oya-">2. Project structure - Recursive Oya.</h1>
+<p>Example code: <a href="https://github.com/tooploox/oya-example/tree/master/recurse">https://github.com/tooploox/oya-example/tree/master/recurse</a></p>
+<p>Ok, but what if i want to create frontend APP in other language, how can we separate it.<br>We have a golang server and http files in one place. In Oyafile we’re building golang and generating html. It is not a best practice.<br>We can separate it into <code>backend/</code> and <code>frontend/</code>. </p>
+<pre><code>$ tree
+.
+├── Oyafile
+├── backend
+│   ├── Oyafile
+│   └── app.go
+└── frontend
+    ├── Oyafile
+    └── template
+        └── index.html
+
+5 directories, 7 files
+</code></pre><p>Each of them will have own <code>Oyafile</code>, and thanks to recursive tasks each file can have task with the same name in our case <code>build</code>.</p>
+<h2 id="backend">Backend</h2>
+<p>Here is how our backend Oyafile looks like (note that there is no <code>Project:</code> for subdirectories):</p>
+<pre><code>$ cat ./backend/Oyafile
+build: |
+  echo &quot;Compiling server&quot;
+  go build -o ../build/server app.go
+</code></pre><h2 id="frontend">Frontend</h2>
+<pre><code>$ cat ./frontend/Oyafile
+Values:
+  title: Hello from Oya
+
+build: |
+  echo &quot;Rendering index.html&quot;
+  oya render template/index.html -o ../build/public
+</code></pre><p>Our frontend holds only template file and Values necessary to render it.</p>
+<h2 id="project-oyafile">Project Oyafile</h2>
+<pre><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+
+build: |
+  echo &quot;Preparing build/ folder&quot;
+  rm -rf build/ &amp;&amp; mkdir -p build/public
+
+start: |
+  export PORT=${Oya[port]}
+  cd ./build/ &amp;&amp; ./server
+</code></pre><h2 id="recursive-run">Recursive run</h2>
+<p>Now let’s see what tasks we have. To do it for whole project including subdirectories we need to use <code>-r or --recurse</code>  flag.</p>
+<pre><code>$ oya tasks -r
+# in ./Oyafile
+oya run build
+oya run start
+
+# in ./backend/Oyafile
+oya run build
+
+# in ./frontend/Oyafile
+oya run build
+</code></pre><p>As you can see we have three <code>build</code> tasks one per Oyafile. We can now run them all.</p>
+<pre><code>$ oya run -r build
+Preparing build/ folder
+Compiling server
+Rendering index.html
+</code></pre><p>And now we can start the app with <code>$ oya run start</code>.</p>
+<h1 id="3-packs-how-to-use-them">3. Packs how to use them</h1>
+<h2 id="import-pack">Import pack</h2>
+<p>Pack is a Oya project with general purpose tasks which can be easily shared and used inside other projects. Oya installs pack in your home <code>~/.oya</code> directory. Each time you rune oya command dependencies will be resolved and installed.</p>
+<p>For better portability our server can be run in Docker container. We can use Docker pack for it. To do it first we need to import it to our project.</p>
+<pre><code>$ oya import github.com/tooploox/oya-packs/docker
+$ cat Oyafile
+Project: OyaExample
+Require:
+  github.com/tooploox/oya-packs/docker: v0.0.6
+Import:
+  docker: github.com/tooploox/oya-packs/docker
+...
+</code></pre><p>Import will add importing pack under <code>Import:</code>, key of imported pack is his alias and can be accessed by this name, (you can change it if needed). </p>
+<p><strong>Packs versioning</strong></p>
+<p>Import will automatically resolve dependencies with newest versions and add them under <code>Require:</code>.</p>
+<p>Imported pack added bunch of new commands into our project</p>
+<pre><code>$ oya tasks
+# in ./Oyafile
+oya run build
+oya run docker.build
+oya run docker.generate
+oya run docker.run
+oya run docker.stop
+oya run docker.version
+oya run start
+</code></pre><p>We can easily generate Dockerfile, update it, and build our project.</p>
+<h1 id="4-pack-development-sharing-oya-s">4. Pack development - sharing oya’s</h1>
+<p>Each oya project is a pack itself, all you need to do is push it to git and tag it version <code>name/v0.0.1</code>. Import it as before with <code>$ oya import github.com/tooploox/oya-packs/name</code> oya should automatically resolve newest version and add <code>Require</code> to your oyafile.</p>
+<p>…. 😕 need decent example…. from life … something what everyone does all over again …. for each setup … hmmm.. help</p>
+<hr>
+<p>NOTES:<br>PACK development</p>
+<ul>
+<li>use ELM for templates  ?</li>
+<li>create sample ELM pack with elm install and “compile” commands /?</li>
+<li>VERSIONING show packs versioning. ?</li>
+</ul>
+
+    <!-- end tutorial -->
+
+
+
   </div>
   <div class="footer">
     <div class="footer-container w-container">
@@ -152,5 +412,13 @@ body {
   <script src="https://d1tdp7z6w94jbb.cloudfront.net/js/jquery-3.3.1.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
   <!-- [if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script><![endif] -->
+
+  <style>
+   code, pre {
+     background-color: #696969;
+     color: white;
+   }
+
+  </style>
 </body>
 </html>
