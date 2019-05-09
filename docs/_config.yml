@@ -1,2 +1,6 @@
 name: Oya site
 description: Oya is awesome
+baseurl: ""
+url: ""
+
+markdown: kramdown

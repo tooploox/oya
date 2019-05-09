@@ -30,3 +30,6 @@ oya
 
 ### Node ###
 /node_modules/
+
+## Jekyll ##
+/docs/_site/

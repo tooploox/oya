@@ -1,3 +1,8 @@
+---
+layout: doc
+permalink: /tutorial/
+---
+
 # Oya HOWTO
 Examples : Web server
 We have a simple http server written in Go.
