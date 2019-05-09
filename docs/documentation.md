@@ -1,6 +1,6 @@
 ---
-layout: doc
-permalink: /tutorial/
+layout: docs
+permalink: /documentation/
 ---
 
 # Oya HOWTO
