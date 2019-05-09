@@ -372,8 +372,7 @@ textarea.w-select {
   height: auto;
 }
 .w-select {
-  background-image: -webkit-linear-gradient(white 0%, #f3f3f3 100%);
-  background-image: linear-gradient(white 0%, #f3f3f3 100%);
+  background-color: #f3f3f3;
 }
 .w-select[multiple] {
   height: auto;
