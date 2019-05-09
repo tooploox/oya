@@ -24,6 +24,8 @@
     "remark-preset-lint-recommended": "^3.0.2"
   },
   "remarkConfig": {
-      "plugins": ["remark-preset-lint-recommended"]
+    "plugins": [
+      "remark-preset-lint-recommended"
+    ]
   }
 }
