@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="14px" viewBox="0 0 16 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>Path</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Designs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD" transform="translate(-699.000000, -513.000000)" fill="#305B5D">
+            <g id="Group-5" transform="translate(468.000000, 492.000000)">
+                <g id="arrows-16px-1-tail-up" transform="translate(239.000000, 28.000000) rotate(90.000000) translate(-239.000000, -28.000000) translate(232.000000, 20.000000)">
+                    <polygon id="Path" points="8 16 8 3.828 12.293 8.121 13.707 6.707 7 0 0.293 6.707 1.707 8.121 6 3.828 6 16"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<!--  This site was created in Webflow. http://www.webflow.com  -->
+<!--  Last Published: Thu May 09 2019 09:44:55 GMT+0000 (UTC)  -->
+<html data-wf-page="5cd2bb58578360730e6d6a31" data-wf-site="5c877e35b774e483c91f13d0" lang="en">
+<head>
+  <title>Oya site - Tutorial</title>
+
+  <meta charset="utf-8">
+<meta content="Documentation" property="og:title">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta content="Webflow" name="generator">
+<link href="/css/normalize.css" rel="stylesheet" type="text/css">
+<link href="/css/webflow.css" rel="stylesheet" type="text/css">
+<link href="/css/oya-2495bc.webflow.css" rel="stylesheet" type="text/css">
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
+<script type="text/javascript">WebFont.load({  google: {    families: ["PT Mono:regular:latin-ext,latin","Roboto Mono:100,100italic,300,300italic,regular,italic,500,500italic,700,700italic:latin-ext,latin","Roboto:100,300,regular,500,700,900"]  }});</script>
+<!-- [if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" type="text/javascript"></script><![endif] -->
+<script type="text/javascript">!function(o,c){var n=c.documentElement,t=" w-mod-";n.className+=t+"js",("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")}(window,document);</script>
+<link href="images/favicon.png" rel="shortcut icon" type="image/x-icon">
+<link href="images/favicon-big.png" rel="apple-touch-icon">
+
+
+  <style>
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+/* Animations to copying of command snippets */
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
+}
+/* Snackbar Control */
+#snackbar.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+</style>
+  <script> 
+  function showCommandSnackbar() {
+  var snackbarDiv = document.getElementById("snackbar");
+  snackbarDiv.className += " show";
+  setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
+	}
+</script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+  <script type="text/javascript">
+	document.addEventListener('click', function (event) {
+    if (event.target.matches('.pack-tooltip')) {
+       showCommandSnackbar()
+    }
+}, false);
+</script>
+<style type="text/css">
+ .github-icon {
+   fill: #091722;
+ }
+</style>
+
+<link href="/css/docs.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+  <div class="top-line"></div>
+  <div id="snackbar" class="snackbar">Commands copied to your clipboard</div>
+  <div class="container w-container">
+    <div class="logo-container"><a href="index.html" class="w-inline-block"><img src="/images/Logo.svg" alt="" class="image"></a></div>
+    <p class="title">Documentation</p>
+    <p class="sub-title full-width">Oya’s power lies within an ecosystem of reusable “packs”, each developed to automate common tasks associated with setting up and extending projects.</p>
+    <div data-w-id="acf1ea2c-9b13-de74-9324-144bd7f1e202" class="goals">
+      <h3 class="heading h3">Our goals</h3>
+      <h2 class="heading h2">What we achive</h2>
+      <div class="goals-list">
+        <div class="goal-row"><img src="/images/goal-icon-1.svg" alt="">
+          <div class="goal-text">Offer the best possible experience out of the box with minimal or no configuration</div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="/images/goal-icon-2.svg" alt="">
+          <div class="goal-text">Avoid unnecessary boilerplate by making it easy to share scripts, artefacts, <br>and configurations between projects including those created by others</div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="/images/goal-icon-3.svg" alt="">
+          <div class="goal-text">Make creating build pipelines for large repositories and monorepos easier <br>thanks to “internal” versioned dependency management</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h1 id="oya-howto">Oya HOWTO</h1>
+<p>Examples : Web server
+We have a simple http server written in Go.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">$</span> <span class="n">tree</span>
+<span class="p">.</span>
+<span class="err">├──</span> <span class="k">public</span>
+<span class="err">│</span>   <span class="err">└──</span> <span class="n">index</span><span class="p">.</span><span class="n">html</span>
+<span class="err">└──</span> <span class="n">app</span><span class="p">.</span><span class="n">go</span>
+
+<span class="m">1</span> <span class="n">directory</span><span class="p">,</span> <span class="m">2</span> <span class="n">files</span>
+
+<span class="p">$</span> <span class="n">cat</span> <span class="n">app</span><span class="p">.</span><span class="n">go</span>
+<span class="k">package</span> <span class="n">main</span>
+
+<span class="n">import</span> <span class="p">(</span>
+        <span class="s2">"fmt"</span>
+        <span class="s2">"net/http"</span>
+        <span class="s2">"os"</span>
+<span class="p">)</span>
+
+<span class="n">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">port</span> <span class="p">:=</span> <span class="n">os</span><span class="p">.</span><span class="nf">Getenv</span><span class="p">(</span><span class="s2">"PORT"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">port</span> <span class="p">==</span> <span class="s2">""</span> <span class="p">{</span>
+                <span class="n">port</span> <span class="p">=</span> <span class="s2">"80"</span>
+        <span class="p">}</span>
+        <span class="n">fileServer</span> <span class="p">:=</span> <span class="n">http</span><span class="p">.</span><span class="n">FileServer</span><span class="p">(</span><span class="n">http</span><span class="p">.</span><span class="n">Dir</span><span class="p">(</span><span class="s2">"public/"</span><span class="p">))</span>
+        <span class="n">http</span><span class="p">.</span><span class="n">Handle</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">fileServer</span><span class="p">)</span>
+
+        <span class="n">fmt</span><span class="p">.</span><span class="n">Printf</span><span class="p">(</span><span class="s2">"Starting server :%v</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">http</span><span class="p">.</span><span class="n">ListenAndServe</span><span class="p">(</span><span class="n">fmt</span><span class="p">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s2">":%v"</span><span class="p">,</span> <span class="n">port</span><span class="p">),</span> <span class="n">nil</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Oya can help with maintaining this project.</p>
+
+<h1 id="1-oya-helps-with-project-build-and-run">1. Oya helps with project build and run</h1>
+
+<p>Final code can be found <a href="https://github.com/tooploox/oya-example/tree/master/sample">here</a></p>
+
+<p>1.1 Install Oya
+1.2 Project
+1.3 Tasks
+1.4 Values
+1.5 Render
+1.6 .oya files
+1.7 Secrets</p>
+
+<h2 id="11-install-oya">1.1 Install Oya</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl https://oya.sh/get | bash
+</code></pre></div></div>
+
+<p>This will install latest version of oya. You can say which version you want with <code class="highlighter-rouge">$ curl https://oya.sh/get | bash -s v0.0.7</code> for example. For release versions check <a href="https://github.com/tooploox/oya/releases">releases</a> .</p>
+
+<p>Now we can setup Oya Project.</p>
+
+<h2 id="12-project">1.2 Project</h2>
+
+<p>Typically, a project will contain an <code class="highlighter-rouge">Oyafile</code> in its root directory. An <code class="highlighter-rouge">Oyafile</code> is a YAML file containing Oya configuration and the  <code class="highlighter-rouge">Project:</code> directive to indicate that this is the project root. You can create Oyafile by hand or with init command, let’s do this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya init
+$ cat Oyafile
+Project: project
+</code></pre></div></div>
+
+<p>Let’s rename our project to <code class="highlighter-rouge">OyaExample</code></p>
+
+<h2 id="13-tasks">1.3 Tasks</h2>
+
+<p>Oya task is a bash script defined as a Oyafile key.
+Tasks in Oyafile are defined as a yaml keys, with pipe at the beginning line and bash code in following.
+Our server is golang app so before starting it needs to be compiled. 
+So lets add <code class="highlighter-rouge">build</code> and <code class="highlighter-rouge">start</code> tasks.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+
+build: |
+  go build app.go
+
+start: |
+  ./server
+</code></pre></div></div>
+
+<p>To list available tasks use tasks command:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya tasks
+# in ./Oyafile
+oya run build
+oya run start
+</code></pre></div></div>
+
+<p>Execute task</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oya run build
+oya run start
+</code></pre></div></div>
+
+<h2 id="14-values">1.4 Values</h2>
+
+<p>Values are defined in <code class="highlighter-rouge">Oyafile</code> as a list under uppercase key <code class="highlighter-rouge">Values</code>. Values can be accessed from tasks with <code class="highlighter-rouge">${Oya[value_name]}</code>.
+As a default our server starts at 80 port, but it might change. Let’s keep port as a Value in <code class="highlighter-rouge">Oyafile</code> to easier management.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+
+build: |
+  go build server.go
+
+start: |
+  export PORT=${Oya[port]}
+  ./server
+</code></pre></div></div>
+
+<h2 id="15-render">1.5 Render</h2>
+
+<p>Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more <a href="https://github.com/gobuffalo/plush">here</a>.</p>
+
+<p>We can generate <code class="highlighter-rouge">index.html</code> for our http server. We need a template file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat template/index.html
+&lt;h1&gt;&lt;%= title %&gt;&lt;/h1&gt;
+</code></pre></div></div>
+
+<p>Let’s add our title under  <code class="highlighter-rouge">Value:</code></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+  title: Hello from Oya
+...
+</code></pre></div></div>
+
+<p>Render output into <code class="highlighter-rouge">public/</code> dir so our server can see it.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya render template/index.html -o public
+$ cat public/index.html
+&lt;h1&gt;Hello from Oya&lt;/h1&gt;
+</code></pre></div></div>
+
+<p>Let’s add a task <code class="highlighter-rouge">generate</code> to do it for us.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+  title: Hello from Oya
+
+build: |
+  go build app.go
+
+start: |
+  export PORT=${Oya[port]}
+  ./app
+
+generate: |
+  oya render template/index.html -o public
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">$ oya run generate</code> will generate <code class="highlighter-rouge">index.html</code> for us.</p>
+
+<h2 id="16-oya-files">1.6 .oya files</h2>
+
+<p>Inside a project you can have many files with named <code class="highlighter-rouge">*.oya</code> they will be read as a Value files, expected syntax is a pair of  <code class="highlighter-rouge">key: value</code>.</p>
+
+<p>One exceptions is <code class="highlighter-rouge">secrets.oya</code> which needs to be encrypted before use.</p>
+
+<h2 id="17-secrets">1.7 Secrets</h2>
+
+<p>Ok, but what if i have some confidential values ?
+Oya uses <a href="https://github.com/mozilla/sops">SOPS</a> to help with secrets management. 
+First you need to configure SOPS for <a href="https://github.com/mozilla/sops/blob/master/README.rst#usage">encryption methods</a>.
+For our example we can use PGP key.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ export SOPS_PGP_FP="317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
+</code></pre></div></div>
+
+<p>Oya secrets commands:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya secrets --help
+...
+  edit        Edit secrets file
+  encrypt     Encrypt secrets file
+  view        View secrets
+...
+</code></pre></div></div>
+
+<p><strong>First run:</strong></p>
+
+<p>First you need to create <code class="highlighter-rouge">secrets.oya</code> file. with <code class="highlighter-rouge">key: value</code> in each line. And encrypt it. (You can also go straight to edit with <code class="highlighter-rouge">$ oya secrets edit secrets.oya</code>).</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat secrets.oya
+magical_spell: hokus pokus czary mary
+$ oya secrets encrypt secrets.oya
+</code></pre></div></div>
+
+<p>Done your secrets are safe. Check how secrets.oya looks like.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat secrets.oya
+{
+        "data": "ENC[AES256_GCM,data:XXXX=,tag:XXXX==,type:str]",
+        "sops": {
+                ...
+                "pgp": [...],
+                ...
+        }
+}%
+</code></pre></div></div>
+
+<p>We can see only sops metadata, our data are safe and encrypted.</p>
+
+<p>To view or edit use:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya secrets view secrets.oya
+magical_spell: hokus pokus czary mary
+$ oya secrets edit secrets.oya
+</code></pre></div></div>
+
+<p>You can access secret value with  <code class="highlighter-rouge">${Oya[magical_spell]}</code> from task.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+...
+spell: |
+  echo ${Oya[magical_spell]}
+
+$ oya run spell
+hokus pokus czary mary
+</code></pre></div></div>
+
+<h1 id="2-project-structure---recursive-oya">2. Project structure - Recursive Oya.</h1>
+
+<p><a href="https://github.com/tooploox/oya-example/tree/master/recurse">Example code</a></p>
+
+<p>Ok, but what if i want to create frontend APP in other language, how can we separate it.
+We have a golang server and http files in one place. In Oyafile we’re building golang and generating html. It is not a best practice. 
+We can separate it into <code class="highlighter-rouge">backend/</code> and <code class="highlighter-rouge">frontend/</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ tree
+.
+├── Oyafile
+├── backend
+│   ├── Oyafile
+│   └── app.go
+└── frontend
+    ├── Oyafile
+    └── template
+        └── index.html
+
+5 directories, 7 files
+</code></pre></div></div>
+
+<p>Each of them will have own <code class="highlighter-rouge">Oyafile</code>, and thanks to recursive tasks each file can have task with the same name in our case <code class="highlighter-rouge">build</code>.</p>
+
+<h2 id="backend">Backend</h2>
+
+<p>Here is how our backend Oyafile looks like (note that there is no <code class="highlighter-rouge">Project:</code> for subdirectories):</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat ./backend/Oyafile
+build: |
+  echo "Compiling server"
+  go build -o ../build/server app.go
+</code></pre></div></div>
+
+<h2 id="frontend">Frontend</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat ./frontend/Oyafile
+Values:
+  title: Hello from Oya
+
+build: |
+  echo "Rendering index.html"
+  oya render template/index.html -o ../build/public
+</code></pre></div></div>
+
+<p>Our frontend holds only template file and Values necessary to render it.</p>
+
+<h2 id="project-oyafile">Project Oyafile</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cat Oyafile
+Project: OyaExample
+
+Values:
+  port: 3000
+
+build: |
+  echo "Preparing build/ folder"
+  rm -rf build/ &amp;&amp; mkdir -p build/public
+
+start: |
+  export PORT=${Oya[port]}
+  cd ./build/ &amp;&amp; ./server
+</code></pre></div></div>
+
+<h2 id="recursive-run">Recursive run</h2>
+
+<p>Now let’s see what tasks we have. To do it for whole project including subdirectories we need to use <code class="highlighter-rouge">-r or --recurse</code>  flag.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya tasks -r
+# in ./Oyafile
+oya run build
+oya run start
+
+# in ./backend/Oyafile
+oya run build
+
+# in ./frontend/Oyafile
+oya run build
+</code></pre></div></div>
+
+<p>As you can see we have three <code class="highlighter-rouge">build</code> tasks one per Oyafile. We can now run them all.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya run -r build
+Preparing build/ folder
+Compiling server
+Rendering index.html
+</code></pre></div></div>
+
+<p>And now we can start the app with <code class="highlighter-rouge">$ oya run start</code>.</p>
+
+<h1 id="3-packs-how-to-use-them">3. Packs how to use them</h1>
+<h2 id="import-pack">Import pack</h2>
+
+<p>Pack is a Oya project with general purpose tasks which can be easily shared and used inside other projects. Oya installs pack in your home <code class="highlighter-rouge">~/.oya</code> directory. Each time you rune oya command dependencies will be resolved and installed.</p>
+
+<p>For better portability our server can be run in Docker container. We can use Docker pack for it. To do it first we need to import it to our project.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya import github.com/tooploox/oya-packs/docker
+$ cat Oyafile
+Project: OyaExample
+Require:
+  github.com/tooploox/oya-packs/docker: v0.0.6
+Import:
+  docker: github.com/tooploox/oya-packs/docker
+...
+</code></pre></div></div>
+
+<p>Import will add importing pack under <code class="highlighter-rouge">Import:</code>, key of imported pack is his alias and can be accessed by this name, (you can change it if needed).</p>
+
+<p><strong>Packs versioning</strong></p>
+
+<p>Import will automatically resolve dependencies with newest versions and add them under <code class="highlighter-rouge">Require:</code>.</p>
+
+<p>Imported pack added bunch of new commands into our project</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oya tasks
+# in ./Oyafile
+oya run build
+oya run docker.build
+oya run docker.generate
+oya run docker.run
+oya run docker.stop
+oya run docker.version
+oya run start
+</code></pre></div></div>
+
+<p>We can easily generate Dockerfile, update it, and build our project.</p>
+
+<h1 id="4-pack-development---sharing-oyas">4. Pack development - sharing oya’s</h1>
+
+<p>Each oya project is a pack itself, all you need to do is push it to git and tag it version <code class="highlighter-rouge">name/v0.0.1</code>. Import it as before with <code class="highlighter-rouge">$ oya import github.com/tooploox/oya-packs/name</code> oya should automatically resolve newest version and add <code class="highlighter-rouge">Require</code> to your oyafile.</p>
+
+<p>…. 😕 need decent example…. from life … something what everyone does all over again …. for each setup … hmmm.. help</p>
+
+ 
+    </div>
+  </div>
+
+
+  <div class="footer">
+    <div class="footer-container w-container">
+      <div class="columns w-row">
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Product</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Install</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="packs.html" class="footer-link w-inline-block">
+            <div class="footer-link-text">Packs</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="documentation.html" class="footer-link w-inline-block w--current">
+            <div class="footer-link-text">Documentation</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Contribution</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Learn more</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Join us</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Support</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Public Slack</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">FAQ</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Legal</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Terms of use</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Privacy Policy</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="footer-copyright-text">Made by <a href="https://tooploox.com" target="_blank" class="link-2">Tooploox sp. z o.o.</a></div>
+        <div class="footer-rights-reserved">All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://d1tdp7z6w94jbb.cloudfront.net/js/jquery-3.3.1.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/js/webflow.js" type="text/javascript"></script>
+  <!-- [if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script><![endif] -->
+</body>
+</html>
