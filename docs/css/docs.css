@@ -2,7 +2,7 @@ body {
   font-family: 'Roboto Mono', sans-serif;
 }
 
-pre {
+.md_container pre {
   background-color: #21415a;
   color: white;
   min-height: 44px;
@@ -12,15 +12,15 @@ pre {
   border-radius: 6px;
 }
 
-code {
+.md_container code {
   background-color: #09172211;
 }
 
-pre > code {
+.md_container pre > code {
   background-color: transparent;
 }
 
-h1 {
+.md_container h1 {
   opacity: 0.6;
   color: #091722;
   font-size: 32px;
@@ -30,7 +30,7 @@ h1 {
   margin-top: 100px;
 }
 
-h2 {
+.md_container h2 {
   font-family: 'Roboto Mono', sans-serif;
   color: #091722;
   font-size: 18px;
@@ -40,7 +40,7 @@ h2 {
   margin-top: 40px;
 }
 
-h3 {
+.md_container h3 {
   font-family: 'Roboto Mono', sans-serif;
   color: #091722BB;
   font-size: 16px;
@@ -50,7 +50,7 @@ h3 {
   margin-top: 30px;
 }
 
-p {
+.md_container p {
   opacity: 1;
   font-family: 'Roboto Mono', sans-serif;
   color: #091722AA;
@@ -59,7 +59,7 @@ p {
   font-weight: 400;
 }
 
-a {
+.md_container a {
   border-bottom: 2px dotted hsla(251.51785714285714, 89.60%, 50.98%, 1.00);
   color: #3d12f2;
   text-decoration: none;
