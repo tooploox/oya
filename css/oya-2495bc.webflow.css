@@ -249,6 +249,22 @@
   font-weight: 400;
 }
 
+.code.green {
+  margin-right: 0px;
+  margin-left: 2px;
+  font-family: 'Roboto Mono', sans-serif;
+  color: #a9eb70;
+  font-weight: 400;
+}
+
+.code.pink {
+  margin-right: 0px;
+  margin-left: 2px;
+  font-family: 'Roboto Mono', sans-serif;
+  color: #e9adff;
+  font-weight: 400;
+}
+
 .features {
   margin-top: 100px;
 }
@@ -322,6 +338,13 @@
   color: #21415a;
   line-height: 28px;
   font-weight: 700;
+}
+
+.text-block.text {
+  margin-left: 0px;
+  opacity: 0.6;
+  font-weight: 400;
+  text-align: left;
 }
 
 .code-line {
@@ -604,6 +627,8 @@
 .underlined-link {
   border-bottom: 2px dotted hsla(251.51785714285714, 89.60%, 50.98%, 1.00);
   color: #3d12f2;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .button-github-icon {
@@ -824,6 +849,17 @@
 .link-2 {
   color: #fff;
   text-decoration: none;
+}
+
+.dollar {
+  display: inline;
+}
+
+.code-value {
+  padding-right: 2px;
+  padding-left: 2px;
+  background-color: rgba(9, 23, 34, .07);
+  font-weight: 500;
 }
 
 @media (max-width: 991px) {
