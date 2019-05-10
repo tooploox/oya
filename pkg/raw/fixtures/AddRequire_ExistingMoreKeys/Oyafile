@@ -1,9 +1,0 @@
-Project: AddRequire_ExistingMoreKeys
-
-# It's before Require on purpose; we want to test whether matching
-# for require entries is effective only under the Require: key.
-Values:
-  foo: bar
-
-Require:
-  github.com/tooploox/bar: v1.1.0

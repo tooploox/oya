@@ -1,5 +1,0 @@
-Project: project
-
-Changeset: echo ""
-
-build: printf "build run"

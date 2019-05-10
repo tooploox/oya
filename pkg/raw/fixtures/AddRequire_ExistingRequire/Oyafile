@@ -1,4 +1,0 @@
-Project: AddRequire_ExistingRequire
-
-Require:
-  github.com/tooploox/foo: v1.0.0

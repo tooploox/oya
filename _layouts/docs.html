@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--  This site was created in Webflow. http://www.webflow.com  -->
+<!--  Last Published: Thu May 09 2019 09:44:55 GMT+0000 (UTC)  -->
+<html data-wf-page="5cd2bb58578360730e6d6a31" data-wf-site="5c877e35b774e483c91f13d0" lang="en">
+<head>
+  <title>{{ site.name }} - Documentation</title>
+
+  {% include meta.html %}
+
+
+  <style>
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+/* Animations to copying of command snippets */
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
+}
+/* Snackbar Control */
+#snackbar.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+</style>
+  <script> 
+  function showCommandSnackbar() {
+  var snackbarDiv = document.getElementById("snackbar");
+  snackbarDiv.className += " show";
+  setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
+	}
+</script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+  <script type="text/javascript">
+	document.addEventListener('click', function (event) {
+    if (event.target.matches('.pack-tooltip')) {
+       showCommandSnackbar()
+    }
+}, false);
+</script>
+<style type="text/css">
+ .github-icon {
+   fill: #091722;
+ }
+</style>
+
+<link href="/css/docs.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+  <div class="top-line"></div>
+  <div id="snackbar" class="snackbar">Commands copied to your clipboard</div>
+  <div class="container w-container">
+    <div class="logo-container"><a href="index.html" class="w-inline-block"><img src="/images/Logo.svg" alt="" class="image"></a></div>
+    <p class="title">Documentation</p>
+    <p class="sub-title full-width">Oya’s power lies within an ecosystem of reusable “packs”, each developed to automate common tasks associated with setting up and extending projects.</p>
+    <div data-w-id="acf1ea2c-9b13-de74-9324-144bd7f1e202" class="goals">
+      <h3 class="heading h3">Our goals</h3>
+      <h2 class="heading h2">What we achive</h2>
+      <div class="goals-list">
+        <div class="goal-row"><img src="/images/goal-icon-1.svg" alt="">
+          <div class="goal-text">Offer the best possible experience out of the box with minimal or no configuration</div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="/images/goal-icon-2.svg" alt="">
+          <div class="goal-text">Avoid unnecessary boilerplate by making it easy to share scripts, artefacts, <br>and configurations between projects including those created by others</div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+          <div class="goal-line"></div>
+        </div>
+        <div class="goal-line"></div>
+        <div class="goal-row"><img src="/images/goal-icon-3.svg" alt="">
+          <div class="goal-text">Make creating build pipelines for large repositories and monorepos easier <br>thanks to “internal” versioned dependency management</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      {{ content }} 
+    </div>
+  </div>
+
+
+  <div class="footer">
+    <div class="footer-container w-container">
+      <div class="columns w-row">
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Product</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Install</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="packs.html" class="footer-link w-inline-block">
+            <div class="footer-link-text">Packs</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="documentation.html" class="footer-link w-inline-block w--current">
+            <div class="footer-link-text">Documentation</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Contribution</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Learn more</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Join us</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Support</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Public Slack</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">FAQ</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+        <div class="footer-column w-col w-col-3">
+          <div class="footer-section-title">Legal</div>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Terms of use</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+          <a href="#" class="footer-link w-inline-block">
+            <div class="footer-link-text">Privacy Policy</div><img src="/images/footer-arrow.svg" alt="" class="footer-link-arrow"></a>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="footer-copyright-text">Made by <a href="https://tooploox.com" target="_blank" class="link-2">Tooploox sp. z o.o.</a></div>
+        <div class="footer-rights-reserved">All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://d1tdp7z6w94jbb.cloudfront.net/js/jquery-3.3.1.min.js" type="text/javascript" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/js/webflow.js" type="text/javascript"></script>
+  <!-- [if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script><![endif] -->
+</body>
+</html>

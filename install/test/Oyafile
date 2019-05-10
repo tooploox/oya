@@ -1,4 +1,0 @@
-Project: oya-install-test
-
-test: |
-  echo "Hello form Oya task"
