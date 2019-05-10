@@ -1,0 +1,16 @@
+<script> 
+  function showCommandSnackbar() {
+  var snackbarDiv = document.getElementById("snackbar");
+  snackbarDiv.className += " show";
+  setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
+	}
+</script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+  <script type="text/javascript">
+	document.addEventListener('click', function (event) {
+    if (event.target.matches('.pack-tooltip')) {
+       showCommandSnackbar()
+    }
+}, false);
+</script>

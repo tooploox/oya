@@ -1,0 +1,42 @@
+<style>
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	-o-font-smoothing: antialiased;
+}
+/* Animations to copying of command snippets */
+.code-wrapper:hover .code-tooltip {
+	opacity: 1;
+  	transition: all .2s ease-in-out;
+}
+.code-wrapper .code-tooltip {
+	opacity: 0;
+  	transition: all .2s ease-in-out;
+}
+/* Snackbar Control */
+#snackbar.show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 1;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@keyframes fadein {
+  from {top: 10px; opacity: 0;} 
+  to {top: 20px; opacity: 1;}
+}
+@-webkit-keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+@keyframes fadeout {
+  from {top: 20px; opacity: 1;} 
+  to {top: 10px; opacity: 0;}
+}
+</style>
