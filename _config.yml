@@ -1,6 +1,6 @@
 name: Oya
-description: Oya will help you with your project.
+description: New projects set up lightening fast
 baseurl: ""
-url: ""
+url: "https://oya.sh"
 
 markdown: kramdown
