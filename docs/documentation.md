@@ -2,9 +2,9 @@
 layout: docs
 permalink: /documentation/
 ---
+  
+**Examples : Web server**
 
-# Oya HOWTO
-Examples : Web server
 We have a simple http server written in Go.
 
 
@@ -43,16 +43,15 @@ Oya can help with maintaining this project.
 
 # 1. Oya helps with project build and run
 
-Final code can be found [here]( https://github.com/tooploox/oya-example/tree/master/sample)
+### Final code can be found [here]( https://github.com/tooploox/oya-example/tree/master/sample)
 
-1.1 Install Oya
-1.2 Project
-1.3 Tasks
-1.4 Values
-1.5 Render
-1.6 .oya files
-1.7 Secrets
-
+> 1.1 Install Oya  
+> 1.2 Project  
+> 1.3 Tasks  
+> 1.4 Values  
+> 1.5 Render  
+> 1.6 .oya files  
+> 1.7 Secrets
 
 ## 1.1 Install Oya
 
@@ -61,7 +60,7 @@ Final code can be found [here]( https://github.com/tooploox/oya-example/tree/mas
 
 This will install latest version of oya. You can say which version you want with `$ curl https://oya.sh/get | bash -s v0.0.7` for example. For release versions check [releases](https://github.com/tooploox/oya/releases) .
 
-Now we can setup Oya Project.
+Now we can setup `Oya Project`.
 
 ## 1.2 Project
 
@@ -202,7 +201,7 @@ Oya secrets commands:
       view        View secrets
     ...
 
-**First run:**
+### First run:
 
 First you need to create `secrets.oya` file. with `key: value` in each line. And encrypt it. (You can also go straight to edit with `$ oya secrets edit secrets.oya`).
 
@@ -358,7 +357,7 @@ For better portability our server can be run in Docker container. We can use Doc
 
 Import will add importing pack under `Import:`, key of imported pack is his alias and can be accessed by this name, (you can change it if needed). 
 
-**Packs versioning**
+### Packs versioning
 
 Import will automatically resolve dependencies with newest versions and add them under `Require:`.
 
