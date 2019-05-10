@@ -5,12 +5,38 @@
   setTimeout(function(){ snackbarDiv.className = snackbarDiv.className.replace("show", ""); }, 3000);
 	}
 </script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
-  <script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
-  <script type="text/javascript">
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script type="text/javascript" src="https://milankyncl.github.io/jquery-copy-to-clipboard/jquery.copy-to-clipboard.js"></script>
+<script type="text/javascript">
 	document.addEventListener('click', function (event) {
     if (event.target.matches('.pack-tooltip')) {
        showCommandSnackbar()
     }
+}, false);
+</script>
+
+<script type="text/javascript">
+const ref = document.querySelector('style');
+const style = document.createElement('style');
+style.innerHTML = ".code:first-of-type:before { content: \"$ \"; display: inline; }";
+ref.parentNode.insertBefore(style, ref);
+function codeToClipboard(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("copy");
+}
+document.addEventListener('click', function (event) {
+  var target = event.target
+  var depth = 3
+  while(!target.matches('.code-block') || depth < 0) {
+    target = target.parentNode
+    depth--;
+  }
+  codeToClipboard(target)
+  showCommandSnackbar()
 }, false);
 </script>
