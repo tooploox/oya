@@ -6,11 +6,11 @@ layout: default
 <div class="top-line"></div>
   <div id="snackbar" class="snackbar">Commands copied to your clipboard</div><img src="images/pattern.svg" alt="" class="pattern">
   <div class="container w-container">
-    <div class="logo-container"><a href="/index.html" class="w-inline-block w--current"><img src="images/Logo.svg" alt="" class="image"></a></div>
+    <div class="logo-container"><a href="index.html" class="w-inline-block w--current"><img src="images/Logo.svg" alt="" class="image"></a></div>
     <p class="title">New projects set up lightening fast</p>
-    <p class="sub-title">Oya with its ecosystem of powerful, <a href="/packs" class="link"><strong class="underlined-link">reusable packs</strong></a> lets you <strong>bootstrap deployable projects</strong> without a hassle.</p>
+    <p class="sub-title">Oya with its ecosystem of powerful, <a href="packs.html" class="link"><strong class="underlined-link">reusable packs</strong></a> lets you <strong>bootstrap deployable projects</strong> without a hassle.</p>
     <div class="cta-buttons"><a data-w-id="27734c38-818a-d9fc-1f06-0e59cf105d65" href="https://github.com/tooploox/oya" target="_blank" class="cta-button github-button w-inline-block"><img src="images/github-icon.svg" data-w-id="a84c2626-de19-6696-7ff2-930f6f0d38b5" alt="" class="button-github-icon"><div data-w-id="d7880b0e-9280-38a4-6e77-3516ac5638d4" class="github-button-text">Open Github repo</div></a>
-      <a data-w-id="20ef2a21-7ccb-a620-0210-252f86dbbd30" href="/documentation" class="cta-button doc-button w-inline-block">
+      <a data-w-id="20ef2a21-7ccb-a620-0210-252f86dbbd30" href="documentation.html" target="_blank" class="cta-button doc-button w-inline-block">
         <div data-w-id="d8d9d949-c8dd-6221-f000-7fb8ff760d62" class="documentation-button-text">Open documentation</div><img src="images/documentation-arrow.svg" data-w-id="c00c2d20-8aaf-50c6-02cc-a0dd3d97e067" alt=""></a>
     </div>
     <div class="how-to-install">
@@ -19,7 +19,9 @@ layout: default
       <div class="code-wrapper">
         <div class="code-block">
           <div class="code-line">
-            <div class="code yellow">curl </div>
+            <div class="dollar">
+              <div class="code yellow">curl </div>
+            </div>
             <div class="code white">https://oya.sh/get </div>
             <div class="code gray">| bash</div>
           </div>
@@ -48,76 +50,169 @@ layout: default
     <div data-w-id="50bee2c5-17cc-1e1e-e4f8-b3a7d29b24e2" class="code-snippets">
       <h3 class="heading h3">Example usage</h3>
       <h2 class="heading h2">How to use Oya</h2>
-      <div class="text-block">Creating project template</div>
+      <div class="text-block text">You can create Oyafile by hand or with init command, let’s do this:</div>
+      <div class="code-wrapper">
+        <div class="code-tooltip">CLICK TO COPY</div>
+      </div>
+      <div class="text-block">Setup Oya project</div>
       <div class="code-wrapper">
         <div class="code-block">
           <div class="code-line">
-            <div class="code yellow">oya </div>
+            <div class="dollar">
+              <div class="code yellow">oya </div>
+            </div>
             <div class="code blue">init</div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">import </div>
-            <div class="code white">github.com/tooploox/oya-packs/scaffold</div>
+            <div class="dollar">
+              <div class="code yellow">cat </div>
+            </div>
+            <div class="code blue">Oyafile</div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">run </div>
-            <div class="code white">scaffold.generate</div>
+            <div class="code green">Project: </div>
+            <div class="code white">project</div>
           </div>
         </div>
         <div class="code-tooltip">CLICK TO COPY</div>
       </div>
-      <div class="text-block">Generating Dockerfile</div>
+      <div class="text-block text">Let’s rename our project to <strong>OyaExample</strong></div>
+      <div class="text-block text">Oya task is a bash script defined as a Oyafile key.<br>Tasks in Oyafile are defined as a yaml keys, with pipe at the beginning line and bash code in following.<br>Our server is golang app so before starting it needs to be compiled. </div>
+      <div class="text-block">Build tasks<span class="work-in-progress"></span></div>
       <div class="code-wrapper">
         <div class="code-block">
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">init</div>
+            <div class="dollar">
+              <div class="code yellow">cat </div>
+            </div>
+            <div class="code blue">Oyafile</div>
+            <div class="code-line">
+              <div class="code green">Project: </div>
+              <div class="code white">OyaExample</div>
+            </div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">import </div>
-            <div class="code white">github.com/tooploox/oya-packs/docker</div>
+            <div class="code white"> </div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">run </div>
-            <div class="code white">docker.generate</div>
+            <div class="code green">build: |</div>
+          </div>
+          <div class="code-line">
+            <div class="code white">   go build app.go</div>
+          </div>
+          <div class="code-line">
+            <div class="code white"> </div>
+          </div>
+          <div class="code-line">
+            <div class="code green">start: |</div>
+          </div>
+          <div class="code-line">
+            <div class="code white">   ./server</div>
           </div>
         </div>
         <div class="code-tooltip">CLICK TO COPY</div>
       </div>
-      <div class="text-block">Deploying to k8s <span class="work-in-progress">– work in progress</span></div>
+      <div class="text-block">List available tasks<span class="work-in-progress"></span></div>
       <div class="code-wrapper">
         <div class="code-block">
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">init</div>
+            <div class="dollar">
+              <div class="code yellow">oya </div>
+            </div>
+            <div class="code blue">tasks</div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">import </div>
-            <div class="code white">github.com/tooploox/oya-packs/k8s</div>
+            <div class="code gray"># in ./Oyafile</div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">run </div>
-            <div class="code white">k8s.init</div>
+            <div class="code white">oya </div>
+            <div class="code white">run </div>
+            <div class="code green">build</div>
           </div>
           <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">run </div>
-            <div class="code white">k8s.generate</div>
-          </div>
-          <div class="code-line">
-            <div class="code yellow">oya </div>
-            <div class="code blue">run </div>
-            <div class="code white">k8s.deploy</div>
+            <div class="code white">oya </div>
+            <div class="code white">run </div>
+            <div class="code green">start</div>
           </div>
         </div>
         <div class="code-tooltip">CLICK TO COPY</div>
       </div>
+      <div class="text-block">Execute task</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="dollar">
+              <div class="code yellow">oya </div>
+            </div>
+            <div class="code blue">run </div>
+            <div class="code white">build</div>
+          </div>
+          <div class="code-line">
+            <div class="dollar">
+              <div class="code yellow">oya </div>
+            </div>
+            <div class="code blue">run </div>
+            <div class="code white">start</div>
+          </div>
+        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
+      </div>
+      <div class="text-block text">Inside a project you can have many files with named <strong class="code-value">*.oya</strong> they will be read as a Value files, expected syntax is a pair of <strong class="code-value">key: value.</strong></div>
+      <div class="text-block text">Let’s say we want to store our port as a value. We can create file <strong class="code-value">server.oya</strong> with:</div>
+      <div class="text-block">Create file server.oya</div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="dollar">
+              <div class="code yellow">cat </div>
+            </div>
+            <div class="code blue">server.oya</div>
+          </div>
+          <div class="code-line">
+            <div class="code green">port: 3000</div>
+          </div>
+        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
+        <div class="text-block">Using values</div>
+      </div>
+      <div class="code-wrapper">
+        <div class="code-block">
+          <div class="code-line">
+            <div class="dollar">
+              <div class="code yellow">cat </div>
+            </div>
+            <div class="code blue">Oyafile</div>
+            <div class="code-line">
+              <div class="code green">Project: </div>
+              <div class="code white">OyaExample</div>
+            </div>
+          </div>
+          <div class="code-line">
+            <div class="code white"> </div>
+          </div>
+          <div class="code-line">
+            <div class="code green">build: |</div>
+          </div>
+          <div class="code-line">
+            <div class="code white">   go build server.go</div>
+          </div>
+          <div class="code-line">
+            <div class="code white"> </div>
+          </div>
+          <div class="code-line">
+            <div class="code green">start: |</div>
+          </div>
+          <div class="code-line">
+            <div class="code white">   export PORT=</div>
+            <div class="code pink">${Oya[port]}</div>
+          </div>
+          <div class="code-line">
+            <div class="code white">   ./server</div>
+          </div>
+        </div>
+        <div class="code-tooltip">CLICK TO COPY</div>
+      </div>
+      <div class="text-block text">If you want to learn more about Values - click <a href="#" class="underlined-link">here</a></div>
       <div class="cta-packs"><a data-w-id="1bd0f877-cf9e-90de-f02f-3b41b352ad01" href="packs.html" class="cta-button github-button w-inline-block"><img src="images/pacs-icon.svg" alt="" class="button-github-icon"><div class="github-button-text">Find packs you need</div></a>
         <div class="cta-packs-description">The biggest power of Oya is lies within in reusable packs dedicated to the most popular development environments and tools.</div>
       </div>

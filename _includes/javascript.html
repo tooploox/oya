@@ -19,7 +19,7 @@
 <script type="text/javascript">
 const ref = document.querySelector('style');
 const style = document.createElement('style');
-style.innerHTML = ".code:first-of-type:before { content: \"$ \"; display: inline; }";
+style.innerHTML = ".dollar > .code:first-of-type:before { content: \"$ \"; display: inline; }";
 ref.parentNode.insertBefore(style, ref);
 function codeToClipboard(el) {
     var range = document.createRange();
