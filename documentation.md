@@ -378,9 +378,3 @@ Imported pack added bunch of new commands into our project
 We can easily generate Dockerfile, update it, and build our project.
 
 
-# 4. Pack development - sharing oya’s
-
-Each oya project is a pack itself, all you need to do is push it to git and tag it version `name/v0.0.1`. Import it as before with `$ oya import github.com/tooploox/oya-packs/name` oya should automatically resolve newest version and add `Require` to your oyafile.
-
-…. 😕 need decent example…. from life … something what everyone does all over again …. for each setup … hmmm.. help
-
