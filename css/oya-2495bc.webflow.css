@@ -986,6 +986,12 @@
   .text-block {
     margin-left: 0px;
   }
+    
+  .text-block.text {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+    
   .code-line {
     overflow: scroll;
     width: 100%;
@@ -1198,6 +1204,7 @@
     margin-top: 10px;
     margin-left: 0px;
   }
+    
   .footer {
     margin-top: 60px;
   }
