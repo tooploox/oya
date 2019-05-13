@@ -30,6 +30,10 @@
       margin-top: 100px;
     }
 
+    .md_container h1:first-of-type {
+      margin-top: 50px;
+    }
+
     .md_container h2 {
       font-family: 'Roboto Mono', sans-serif;
       color: #091722;
@@ -50,7 +54,9 @@
       margin-top: 30px;
     }
 
-    .md_container p {
+    .md_container p, 
+    .md_container ul,
+    .md_container ol {
       opacity: 1;
       font-family: 'Roboto Mono', sans-serif;
       color: #091722AA;

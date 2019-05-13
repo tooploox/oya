@@ -32,9 +32,9 @@ The task in the above example is called "build" but there's nothing special abou
 
 # Concept
 
-- **Oyafile -** is a yaml formatted fileontaining Oya configuration and task definitions.
-- **Oya project -** is a directory with Oyafile inside and `Project: name` defined. Project is a set of tasks and files.
-- **Oya task -** tasks are bash scripts defined in Oyafiles under name like `task: |`.
+-   **Oyafile -** is a yaml formatted fileontaining Oya configuration and task definitions.
+-   **Oya project -** is a directory with Oyafile inside and `Project: name` defined. Project is a set of tasks and files.
+-   **Oya task -** tasks are bash scripts defined in Oyafiles under name like `task: |`.
 
 # Install Oya
 
@@ -123,8 +123,8 @@ You can also store all values inside Oyafile.
 # Secrets
 
 You can also store confidential data using Oya secrets.
-Oya uses SOPS (https://github.com/mozilla/sops) to help with secrets management. 
-First you need to configure SOPS for encryption method, check https://github.com/mozilla/sops/blob/master/README.rst#usage.
+Oya uses SOPS (<https://github.com/mozilla/sops>) to help with secrets management. 
+First you need to configure SOPS for encryption method, check <https://github.com/mozilla/sops/blob/master/README.rst#usage>.
 For our example we can use PGP key.
 
     $ export SOPS_PGP_FP="317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -184,7 +184,7 @@ You can access secret value with  `${Oya[magical_spell]}` from task.
 
 # Render
 
-Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more here https://github.com/gobuffalo/plush.
+Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more here <https://github.com/gobuffalo/plush>.
 
 
     $ cat template/index.html
@@ -334,10 +334,10 @@ To have all tests passing successfull it's require to have our pgp key for secre
     
 # Contributing
 
-1. Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
-2. Checkout oya outside GOHOME.
-3. Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
-4. Run acceptance tests: `godog`.
-5. Run tests: `go test ./...`.
-6. Run Oya: `go run oya.go`.
+1.  Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
+2.  Checkout oya outside GOHOME.
+3.  Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
+4.  Run acceptance tests: `godog`.
+5.  Run tests: `go test ./...`.
+6.  Run Oya: `go run oya.go`.
 
