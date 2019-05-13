@@ -2,7 +2,7 @@ body {
   font-family: 'Roboto Mono', sans-serif;
 }
 
-.md_container pre {
+  .md_container pre {
   background-color: #21415a;
   color: white;
   min-height: 44px;
