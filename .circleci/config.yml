@@ -9,7 +9,7 @@ jobs:
       - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
       - run: sudo apt update && sudo apt install nodejs
       - run: npm i
-      - run: ./node_modules/.bin/remark -f .
+      - run: ../node_modules/.bin/remark -f .
 
 workflows:
   version: 2

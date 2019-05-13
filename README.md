@@ -2,39 +2,33 @@
 layout: docs
 permalink: /documentation/
 ---
-
-
 # Oya
 
-# Usage
+## Usage
 
+Install oya and its dependencies:
 
-- Install oya and its dependencies:
+    $ curl https://oya.sh/get | bash
 
+Initialize project.
 
-  $ curl https://oya.sh/get | bash
+    $ oya init
 
+Define a task you can run:
 
-- Initialize project.
+    # ./Oyafile
+    build: echo "Hello, world"
+    
+View tasks
 
+    $ oya tasks
 
-  $ oya init
+Run the task:
 
-
-- Define a task you can run:
-
-
-  # ./Oyafile
-  build: echo "Hello, world"
-
-
-- Run the task:
-
-  oya run build
-  Hello, world
+    $ oya run build
+    Hello, world
 
 The task in the above example is called "build" but there's nothing special about the name. In fact, a task name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different tasks as you like.
-
 
 # Concept
 
