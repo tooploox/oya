@@ -101,8 +101,9 @@ Inside a project you can have many files with named `*.oya` they will be read as
     
     eat: |
       echo ${Oya[fruit]}
+      
 
-`$ oya run eat`
+    $ oya run eat
 
 
 # Values
