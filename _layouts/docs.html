@@ -5,6 +5,7 @@
 <head>
   <title>{{ site.name }} - Documentation</title>
 
+  {% include analytics.html %}
   {% include meta.html %}
   {% include style.html %}
   {% include javascript.html %}
@@ -18,6 +19,7 @@
 
 </head>
 <body>
+  {% include analytics_noscript.html %}
   <div class="top-line"></div>
   <div id="snackbar" class="snackbar">Commands copied to your clipboard</div>
   <div class="container w-container">
@@ -31,6 +33,5 @@
   </div>
 
     {% include footer.html %}
-
 </body>
 </html>

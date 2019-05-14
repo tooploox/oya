@@ -5,16 +5,17 @@
 <head>
   <title>{{site.name}}</title>
     
+   {% include analytics.html %}
    {% include meta.html %}
    {% include style.html %}
    {% include javascript.html %}
     
 </head>
 <body>
+  {% include analytics_noscript.html %}
     
   {{ content }}
     
   {% include footer.html %}
-    
 </body>
 </html>

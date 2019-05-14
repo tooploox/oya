@@ -2,5 +2,6 @@ name: Oya
 description: New projects set up lightening fast
 baseurl: ""
 url: "https://oya.sh"
+analytics_code: GTM-KJWZ9RS
 
 markdown: kramdown
