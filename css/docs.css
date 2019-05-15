@@ -8,20 +8,22 @@
     }
 
     .md_container pre {
-      background-color: #21415a;
       min-height: 44px;
       padding-top: 12px;
       padding-bottom: 12px;
       padding-left: 15px;
-      border-radius: 6px;
     }
     
     .md_container .highlighter-rouge pre {
       margin: 0 auto !important
     }
 
-    .md_container .highlighter-rouge > div.highlight {
-      background-color: transparent;
+    .highlighter-rouge {
+      background-color: #21415a;
+    }
+
+    div .highlight {
+      background-color: transparent !important;
     }
 
     .md_container code {
