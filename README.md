@@ -20,11 +20,15 @@ Initialize a project:
 
 Add an example task to the bottom of the generated `Oyafile`:
 
+    $ cat Oyafile
+    Project: project
+
     build: |
       echo "Hello, world"
 
-> A task name is any valid camel-case identifier starting with a lower case
-> letter. Identifiers starting with caps are reserved by Oya.
+A task is simply a bash-compatible script. Its name is any valid camel-case identifier starting with a lowercase letter.
+
+> Identifiers starting with caps are reserved by Oya.
 
 List available tasks:
 
@@ -46,12 +50,11 @@ much more to offer so keep reading.
 
 ## Key concepts
 
-- **Oyafile -** is a YAML file containing Oya configuration and task
-  definitions.
+- **Oyafile -** is an YAML file containing Oya config and task definitions.
+- **Oya task -** a named bash-compatible script you can run using `oya run <task
+  name>`.
 - **Oya project -** is a directory and any number of subdirectories containing
   `Oyafiles`; the top-level `Oyafile` must contain a `Project:` directive.
-- **Oya task -** a named bash script you can run using `oya run <task
-  name>`.
 - **Oya pack -** an installable Oya project containing reusable tasks you can
   easily use in other projects.
 
@@ -80,10 +83,12 @@ running the following command in its top-level directory:
 
 All the command does is generate a file named `Oyafile` that looks like this.
 
+    $ cat Oyafile
     Project: project
 
 You may want to change project name. We'll change it to `OyaExample`:
 
+    $ cat Oyafile
     Project: OyaExample
 
 
@@ -93,6 +98,7 @@ Oya task is a named bash script defined in an `Oyafile`. Let's pretend our
 project is a Golang HTTP server and we need tasks for building and running the
 server. Edit the generated `Oyafile` so it looks like this:
 
+    $ cat Oyafile
     Project: OyaExample
 
     build: |
@@ -113,32 +119,29 @@ Here's how you can list available tasks:
 
 To make it work, let's create a simple server implementation:
 
-```
-cat << EOT >> app.go
-package main
+    $ cat app.go
+    package main
 
-import (
-	"flag"
-	"fmt"
-	"log"
-	"net/http"
-)
+    import (
+        "flag"
+        "fmt"
+        "log"
+        "net/http"
+    )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, world!")
-}
+    func handler(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello, world!")
+    }
 
-func main() {
-	host := flag.String("host", "0.0.0.0", "host name to bind to")
-	port := flag.Int("port", 8080, "port number")
-	flag.Parse()
-	http.HandleFunc("/", handler)
-	bind := fmt.Sprintf("%s:%d", *host, *port)
-	fmt.Printf("Starting web server on %s\n", bind)
-	log.Fatal(http.ListenAndServe(bind, nil))
-}
-EOT
-```
+    func main() {
+        host := flag.String("host", "0.0.0.0", "host name to bind to")
+        port := flag.Int("port", 8080, "port number")
+        flag.Parse()
+        http.HandleFunc("/", handler)
+        bind := fmt.Sprintf("%s:%d", *host, *port)
+        fmt.Printf("Starting web server on %s\n", bind)
+        log.Fatal(http.ListenAndServe(bind, nil))
+    }
 
 > Well, to really make it work, you also need the Go language tools
 > [installed](https://golang.org/doc/install).
@@ -159,18 +162,22 @@ Success!
 ## Parametrizing tasks
 
 Alongside the `Oyafile` you can create any number of YAML files with an `.oya`
-extension containing constants you can use in your tasks (and in generated
-boilerplate as you'll find out later).
+extension containing predefined values you can use in your tasks (and in
+generated boilerplate as you'll find out later).
 
 Let's put the default port number and host name into an '.oya' file. Create file
 named `values.oya` with the following contents:
 
+    $ cat values.oya
     port: 4000
     host: localhost
+
+You can use any names for your values as long as they start with a lowercase letter. By convention, the names are camel-case.
 
 Let's now modify our task definitions so we pass port and host name explicitly
 when starting the server:
 
+    $ cat Oyafile
     Project: OyaExample
 
     build: |
@@ -187,6 +194,22 @@ different port:
 
     $ curl localhost:4000
     Hello, world!
+
+This is a YAML file you can use maps, arrays and nest values. Let's modify `values.oya` slightly:
+
+    $ cat values.oya
+    port: 4000
+    host: localhost
+    app:
+      version: v0.1.0
+
+This is how you can use it in the `start` task:
+
+    $ cat Oyafile
+    [...]
+    start: |
+       echo Starting server version ${Oya[app.version]}
+       go run . --port ${Oya[port]} --host ${Oya[host]}
 
 ## Passing arguments
 
@@ -224,6 +247,7 @@ Let's first slightly modify our HTTP server so it checks if the provided
 password matches one in an environment variable. Change `app.go` so it looks
 like this:
 
+    $ cat app.go
     package main
 
     import (
@@ -258,6 +282,7 @@ like this:
 Long story short, the server now requires the `PASSWORD` environment variable to
 be present. Let's modify our `Oyafile` so it sets that variable:
 
+    $ cat Oyafile
     Project: OyaExample
 
     build: |
@@ -270,13 +295,14 @@ Because we don't want to store the password in the plain, we'll encrypt it.
 
 First you need to create `secrets.oya` file and encrypt it:
 
-    $ cat << EOT >> secrets.oya
+    $ cat secrets.oya
     password: hokuspokus
     EOT
     $ oya secrets encrypt secrets.oya
 
 > There's nothing special about the name of the file. You can encrypt any YAML
-> file with .oya extension possibly grouping your secrets in larger projects.
+> file with .oya extension. In larger projects you could keep your secrets in
+> several encrypted .oya files, grouping secrets by function.
 
 Now our precious secret is safe!
 
@@ -290,7 +316,7 @@ Now our precious secret is safe!
             }
     }%
 
-Only SOPS metadata is out in the plain, the password itself is encrypted and safe.
+Only SOPS metadata is out in the plain, the password itself is encrypted.
 
 Restart the HTTP server and test it:
 
@@ -307,7 +333,7 @@ To view or edit an encrypted file later:
     $ oya secrets edit secrets.oya
 
 > You can use your favorite editor by setting the `EDITOR` environment variable.
-> The default is vim but you should be able to make it even with [GUI
+> The default is vim but you should be able to make it work even with [GUI
 > editors](https://github.com/mozilla/sops/issues/127).
 
 
@@ -315,30 +341,28 @@ To view or edit an encrypted file later:
 
 
 Pack is an installable Oya project containing reusable tasks you can easily use
-in other projects. Oya installs pack in your home `~/.oya` directory.
+in other projects.
+
+> Oya installs pack in your home `~/.oya` directory by default but you can
+> change the location by setting the `OYA_HOME` environment variable.
 
 In this tutorial, let's use the `docker` pack to generate a Dockerfile for the
 application:
 
-
     $ oya import github.com/tooploox/oya-packs/docker
 
-Import will automatically resolve dependencies with newest versions and add them
-to the `Require:` directive. It will make the pack's tasks available under the
-`docker` alias by default. You can change the alias to something more suitable
-by editing the Oyafile:
+Import automatically resolves dependencies using the newest available version of
+the pack, pinning it in the `Require:` section:
 
     $ cat Oyafile
     Project: OyaExample
     Require:
       github.com/tooploox/oya-packs/docker: v0.0.6
-    Import:
-      docker: github.com/tooploox/oya-packs/docker
     [...]
 
 
-Imported pack added bunch of new commands into our project:
-
+It makes the pack's tasks available under an alias. In case of this pack, it's
+`docker`:
 
     $ oya tasks
     # in ./Oyafile
@@ -350,12 +374,23 @@ Imported pack added bunch of new commands into our project:
     oya run docker.version
     oya run start
 
-Here's how you can generate the Dockerfile:
+
+You can change the alias by editing the alias in the `Import` section:
+
+    $ cat Oyafile
+    Project: OyaExample
+    [...]
+    Import:
+      docker: github.com/tooploox/oya-packs/docker
+    [...]
+
+Let's now generate a Dockerfile for our server:
 
     $ oya run docker.generate
 
-This is what what the Dockerfile will look like:
+This is what what the Dockerfile looks like:
 
+    $ cat Dockefile
     FROM golang
 
     COPY . /go/src/app
@@ -385,8 +420,7 @@ easier by generating the boilerplate from a template.
 
 Let's create `app.go` in `templates/` directory:
 
-    mkdir templates
-    cat << EOT >> templates/app.go
+    cat templates/app.go
     package main
 
     import (
@@ -437,6 +471,7 @@ Rather than doing that, let's create it step-by-step in a fresh new git repo.
 First, let's add a task you'll use to generate boilerplate to the original
 Oyafile so it looks like this:
 
+    $ cat Oyafile
     Project: project
 
     build: |
@@ -457,6 +492,7 @@ the contents of the templates directory.
 Because the script needs `port` and `host`, let's also create `values.oya`
 containing pack defaults:
 
+    $ cat values.oya
     port: 8080
     host: localhost
 
@@ -500,6 +536,7 @@ Let's generate the server source:
 
 This will generate `app.go` file in the current directory:
 
+    $ cat app.go
     package main
 
     import (
@@ -553,7 +590,7 @@ own `Oyafiles`, let's have a look at each.
 The top level Oyafile contains a `Project:` directive to mark the top-level
 project directory and a task named `build` preparing the output directory.
 
-    $ cat ./Oyafile
+    $ cat Oyafile
     Project: myproject
 
     build: |
@@ -566,7 +603,7 @@ In this example, let's assume that back-end is an HTTP API written in Go. Here
 is how the back-end `Oyafile` looks like:
 
 
-    $ cat ./backend/Oyafile
+    $ cat backend/Oyafile
     build: |
       echo "Compiling server"
       go build -o ../build/server .
@@ -580,7 +617,7 @@ Front-end is a TypeScript SPA application. The `build` task compiles TypeScript
 source to JavaScript:
 
 
-    $ cat ./frontend/Oyafile
+    $ cat frontend/Oyafile
     build: |
       echo "Compiling front-end"
       tsc main.ts --outFile ../build/public/main.js
