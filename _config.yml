@@ -5,3 +5,5 @@ url: "https://oya.sh"
 analytics_code: GTM-KJWZ9RS
 
 markdown: kramdown
+redcarpet:
+    extensions: ["no_intra_emphasis", "tables", "autolink", "strikethrough", "with_toc_data"]

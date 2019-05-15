@@ -1,15 +1,27 @@
     body {
       font-family: 'Roboto Mono', sans-serif;
     }
+    
+    p {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
 
-      .md_container pre {
+    .md_container pre {
       background-color: #21415a;
-      color: white;
       min-height: 44px;
       padding-top: 12px;
       padding-bottom: 12px;
       padding-left: 15px;
       border-radius: 6px;
+    }
+    
+    .md_container .highlighter-rouge pre {
+      margin: 0 auto !important
+    }
+
+    .md_container .highlighter-rouge > div.highlight {
+      background-color: transparent;
     }
 
     .md_container code {
