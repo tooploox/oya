@@ -54,8 +54,10 @@ $ curl https://oya.sh/get | bash
 
 This will install latest version of oya. It’s also possible to specify which version should be installed 
 
-`$ curl https://oya.sh/get | bash -s v0.0.7`.
-`$ oya` `--``version`
+```bash
+$ curl https://oya.sh/get | bash -s v0.0.7
+$ oya --version
+```
 
 
 # Oya Project
