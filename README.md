@@ -15,7 +15,7 @@ $ curl https://oya.sh/get | bash
 Initialize project.
 
 ``` bash
-$ oya init
+$ oya init OyaExample
 ```
 
 Define a task you can run:
@@ -65,15 +65,12 @@ $ oya --version
 You can create Oyafile by hand or with init command.
 
 ``` bash
-$ oya init
+$ oya init OyaExample
 $ cat Oyafile
 ```
 ``` yaml
-Project: project
+Project: OyaExample
 ```
-
-Don’t forget to change project name.
-
 
 # Tasks
 
