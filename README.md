@@ -1,6 +1,428 @@
+---
+layout: docs
+permalink: /documentation/
+---
 # Oya
 
-## Contributing
+## Usage
+
+Install oya and its dependencies:
+
+``` bash
+$ curl https://oya.sh/get | bash
+```
+
+Initialize project.
+
+``` bash
+$ oya init
+```
+
+Define a task you can run:
+
+``` yaml
+# ./Oyafile
+build: echo "Hello, world"
+```
+    
+View tasks
+
+``` bash
+$ oya tasks
+```
+
+Run the task:
+
+``` bash
+$ oya run build
+Hello, world
+```
+
+The task in the above example is called "build" but there's nothing special about the name. In fact, a task name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different tasks as you like.
+
+# Concept
+
+-   **Oyafile -** is a yaml formatted fileontaining Oya configuration and task definitions.
+-   **Oya project -** is a directory with Oyafile inside and `Project: name` defined. Project is a set of tasks and files.
+-   **Oya task -** tasks are bash scripts defined in Oyafiles under name like `task: |`.
+
+# Install Oya
+
+``` bash
+$ curl https://oya.sh/get | bash
+```
+
+This will install latest version of oya. It’s also possible to specify which version should be installed 
+
+```bash
+$ curl https://oya.sh/get | bash -s v0.0.7
+$ oya --version
+```
+
+
+# Oya Project
+
+You can create Oyafile by hand or with init command.
+
+``` bash
+$ oya init
+$ cat Oyafile
+```
+``` yaml
+Project: project
+```
+
+Don’t forget to change project name.
+
+
+# Tasks
+
+Oya task is a bash script defined as a Oyafile key.
+Tasks in Oyafile are defined as a yaml keys, with pipe at the beginning line and bash code in following.
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+    
+build: |
+  go build app.go
+    
+start: |
+  ./server
+```
+
+To list available tasks use tasks command:
+
+``` bash
+$ oya tasks
+```
+``` yaml
+# in ./Oyafile
+oya run build
+oya run start
+```
+
+Execute task
+
+``` bash
+$ oya run build
+$ oya run start
+```
+    
+# *.oya files
+
+Inside a project you can have many files with named `*.oya` they will be read as a Value files, expected syntax is a pair of  `key: value`. 
+
+``` bash
+$ cat values.oya
+```
+``` yaml
+fruit: banana
+```  
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+    
+eat: |
+  echo ${Oya[fruit]}
+```
+``` bash
+$ oya run eat
+```
+
+# Values
+
+You can also store all values inside Oyafile.
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+    
+Values:
+  fruit: banana
+    
+eat: |
+  echo ${Oya[fruit]}
+```
+
+
+# Secrets
+
+You can also store confidential data using Oya secrets.
+Oya uses SOPS (<https://github.com/mozilla/sops>) to help with secrets management. 
+First you need to configure SOPS for encryption method, check <https://github.com/mozilla/sops/blob/master/README.rst#usage>.
+For our example we can use PGP key.
+
+``` bash
+$ export SOPS_PGP_FP="317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
+```
+
+Oya secrets commands:
+
+``` bash
+$ oya secrets --help
+```
+``` yaml
+...
+  edit        Edit secrets file
+  encrypt     Encrypt secrets file
+  view        View secrets
+...
+```
+
+**First run:**
+
+First you need to create `secrets.oya` file. with `key: value` in each line. And encrypt it. (You can also go straight to edit with `$ oya secrets edit secrets.oya`).
+
+``` bash
+$ cat secrets.oya
+```
+``` yaml
+magical_spell: hokus pokus czary mary
+```
+``` bash
+$ oya secrets encrypt secrets.oya
+```
+
+Done your secrets are safe. Check how secrets.oya looks like.
+
+``` bash
+$ cat secrets.oya
+```
+``` yaml
+{
+        "data": "ENC[AES256_GCM,data:XXXX=,tag:XXXX==,type:str]",
+        "sops": {
+                ...
+                "pgp": [...],
+                ...
+        }
+}
+```
+
+We can see only sops metadata, our data are safe and encrypted.
+
+To view or edit use:
+
+``` bash
+$ oya secrets view secrets.oya
+```
+``` yaml
+magical_spell: hokus pokus czary mary
+```
+``` bash
+$ oya secrets edit secrets.oya
+```
+
+You can access secret value with  `${Oya[magical_spell]}` from task.
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+...
+spell: |
+  echo ${Oya[magical_spell]}
+```
+``` bash
+$ oya run spell
+hokus pokus czary mary
+```
+    
+
+
+# Render
+
+Oya can also render a template files or even whole directory. Oya uses Plush templating system You can find out more here <https://github.com/gobuffalo/plush>.
+
+``` bash
+$ cat template/index.html
+```
+``` yaml
+<h1><%= title %></h1>
+```
+
+Let’s add our title under  `Value:`
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+
+Values:
+  title: Hello from Oya
+...
+```
+
+Render output into `public/` dir so our server can see it.
+
+``` bash
+$ oya render template/index.html
+$ cat index.html
+```
+``` yaml
+<h1>Hello from Oya</h1>
+```
+
+
+# Recursive oya
+
+It’s possible to organize oya project into directories with separated logic. 
+
+We can separate it into `backend/` and `frontend/`. 
+
+``` 
+$ tree
+.
+├── Oyafile
+├── backend
+│   ├── Oyafile
+└── frontend
+    ├── Oyafile
+
+2 directories, 3 files
+```
+
+Each of them will have own `Oyafile`, and thanks to recursive tasks each file can have task with the same name in our case `build`.
+
+## Backend
+
+Here is how our backend Oyafile looks like (note that there is no `Project:` for subdirectories):
+
+``` bash
+$ cat ./backend/Oyafile
+```
+``` yaml
+build: |
+  echo "Compiling server"
+  go build -o ../build/server app.go
+```
+
+## Frontend
+
+``` bash
+$ cat ./frontend/Oyafile
+```
+``` yaml
+Values:
+  title: Hello from Oya
+    
+build: |
+  echo "Rednering template"
+  oya render template/index.html -o ../build/public
+```
+
+Our frontend holds only template file and Values necessary to render it.
+
+## Project Oyafile
+
+``` bash
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+    
+build: |
+  echo "Preparing build/ folder"
+  rm -rf build/ && mkdir -p build/public
+```
+
+## Recursive run
+
+Now let’s see what tasks we have. To do it for whole project including subdirectories we need to use `-r or --recurse`  flag.
+
+``` bash
+$ oya tasks -r
+```
+``` bash
+# in ./Oyafile
+oya run build
+
+# in ./backend/Oyafile
+oya run build
+
+# in ./frontend/Oyafile
+oya run build
+```
+
+As you can see we have three `build` tasks one per Oyafile. We can now run them all.
+
+``` bash
+$ oya run -r build
+```
+``` bash
+Preparing build/ folder
+Compiling server
+Rendering template.html
+```
+
+And now we can start the app with `$ oya run start`.
+
+# Packs
+
+Pack is a Oya project with general purpose tasks which can be easily shared and used inside other projects. Oya installs pack in your home `~/.oya` directory. Each time you rune oya command dependencies will be resolved and installed.
+
+``` bash
+$ oya import github.com/tooploox/oya-packs/docker
+$ cat Oyafile
+```
+``` yaml
+Project: OyaExample
+Require:
+  github.com/tooploox/oya-packs/docker: v0.0.6
+Import:
+  docker: github.com/tooploox/oya-packs/docker
+...
+```
+
+Import will add importing pack under `Import:`, key of imported pack is his alias and can be accessed by this name, (you can change it if needed). 
+
+## Packs versioning
+
+Import will automatically resolve dependencies with newest versions and add them under `Require:`.
+
+Imported pack added bunch of new commands into our project
+
+``` bash
+$ oya tasks
+```
+``` bash
+# in ./Oyafile
+oya run build
+oya run docker.build
+oya run docker.generate
+oya run docker.run
+oya run docker.stop
+oya run docker.version
+oya run start
+```
+
+We can easily generate Dockerfile, update it, and build our project.
+
+
+# Pack development - sharing oya’s
+
+Each oya project is a pack itself, all you need to do is push it to git and tag it version `name/v0.0.1`. Import it as before with `$ oya import github.com/tooploox/oya-packs/name` oya should automatically resolve newest version and add `Require` to your Oyafile.
+
+
+# Tests PGP keys
+
+To have all tests passing successfull it's require to have our pgp key for secrets
+
+``` bash
+$ gpg --import testutil/pgp/private.rsa
+```
+
+# Contributing
 
 1.  Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
 2.  Checkout oya outside GOHOME.
@@ -9,238 +431,3 @@
 5.  Run tests: `go test ./...`.
 6.  Run Oya: `go run oya.go`.
 
-# Documentation below is a draft and is likely incompatible with the current version.
-
-## Usage
-
-1.  Install oya and its dependencies:
-
-        curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
-
-2.  Initialize project to use a certain CI/CD tool and workflow. Example:
-
-         oya init jenkins-monorepo
-
-    It boostraps configuration for Jenkins pipelines supporting the 1.a workflow
-    (see Workflows below), an Oyafile and supporting scripts and compatible
-    generators.
-
-3.  Define a task you can run:
-
-    ```yaml
-    # ./Oyafile
-    build: echo "Hello, world"
-    ```
-
-4.  Run the task:
-
-        oya run build
-        Hello, world
-
-The task in the above example is called "build" but there's nothing special about the name. In fact, a task name is any camel case identifier as long as it starts with a lower-case letter. You can have as many different tasks as you like.
-
-## Plugins
-
-    oya vendor p github.com/tooploox/oya/packs/circleci-helm-platform
-
-installs into `vendor/`
-symlinks `vendor/p` to it
-symlinks all in `vendor/p/bin/` to `oya/bin/p`
-
-    cd delivery/broadcasts/Oyafile
-    oya p/generate/docker
-
-```yaml
-# ./delivery/broadcasts/Oyafile
-
-Import:
-
--   github.com/tooploox/oya/packs/jenkins-monorepo
-
---
-
-Path:
-  jm: github.com/tooploox/oya/packs/jenkins-monorepo/bin
-
-buildDocker:
-  jm/buildDocker
-
-buildChart:
-  jm/buildChart
-```
-
-## How it works
-
-A directory is included in the build process if contains an Oyafile regardless of how deeply nested it is. You can use Oyafiles in these directories to define their own tasks.
-
-For example, to set up a CI/CD pipeline in a mono-repository containing several
-microservices, you'd put each microservice in its directory, each with its own
-Oyafile containing the tasks necessary to support the CI/CD workflow.
-
-Imagine you have the following file structure:
-
-```yaml
-# ./Oyafile
-
-build: |
-  echo "Top-level directory"
-```
-
-```yaml
-# ./subdir/Oyafile
-
-build: |
-  echo "Sub-directory"
-```
-
-When you run `oya run build`, Oya first walks the directory tree, starting from
-the current directory, to build the **changeset**: the list of directories that
-are marked as changed. In the above example it would be, as you probably
-guessed, `.` (the top-level directory) and `subdir` (the sub-directory).
-
-Finally, Oya executes the task you specified for every directory marked as
-changed, starting from the top directory. Going back to our example, it would
-generate the following output:
-
-    Top-level directory
-    Sub-directory
-
-As you say, tasks and their corresponding scripts are defined in `Oyafile`s.
-Their names must be camel-case yaml identifiers, starting with a lower-case
-letter. Built-in tasks start with capital letters.
-
-More realistic example of an `Oyafile`:
-
-    build: docker build .
-    test: pytest
-
-## Changesets
-
-TODO
-
--   `Changeset` -- (optional) modifies the current changeset (see Changesets).
-
-Oya first walks all directories to build the changeset: a list of directories
-containing an Oyafile that are marked as "changed".
-
-It then walks the list,
-running the matching task in each. CI/CD tool-specific script outputting list of
-modified files in buildable directories given the current task name.
-     \- each path must be normalized and prefixed with `+`
-     \- cannot be overriden, only valid for top-level Oyafile
-     \- in the future, you'll be able to override for a buildable directory and
-       use `-` to exclude directories, `+` to include additional ones, and use
-       wildcards, this will allow e.g. forcing running tests for all apps when
-       you change a shared directory
-     \- git diff --name-only origin/master...$branch
-     \- <https://dzone.com/articles/build-test-and-deploy-apps-independently-from-a-mo>
-     \- <https://stackoverflow.com/questions/6260383/how-to-get-list-of-changed-files-since-last-build-in-jenkins-hudson/9473207#9473207>
-
-Generation of the changeset is controlled by the optional changeset key in
-Oyafiles, which can point to a script executed to generate the changeset:
-
-1.  No directive -- includes all directories containing on Oyafile.
-2.  Directive pointing to a script.
-
-.oyaignore lists files whose changes do not trigger build for the containing
-buildable directory
-
-## Features/ideas
-
-1.  Generators based on packs. <https://github.com/Flaque/thaum> + draft pack
-    plugin
-
-## Workflows
-
-### Repo structure
-
-1.  Mono-repo:
-    -   Each app has its own directory
-    -   There is a directory/file containing deployment configuration
-
-2.  Multi-repo:
-    -   Each app has its own repo
-    -   Deployment configurations in its own repo
-
-3.  Mix:
-    -   Some/all apps share repos, some may have their own
-    -   Deployment configurations in its own repo
-
-> Also submodules tried for NT/Switchboard and eventually ditched.
-
-### Change control
-
-a. Each environment has its own directory
-
-b. Each environment has its own branch
-
-### Evaluation
-
-| Workflow   | Projects      | Pros                                         | Cons                                                      |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 1.a        | E             | "Can share code"                             | Merge order dependent¹                                    |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 1.b        | C             | Single checkout                              | Complex automation²                                       |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 2.a        |               | Same as 2.b                                  | Same as 2.b plus need to detect which directory changed   |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 2.b        | S             | Better isolation³  Simple automation⁴        | More process overhead⁵                                    |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 3.a        | P             | Can divide up a project however you like     | Complex automation²                                       |
-| ---------- | ------------- | -------------------------------------------- | --------------------------------------------------------- |
-| 3.b        | P             | Simple deployment automation                 | Same as 3.a                                               |
-
-¹
-: Code gets merged from branch to branch; works for small team.
-
-²
-: Need to detect what changed between commits. Many CI/CD tools allow only one configuration per repo and require coding around the limitations, example: <https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/13>
-
-³
-: No way to just share code, need to package into libraries. Great for microservices and must have for large teams.
-
-⁴
-: Just put a CI/CD config into the root.
-
-⁵
-: No way to just share code, need to package into libraries. Bad for small teams wanting to quickly prototype.
-
-## Adding CircleCI integration
-
-1.  Install Oya
-
-        curl https://raw.githubusercontent/bilus/oya/master/scripts/setup.sh | sh
-
-2.  Initialize project
-
-        oya init
-        oya +github.com/bilus/oya-packs/circleci
-        oya vendor
-
-3.  Push to git
-
-## Secrets
-
-Secrets requires [Sops](https://github.com/mozilla/sops) to be installed.
-
-### PGP keys
-
-    $ gpg --list-keys
-    $ gpg --fingerprint
-
-Generate/Export/Import
-
-    $ gpg --gen-key
-    $ gpg --export-secret-keys --armor {{fingerprint}} > private.rsa
-    $ gpg --import private.rsa
-
-Remove
-
-    $ gpg --delete-keys {{fingerprint}}
-    $ gpg --delete-secret-keys {{fingerprint}}
-
-## Tests PGP keys
-
-To have all tests passing successfull it's require to have our pgp key for secrets
-
-    $ gpg --import testutil/pgp/private.rsa
