@@ -62,12 +62,12 @@ much more to offer so keep reading.
 
 # Key concepts
 
-- **Oyafile -** is an YAML file containing Oya config and task definitions.
-- **Oya task -** a named bash-compatible script you can run using `oya run <task
+-   **Oyafile -** is an YAML file containing Oya config and task definitions.
+-   **Oya task -** a named bash-compatible script you can run using `oya run <task
   name>`.
-- **Oya project -** is a directory and any number of subdirectories containing
+-   **Oya project -** is a directory and any number of subdirectories containing
   `Oyafiles`; the top-level `Oyafile` must contain a `Project:` directive.
-- **Oya pack -** an installable Oya project containing reusable tasks you can
+-   **Oya pack -** an installable Oya project containing reusable tasks you can
   easily use in other projects.
 
 # Installation
