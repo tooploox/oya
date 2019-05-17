@@ -29,7 +29,7 @@ import (
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
-	Use:   "init NAME",
+	Use:   "init PROJECT_NAME",
 	Short: "Initialize an Oya project",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
