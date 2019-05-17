@@ -67,3 +67,34 @@ Scenario: It correctly merges values, processing *.oya alphabetically
   coconut
 
   """
+
+Scenario: Support for .oya in a pack
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/test/foo: v0.0.1
+
+    Import:
+      foo: github.com/test/foo
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
+    """
+    # Project: foo
+
+    echo: |
+      echo ${Oya[fruit]}
+
+    """
+  And file ./.oya/packs/github.com/test/foo@v0.0.1/values.oya containing
+    """
+    fruit: orange
+    """
+  When I run "oya run foo.echo"
+  Then the command succeeds
+  And the command outputs
+  """
+  orange
+
+  """

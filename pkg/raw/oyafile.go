@@ -81,7 +81,8 @@ func (raw *Oyafile) Decode() (DecodedOyafile, error) {
 		return nil, err
 	}
 	for _, path := range paths {
-		rawValueFile, found, err := Load(path, raw.RootDir)
+		fullPath := filepath.Join(raw.Dir, path)
+		rawValueFile, found, err := Load(fullPath, raw.RootDir)
 		if err != nil {
 			return nil, err
 		}
