@@ -1,12 +1,13 @@
 package raw
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
 )
 
-func InitDir(dirPath string) error {
+func InitDir(dirPath, projectName string) error {
 	// BUG(bilus): Use raw access.
 	_, found, err := LoadFromDir(dirPath, dirPath)
 	if err == nil && found {
@@ -16,7 +17,7 @@ func InitDir(dirPath string) error {
 	if err != nil {
 		return err
 	}
-	_, err = f.WriteString("Project: project\n")
+	_, err = f.WriteString(fmt.Sprintf("Project: %s\n", projectName))
 	if err != nil {
 		_ = f.Close()
 		return err
