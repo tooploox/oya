@@ -86,6 +86,14 @@
       font-weight: 500; 
     }
 
+    blockquote {
+      margin-top: 20px;
+    }
+
+    blockquote code {
+      font-size : 14px;
+    }
+
 @media (max-width: 991px) {
     /* to be added */     
 }

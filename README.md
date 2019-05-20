@@ -19,7 +19,7 @@ $ curl https://oya.sh/get | bash
 Initialize a project:
 
 ``` bash
-$ oya init
+$ oya init OyaExample
 ```
 
 Add an example task to the bottom of the generated `Oyafile`:
@@ -74,7 +74,9 @@ much more to offer so keep reading.
 
 To install the latest version of Oya run the following command:
 
-    $ curl https://oya.sh/get | bash
+``` bash
+$ curl https://oya.sh/get | bash
+```
 
 > You can also specify which version should be installed
 >
