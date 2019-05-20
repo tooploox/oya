@@ -19,7 +19,8 @@ func (err ErrNoScope) Error() string {
 }
 
 func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath string,
-	autoScope bool, scopePath string, stdout, stderr io.Writer) error {
+	autoScope bool, scopePath string, overrides map[string]interface{},
+	stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
 		return err
@@ -65,5 +66,30 @@ func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath
 		}
 	}
 
+	err = overrideValues(values, overrides)
+	if err != nil {
+		return err
+	}
+
 	return template.RenderAll(templatePath, excludedPaths, outputPath, values)
+}
+
+func overrideValues(values template.Scope, overrides map[string]interface{}) error {
+	for path, val := range overrides {
+		// Force overriding existing paths that have different "shapes".
+		// What AssocAt does is it will create scopes along the path if they don't exist.
+		// If an intermediate path does exist and is a simple value (not a Scope), it will
+		// force it's conversion to a scope, thus losing the original value.
+		// For example:
+		// values: {"foo": "xxx"}
+		// overrides: foo.bar="yyy"
+		// result: {"foo": {"bar": "yyy"}}
+		// With force set to false, the function would fail for the input ^.
+		force := true
+		err := values.AssocAt(path, val, force)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -18,6 +18,12 @@ func (e ErrScopeMergeConflict) Error() string {
 	return fmt.Sprintf("path %v already exists", e.Path)
 }
 
+type ErrPathEmpty struct{}
+
+func (e ErrPathEmpty) Error() string {
+	return "Path must not be empty"
+}
+
 // Scope represents a single lexical value scope. Scopes can be nested.
 type Scope map[interface{}]interface{}
 
@@ -79,13 +85,14 @@ func (scope Scope) Replace(other Scope) {
 // UpdateScopeAt transforms a scope pointed to by the path (e.g. "foo.bar.baz").
 // It will create scopes along the way if they don't exist.
 // In case the value pointed by the path already exists and cannot be interpreted
-// as a Scope (see ParseScope), the function signals ErrScopeMergeConflict.
-func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope) error {
+// as a Scope (see ParseScope), the function signals ErrScopeMergeConflict unless
+// force is true. If that's the case, the value is overridden.
+func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope, force bool) error {
 	var pathArr []string
 	if len(path) > 0 {
 		pathArr = strings.Split(path, ".")
 	}
-	targetScope, err := scope.resolveScope(pathArr, true)
+	targetScope, err := scope.resolveScope(pathArr, true, force)
 	if err != nil {
 		// Ignore the reason.
 		return ErrScopeMergeConflict{Path: path}
@@ -94,17 +101,35 @@ func (scope Scope) UpdateScopeAt(path string, f func(Scope) Scope) error {
 	return nil
 }
 
+// AssocAt modifies scope by setting value at the provided path.
+// It will create scopes along the way if they don't exist.
+// In case the value pointed by the path already exists and cannot be interpreted
+// as a Scope (see ParseScope), the function signals ErrScopeMergeConflict unless
+// force is true. If that's the case, the value is overridden.
+func (scope Scope) AssocAt(path string, value interface{}, force bool) error {
+	if len(path) == 0 {
+		return ErrPathEmpty{}
+	}
+	pathArr := strings.Split(path, ".")
+	scopePath := strings.Join(pathArr[0:len(pathArr)-1], ".")
+	key := pathArr[len(pathArr)-1]
+	return scope.UpdateScopeAt(scopePath, func(s Scope) Scope {
+		s[key] = value
+		return s
+	}, force)
+}
+
 // GetScopeAt returns scope at the specified path. If path doesn't exist or points
 // to a value that cannot be interpreted as a Scope (see ParseScope), the function
 // signals an error.
 func (scope Scope) GetScopeAt(path string) (Scope, error) {
 	pathArr := strings.Split(path, ".")
-	return scope.resolveScope(pathArr, false)
+	return scope.resolveScope(pathArr, false, false)
 }
 
 // Flat returns a flattened scope.
 
-func (scope Scope) resolveScope(path []string, create bool) (Scope, error) {
+func (scope Scope) resolveScope(path []string, create, force bool) (Scope, error) {
 	if len(path) == 0 {
 		return scope, nil
 	}
@@ -122,9 +147,13 @@ func (scope Scope) resolveScope(path []string, create bool) (Scope, error) {
 	}
 	subScope, ok := ParseScope(potentialScope)
 	if !ok {
-		return nil, errors.Errorf("Unsupported value under %q", scopeName)
+		if !force {
+			return nil, errors.Errorf("Unsupported value under %q", scopeName)
+		}
+		subScope = Scope{}
+		scope[scopeName] = subScope
 	}
-	return subScope.resolveScope(path[1:], create)
+	return subScope.resolveScope(path[1:], create, force)
 }
 
 func (scope Scope) Flat() Scope {

@@ -42,6 +42,7 @@ func TestScope_UpdateScopeAt(t *testing.T) {
 		desc          string
 		scope         template.Scope
 		path          string
+		force         bool
 		f             func(template.Scope) template.Scope
 		expectedScope template.Scope
 	}{
@@ -144,13 +145,31 @@ func TestScope_UpdateScopeAt(t *testing.T) {
 				},
 			},
 		},
+		{
+			desc: "existing non-compatible path",
+			scope: template.Scope{
+				"foo": "aaa",
+			},
+			path:  "foo.xxx.yyy",
+			f:     merge,
+			force: true,
+			expectedScope: template.Scope{
+				"foo": template.Scope{
+					"xxx": template.Scope{
+						"yyy": template.Scope{
+							"bar": "baz",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
 		var scope template.Scope
 		err := deepcopy(&scope, tc.scope) // Because f can mutate it.
 		tu.AssertNoErr(t, err, "deepcopy failed")
-		err = scope.UpdateScopeAt(tc.path, tc.f)
+		err = scope.UpdateScopeAt(tc.path, tc.f, tc.force)
 		tu.AssertNoErr(t, err, "UpdateScopeAt failed in test case %q", tc.desc)
 		tu.AssertObjectsEqualMsg(t, tc.expectedScope, scope, "In test case %q", tc.desc)
 	}
@@ -242,4 +261,107 @@ func TestMerge(t *testing.T) {
 		actual := tc.lhs.Merge(tc.rhs)
 		tu.AssertObjectsEqual(t, tc.expected, actual)
 	}
+}
+
+func TestAssocAt(t *testing.T) {
+	testCases := []struct {
+		desc          string
+		scope         template.Scope
+		path          string
+		value         interface{}
+		force         bool
+		isErrExpected bool
+		expectedScope template.Scope
+	}{
+		{
+			desc:          "empty path",
+			scope:         template.Scope{},
+			path:          "",
+			value:         "foo",
+			isErrExpected: true,
+			expectedScope: template.Scope{},
+		},
+		{
+			desc:  "non-existent key",
+			scope: template.Scope{},
+			path:  "foo",
+			value: "bar",
+			expectedScope: template.Scope{
+				"foo": "bar",
+			},
+		},
+		{
+			desc:  "non-existent nested path",
+			scope: template.Scope{},
+			path:  "foo.bar",
+			value: "baz",
+			expectedScope: template.Scope{
+				"foo": template.Scope{
+					"bar": "baz",
+				},
+			},
+		},
+		{
+			desc: "existing key",
+			scope: template.Scope{
+				"foo": "xxx",
+			},
+			path:  "foo",
+			value: "bar",
+			expectedScope: template.Scope{
+				"foo": "bar",
+			},
+		},
+		{
+			desc: "existing nested path",
+			scope: template.Scope{
+				"foo": template.Scope{
+					"bar": "xxx",
+				},
+			},
+			path:  "foo.bar",
+			value: "baz",
+			expectedScope: template.Scope{
+				"foo": template.Scope{
+					"bar": "baz",
+				},
+			},
+		},
+		{
+			desc: "existing incompatible value",
+			scope: template.Scope{
+				"foo": "xxx",
+			},
+			path:          "foo.bar",
+			value:         "baz",
+			force:         false,
+			isErrExpected: true,
+		},
+		{
+			desc: "existing incompatible value, force",
+			scope: template.Scope{
+				"foo": "xxx",
+			},
+			path:  "foo.bar",
+			value: "baz",
+			force: true,
+			expectedScope: template.Scope{
+				"foo": template.Scope{
+					"bar": "baz",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		err := tc.scope.AssocAt(tc.path, tc.value, tc.force)
+		if tc.isErrExpected {
+			tu.AssertErr(t, err, "AssocAt unexpectedly succeeded in test case %q", tc.desc)
+
+		} else {
+			tu.AssertNoErr(t, err, "AssocAt failed in test case %q", tc.desc)
+			tu.AssertObjectsEqualMsg(t, tc.expectedScope, tc.scope, "In test case %q", tc.desc)
+		}
+	}
+
 }

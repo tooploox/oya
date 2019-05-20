@@ -42,7 +42,7 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 				// Task is keeping a pointed to the scope.
 				packOyafile.Values.Replace(merged)
 				return merged
-			})
+			}, false)
 		if err != nil {
 			return errors.Wrapf(err, "error merging values for imported pack %v", alias)
 		}

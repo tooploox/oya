@@ -16,9 +16,11 @@ package cmd
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tooploox/oya/cmd/internal"
+	"github.com/tooploox/oya/pkg/errors"
 )
 
 // renderCmd represents the render command
@@ -58,7 +60,12 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, exclude, fullOutputPath, autoScope, scopePath, cmd.OutOrStdout(), cmd.OutOrStderr())
+
+		overrides, err := parseValueOverrides(cmd, "set")
+		if err != nil {
+			return err
+		}
+		return internal.Render(fullOyafilePath, templatePath, exclude, fullOutputPath, autoScope, scopePath, overrides, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
@@ -69,4 +76,29 @@ func init() {
 	renderCmd.Flags().StringP("scope", "s", "", "Render template within the specified value scope")
 	renderCmd.Flags().BoolP("auto-scope", "a", true, "When running in an imported pack's task, use the pack's scope, unless --")
 	renderCmd.Flags().StringArrayP("exclude", "e", []string{}, "Relative paths to files or directories to exclude")
+	renderCmd.Flags().StringArrayP("set", "", []string{}, "Value overrides, e.g. foo.bar=value")
+}
+
+func parseValueOverrides(cmd *cobra.Command, flag string) (map[string]interface{}, error) {
+	assigns, err := cmd.Flags().GetStringArray("set")
+	if err != nil {
+		return nil, err
+	}
+	overrides := make(map[string]interface{})
+	for _, a := range assigns {
+		if a == "" {
+			// This will not happen in real-life but it does happen in godog tests
+			// because cmd.ResetFlags function used in oya_test.go doesn't reset
+			// string arrays properly, making them into [""].
+			continue
+		}
+		pv := strings.Split(a, "=")
+		if len(pv) != 2 {
+			return nil, errors.Errorf("unexpected --%s %s flag; must be in key=value or some.path=value format", flag, a)
+		}
+		path := pv[0]
+		value := pv[1]
+		overrides[path] = value
+	}
+	return overrides, nil
 }
