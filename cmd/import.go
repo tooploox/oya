@@ -40,5 +40,5 @@ var importCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(importCmd)
-	importCmd.Flags().StringP("alias", "a", "", "Import pack alias name")
+	importCmd.Flags().StringP("alias", "a", "", "Import pack under alias name")
 }
