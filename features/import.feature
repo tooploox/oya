@@ -103,3 +103,38 @@ Scenario: Import a pack which is already imported
   """
   .*Pack already imported: github.com/bilus/oya.*
   """
+
+Scenario: Import a pack with long name should have lower camelcase alias
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya import github.com/tooploox/oya-fixtures/pack3-and-a-half"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack3-and-a-half: v1.1.0
+    Import:
+      pack3AndAHalf: github.com/tooploox/oya-fixtures/pack3-and-a-half
+
+    """
+
+
+Scenario: Import a pack with alias from a parameter
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya import github.com/tooploox/oya-fixtures/pack3-and-a-half --alias pack3_5"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack3-and-a-half: v1.1.0
+    Import:
+      pack3_5: github.com/tooploox/oya-fixtures/pack3-and-a-half
+
+    """
