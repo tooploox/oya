@@ -358,8 +358,9 @@ Because we don't want to store the password in the plain, we'll encrypt it.
 
 First you need to create `secrets.oya` file and encrypt it:
 
-    $ oya secrets encrypt secrets.oya
-=======
+``` bash
+$ oya secrets encrypt secrets.oya
+```
 ``` bash
 $ cat secrets.oya
 ```
@@ -632,8 +633,6 @@ github.com/tooploox/oya-gohttp:
 ``` bash
 $ oya import github.com/tooploox/oya-gohttp
 ```
-
-> TODO: There must be a way to set alias.
 
 That's it! Let's see what tasks we have available:
 
