@@ -90,19 +90,10 @@ To get started using Oya in an existing project you need to initialize it by
 running the following command in its top-level directory:
 
 ``` bash
-$ oya init
+$ oya init OyaExample
 ```
 
 All the command does is generate a file named `Oyafile` that looks like this.
-
-``` bash
-$ cat Oyafile
-```
-``` yaml
-Project: project
-```
-
-You may want to change project name. We'll change it to `OyaExample`:
 
 ``` bash
 $ cat Oyafile
@@ -636,7 +627,7 @@ So how do you use the pack? Easy. First, create a new empty project and
 initialize it:
 
 ``` bash
-$ oya init
+$ oya init OyaExample
 ```
 
 Then import the pack. Here, I'm assuming it's under
