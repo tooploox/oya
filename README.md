@@ -558,10 +558,6 @@ $ oya render templates/app.go
 
 # Parametrizing boilerplate
 
-TODO: I was sure we had --set implemented for render so we can override values.
-Now Flags doesn't seem to work either, I probably forgot something. But setting
-values just to generate boilerplate is idiotic as a basic example.
-
 # Reusing your scripts
 
 Ok, all is good and fine but how to make the ^ code available when creating new
@@ -649,8 +645,6 @@ oya run oya-gohttp.build
 oya run oya-gohttp.generate
 oya run oya-gohttp.start
 ```
-
-> TODO: Error: Internal error: values.oya file not found while loading
 
 Let's generate the server source:
 
