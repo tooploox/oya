@@ -319,7 +319,6 @@ Scenario: Render dir excluding files and directories
   And file ./subdir/excludeme.txt does not exist
   And file ./excludeme/excludeme.txt does not exist
 
-
 Scenario: Render dir excluding using globbing
   Given file ./Oyafile containing
     """
@@ -362,7 +361,6 @@ Scenario: Render dir excluding using globbing
   And file ./subdir/excludeme.txt does not exist
   And file ./excludeme/excludeme.txt does not exist
 
-
 Scenario: Rendering a dir to an output dir outside project dir
   Given file ./Oyafile containing
     """
@@ -391,7 +389,6 @@ Scenario: Rendering a dir to an output dir outside project dir
   Eve
   """
 
-
 Scenario: Override a value
   Given file ./Oyafile containing
     """
@@ -409,7 +406,6 @@ Scenario: Override a value
   """
   yyy
   """
-
 
 Scenario: Override a nested value
   Given file ./Oyafile containing
