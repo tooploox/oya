@@ -449,3 +449,26 @@ Scenario: Override a nested value
   yyy
   """
 
+
+Scenario: Renders html characters unescaped
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      special_char: "&&"
+    """
+  Given file ./templates/file.txt containing
+    """
+    <%= "&" %>
+    <%= special_char %>
+    <%= "!@#$%^&*()<>/" %>
+    """
+  When I run "oya render ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  &
+  &&
+  !@#$%^&*()<>/
+  """
+
