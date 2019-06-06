@@ -95,7 +95,6 @@ func renderFile(templatePath, outputPath string, values Scope) error {
 	if err != nil {
 		return err
 	}
-
 	out, err := os.Create(outputPath)
 	if err != nil {
 		return err
@@ -103,6 +102,7 @@ func renderFile(templatePath, outputPath string, values Scope) error {
 	defer func() {
 		_ = out.Close()
 	}()
+	
 	return t.Render(out, values)
 }
 
