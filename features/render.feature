@@ -407,25 +407,6 @@ Scenario: Override a value
   yyy
   """
 
-Scenario: Override a nested value
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Values:
-      foo:
-        bar:
-          baz: xxx
-    """
-  Given file ./templates/file.txt containing
-    """
-    <%= foo["bar"]["baz"] %>
-    """
-  When I run "oya render --set foo.bar.baz=yyy ./templates/file.txt"
-  Then the command succeeds
-  And file ./file.txt contains
-  """
-  yyy
-  """
 
 Scenario: Set several value
   Given file ./Oyafile containing
@@ -446,3 +427,25 @@ Scenario: Set several value
   yyy
   zzz
   """
+
+
+Scenario: Override a nested value
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo:
+        bar:
+          baz: xxx
+    """
+  Given file ./templates/file.txt containing
+    """
+    <%= foo["bar"]["baz"] %>
+    """
+  When I run "oya render --set foo.bar.baz=yyy ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  yyy
+  """
+
