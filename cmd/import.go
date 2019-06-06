@@ -30,10 +30,15 @@ var importCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Import(cwd, args[0], cmd.OutOrStdout(), cmd.OutOrStderr())
+		alias, err := cmd.Flags().GetString("alias")
+		if err != nil {
+			return err
+		}
+		return internal.Import(cwd, args[0], alias, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(importCmd)
+	importCmd.Flags().StringP("alias", "a", "", "Import pack under alias name")
 }

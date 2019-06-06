@@ -4,14 +4,17 @@ import (
 	"io"
 	"strings"
 
+	"github.com/iancoleman/strcase"
 	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/raw"
 )
 
-func Import(workDir, uri string, stdout, stderr io.Writer) error {
-	uriArr := strings.Split(uri, "/")
-	alias := uriArr[len(uriArr)-1]
+func Import(workDir, uri, alias string, stdout, stderr io.Writer) error {
+	if alias == "" {
+		uriArr := strings.Split(uri, "/")
+		alias = strcase.ToLowerCamel(uriArr[len(uriArr)-1])
+	}
 
 	installDir, err := installDir()
 	if err != nil {
