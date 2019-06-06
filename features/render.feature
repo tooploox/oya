@@ -407,28 +407,6 @@ Scenario: Override a value
   yyy
   """
 
-
-Scenario: Set several value
-  Given file ./Oyafile containing
-    """
-    Project: project
-    Values:
-      foo: aa
-    """
-  Given file ./templates/file.txt containing
-    """
-    <%= foo["bar"]["baz"] %>
-    <%= abc["cde"] %>
-    """
-  When I run "oya render --set foo.bar.baz=yyy --set abc.cde=zzz ./templates/file.txt"
-  Then the command succeeds
-  And file ./file.txt contains
-  """
-  yyy
-  zzz
-  """
-
-
 Scenario: Override a nested value
   Given file ./Oyafile containing
     """
@@ -449,6 +427,25 @@ Scenario: Override a nested value
   yyy
   """
 
+Scenario: Set several value
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      foo: aa
+    """
+  Given file ./templates/file.txt containing
+    """
+    <%= foo["bar"]["baz"] %>
+    <%= abc["cde"] %>
+    """
+  When I run "oya render --set foo.bar.baz=yyy --set abc.cde=zzz ./templates/file.txt"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  yyy
+  zzz
+  """
 
 Scenario: Renders html characters unescaped
   Given file ./Oyafile containing
