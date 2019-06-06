@@ -1,6 +1,7 @@
 package template
 
 import (
+	"html"
 	"io"
 	"strings"
 	"sync"
@@ -32,6 +33,7 @@ func (t plushTemplate) Render(out io.Writer, scope Scope) error {
 	if err != nil {
 		return err
 	}
+	result = html.UnescapeString(result)
 	_, err = out.Write([]byte(result)) // Makes copy of result.
 	return err
 }
