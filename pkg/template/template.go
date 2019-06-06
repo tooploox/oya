@@ -70,6 +70,7 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 				},
 			)
 		}
+
 		err = renderFile(path, filePath, values)
 		if err != nil {
 			return errors.Wrap(err,
@@ -102,7 +103,6 @@ func renderFile(templatePath, outputPath string, values Scope) error {
 	defer func() {
 		_ = out.Close()
 	}()
-
 	return t.Render(out, values)
 }
 
