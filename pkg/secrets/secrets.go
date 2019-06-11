@@ -45,8 +45,8 @@ func Encrypt(inputPath, outputPath string) error {
 	return nil
 }
 
-func ViewCmd(path string) *exec.Cmd {
-	return exec.Command("sops", path)
+func ViewCmd(filename string) *exec.Cmd {
+	return exec.Command("sops", filename)
 }
 
 func isSopsFile(path string) (bool, error) {
