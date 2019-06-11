@@ -3,7 +3,6 @@ package internal
 import (
 	"io"
 	"os"
-	"os/exec"
 
 	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/secrets"
@@ -24,8 +23,8 @@ func SecretsView(path string, stdout, stderr io.Writer) error {
 func SecretsEdit(filename string, stdout, stderr io.Writer) error {
 	cmd := secrets.ViewCmd(filename)
 	cmd.Stdin = os.Stdin
-	cmd.Stdout = stdout // os.Stdout
-	cmd.Stderr = stderr // os.Stderr
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 	return cmd.Run()
 }
 
@@ -34,8 +33,4 @@ func SecretsEncrypt(path string, stdout, stderr io.Writer) error {
 		return err
 	}
 	return nil
-}
-
-func terminalRun(cmd *exec.Cmd) error {
-	return cmd.Run()
 }
