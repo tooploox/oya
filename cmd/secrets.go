@@ -32,11 +32,7 @@ var secretsEditCmd = &cobra.Command{
 	Short:        "Edit secrets file",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		path, err := filepath.Abs(args[0])
-		if err != nil {
-			return err
-		}
-		return internal.SecretsEdit(path,
+		return internal.SecretsEdit(args[0],
 			cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
