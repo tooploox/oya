@@ -1,6 +1,7 @@
 # -*- mode: yaml -*-
 Project: project
 Require:
+  github.com/tooploox/oya-packs/innosetup: v0.0.1
   github.com/tooploox/oya-fixtures: v1.1.0
 
 Values:
@@ -61,8 +62,10 @@ release: |
   go get -u github.com/mitchellh/gox
   go get -u github.com/tcnksm/ghr
   gox -os="linux darwin windows" -arch="amd64 386" -output="dist/oya_${CIRCLE_TAG}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${CIRCLE_TAG}"
-  gzip dist/*
-  sha256sum dist/oya_${CIRCLE_TAG}_{darwin,linux}_* | tee dist/oya_${CIRCLE_TAG}_SHA256SUMS
+  find ./dist -type f ! -name "*.exe" -exec gzip {} \;
+  find ./dist -type f -name "*.exe" -execdir zip {}.zip {} \;
+  find ./dist -type f -name "*.exe" -exec rm {} \;
+  sha256sum dist/oya_${CIRCLE_TAG}_{darwin,linux,windows}_* | tee dist/oya_${CIRCLE_TAG}_SHA256SUMS
   if [ "$CIRCLE_TAG" ]; then
     ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $CIRCLE_TAG dist/
   else

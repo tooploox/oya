@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11.4
-
     steps:
       - checkout
       - restore_cache:
@@ -39,6 +38,20 @@ jobs:
           paths:
             - "/go/pkg"
 
+  build-installer:
+    docker:
+      - image: scottyhardy/docker-wine:latest
+    steps:
+      - checkout
+      - run: apt-get update && apt-get install -y wget curl zip osslsigncode
+      - run: wget https://github.com/mozilla/sops/releases/download/3.3.1/sops_3.3.1_amd64.deb
+      - run: dpkg -i sops_3.3.1_amd64.deb
+      - run: curl https://oya.sh/get | bash
+      - run: oya run -r fetchBinary
+      - run: oya run -r buildInstaller
+      - run: oya run -r signInstaller
+      - run: oya run -r releaseInstaller
+
 workflows:
   version: 2
   build-release:
@@ -47,9 +60,19 @@ workflows:
           filters:  # required since `release` has tag filters AND requires `build`
             tags:
               only: /.*/
+
       - release:
           requires:
             - build
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
+
+      - build-installer:
+          requires:
+            - release
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
