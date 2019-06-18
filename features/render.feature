@@ -432,14 +432,14 @@ Scenario: Set several value
     """
     Project: project
     Values:
-      foo: aa
+      fooo: aa
     """
   Given file ./templates/file.txt containing
     """
-    <%= foo["bar"]["baz"] %>
+    <%= fooo["bar"]["baz"] %>
     <%= abc["cde"] %>
     """
-  When I run "oya render --set foo.bar.baz=yyy --set abc.cde=zzz ./templates/file.txt"
+  When I run "oya render --set fooo.bar.baz=yyy --set abc.cde=zzz ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """

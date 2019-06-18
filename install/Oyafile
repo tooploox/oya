@@ -1,0 +1,76 @@
+Import:
+  innosetup: github.com/tooploox/oya-packs/innosetup
+
+Values:
+  appName: 'Oya'
+  appPublisher: 'Tooploox'
+  appUrl: 'https://oya.sh/'
+  appExe: 'oya.exe'
+  appExe32: 'oya.exe'
+  appUid: 'C06341D8-9A5F-47C9-823C-4A336C83EC7F'
+
+  wineProjectPath: 'Z:\root\project'
+  projectPath: '/root/project'
+  installPath: 'install'
+  distPath: 'dist'
+
+  releasesUrl: "https://github.com/tooploox/oya/releases/download"
+  ghrUrl: "https://github.com/tcnksm/ghr/releases/download/v0.12.1/ghr_v0.12.1_linux_amd64.tar.gz"
+
+
+fetchBinary: |
+  downloadUrl="${Oya[releasesUrl]}/${CIRCLE_TAG}/"
+  oya64="oya_${CIRCLE_TAG}_windows_amd64.exe"
+  oya32="oya_${CIRCLE_TAG}_windows_386.exe"
+  wget "${downloadUrl}/${oya64}.zip" "${downloadUrl}/${oya32}.zip"
+  unzip "${oya64}.zip"; unzip "${oya32}.zip"
+  mkdir 32bit
+  mv $oya64 ${Oya[appExe]}
+  mv $oya32 32bit/${Oya[appExe]}
+
+buildInstaller: |
+  projectPath=${Oya[wineProjectPath]}
+  distPath="${projectPath}\\${Oya[distPath]}"
+  sourcePath="${projectPath}\\${Oya[installPath]}\\${Oya[appExe]}"
+  source32Path="${projectPath}\\${Oya[installPath]}\\32bit\\${Oya[appExe]}"
+  setupPath="${projectPath}\\${Oya[installPath]}\\setup.iss"
+  oya render \
+    --set appVer=$CIRCLE_TAG \
+    --set distDir=$distPath \
+    --set sourceDir=$sourcePath \
+    --set source32Dir=$source32Path \
+    --set outputFileName="oya_${CIRCLE_TAG}_windows_installer" \
+    installer_tpl/
+  oya run innosetup.compile $setupPath
+
+signInstaller: |
+  # TODO: use our certs this are generated? + secure store.
+  cert="cert/setup.cert"
+  key="cert/setup.key"
+
+  dist="${Oya[projectPath]}/${Oya[distPath]}"
+  in="oya_${CIRCLE_TAG}_windows_installer.exe"
+  out="oya_${CIRCLE_TAG}_windows_installer_signed.exe"
+
+  osslsigncode sign -certs $cert -key $key \
+    -n "${Oya[appName]}" \
+    -i ${Oya[appUrl]} \
+    -t http://timestamp.verisign.com/scripts/timstamp.dll \
+    -in $dist/$in \
+    -out $dist/$out
+
+  mv $dist/$out $dist/$in
+
+releaseInstaller: |
+  wget ${Oya[ghrUrl]}
+  tar zxf ghr*.tar.gz
+  ghr=`find "$(pwd)" -type f -name "ghr"`
+
+  if [ "$CIRCLE_TAG" ]; then
+    dist="${Oya[projectPath]}/${Oya[distPath]}"
+    sha256sum $dist/oya_* | tee "$dist/oya_${CIRCLE_TAG}_windows_installer_SHA256SUMS"
+    $ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $CIRCLE_TAG $dist
+  else
+    echo "The build is missing Git / CircleCi Tag"
+  fi
+
