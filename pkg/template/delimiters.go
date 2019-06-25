@@ -6,8 +6,8 @@ import(
 )
 
 type Delimiters struct {
-	start string
-	end   string
+	Start string
+	End   string
 }
 
 type invalidDelimitersFormat struct {

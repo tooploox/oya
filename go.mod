@@ -9,7 +9,6 @@ require (
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible
 	github.com/aws/aws-sdk-go v1.16.28
-	github.com/bart84ek/plush v3.8.2+incompatible // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cheggaaa/pb v2.0.6+incompatible // indirect
@@ -73,7 +72,7 @@ require (
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
 	go.mozilla.org/sops v0.0.0-20190313223743-c3c3b7c76d4d // indirect
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
-	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
 	golang.org/x/sys v0.0.0-20190515120540-06a5c4944438
 	golang.org/x/text v0.3.2
 	google.golang.org/api v0.2.0 // indirect
@@ -89,3 +88,5 @@ require (
 	k8s.io/helm v2.12.3+incompatible
 	mvdan.cc/sh v2.6.5-0.20190408145316-ee3cf905f3a4+incompatible
 )
+
+replace github.com/gobuffalo/plush => github.com/bart84ek/plush v3.8.2-oya+incompatible

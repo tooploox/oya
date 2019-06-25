@@ -21,7 +21,7 @@ var once sync.Once
 func parsePlush(source string, delimiters Delimiters) (Template, error) {
 	once.Do(prepHelpers)
 
-	if err := token.SetTemplatingDelimiters(delimiters.start, delimiters.end); err != nil {
+	if err := token.SetTemplatingDelimiters(delimiters.Start, delimiters.End); err != nil {
 		return plushTemplate{}, err
 	}
 
