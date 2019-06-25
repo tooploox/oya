@@ -469,3 +469,25 @@ Scenario: Renders html characters unescaped
   !@#$%^&*()<>/
   """
 
+Scenario: Renders with custom template delimiters
+  Given file ./Oyafile containing
+    """
+    Project: project
+    Values:
+      fuu: "bar"
+      bazz: "demo"
+    """
+  Given file ./templates/file.txt containing
+    """
+    {%= fuu %}
+    {%= fuu %}
+    {%= bazz %}
+    """
+  When I run "oya render ./templates/file.txt --delimiters {%...%}"
+  Then the command succeeds
+  And file ./file.txt contains
+  """
+  bar
+  bar
+  demo
+  """

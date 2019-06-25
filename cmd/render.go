@@ -65,7 +65,13 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Render(fullOyafilePath, templatePath, exclude, fullOutputPath, autoScope, scopePath, overrides, cmd.OutOrStdout(), cmd.OutOrStderr())
+
+		delimiters, err := cmd.Flags().GetString("delimiters")
+		if err != nil {
+			return err
+		}
+
+		return internal.Render(fullOyafilePath, templatePath, exclude, fullOutputPath, autoScope, scopePath, overrides, delimiters, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
@@ -74,6 +80,7 @@ func init() {
 	renderCmd.Flags().StringP("file", "f", "./Oyafile", "Path to Oyafile to read")
 	renderCmd.Flags().StringP("output-dir", "o", ".", "Specify the output DIRECTORY")
 	renderCmd.Flags().StringP("scope", "s", "", "Render template within the specified value scope")
+	renderCmd.Flags().StringP("delimiters", "d", "<%...%>", "Render template using delimiters for logic block")
 	renderCmd.Flags().BoolP("auto-scope", "a", true, "When running in an imported pack's task, use the pack's scope, unless --")
 	renderCmd.Flags().StringArrayP("exclude", "e", []string{}, "Relative paths to files or directories to exclude")
 	renderCmd.Flags().StringArrayP("set", "", []string{}, "Value overrides, e.g. foo.bar=value")

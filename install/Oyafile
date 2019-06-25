@@ -19,6 +19,7 @@ Values:
 
 
 fetchBinary: |
+  set -e
   downloadUrl="${Oya[releasesUrl]}/${CIRCLE_TAG}/"
   oya64="oya_${CIRCLE_TAG}_windows_amd64.exe"
   oya32="oya_${CIRCLE_TAG}_windows_386.exe"
@@ -29,6 +30,7 @@ fetchBinary: |
   mv $oya32 32bit/${Oya[appExe]}
 
 buildInstaller: |
+  set -e
   projectPath=${Oya[wineProjectPath]}
   distPath="${projectPath}\\${Oya[distPath]}"
   sourcePath="${projectPath}\\${Oya[installPath]}\\${Oya[appExe]}"
@@ -44,6 +46,7 @@ buildInstaller: |
   oya run innosetup.compile $setupPath
 
 signInstaller: |
+  set -e
   # TODO: use our certs this are generated? + secure store.
   cert="cert/setup.cert"
   key="cert/setup.key"
@@ -62,6 +65,7 @@ signInstaller: |
   mv $dist/$out $dist/$in
 
 releaseInstaller: |
+  set -e
   wget ${Oya[ghrUrl]}
   tar zxf ghr*.tar.gz
   ghr=`find "$(pwd)" -type f -name "ghr"`
