@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/gobuffalo/plush"
+	"github.com/gobuffalo/plush/token"
 	"github.com/pkg/errors"
 )
 
@@ -17,8 +18,12 @@ type plushTemplate struct {
 var once sync.Once
 
 // parsePlush parses a plush template in the source string.
-func parsePlush(source string) (Template, error) {
+func parsePlush(source string, delimiters Delimiters) (Template, error) {
 	once.Do(prepHelpers)
+
+	if err := token.SetTemplatingDelimiters(delimiters.start, delimiters.end); err != nil {
+		return plushTemplate{}, err
+	}
 
 	kt, err := plush.Parse(source)
 	if err != nil {

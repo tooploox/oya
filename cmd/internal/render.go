@@ -19,7 +19,7 @@ func (err ErrNoScope) Error() string {
 }
 
 func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath string,
-	autoScope bool, scopePath string, overrides map[string]interface{},
+	autoScope bool, scopePath string, overrides map[string]interface{}, delimitersStr string,
 	stdout, stderr io.Writer) error {
 	installDir, err := installDir()
 	if err != nil {
@@ -71,7 +71,12 @@ func Render(oyafilePath, templatePath string, excludedPaths []string, outputPath
 		return err
 	}
 
-	return template.RenderAll(templatePath, excludedPaths, outputPath, values)
+	delimiters, err := template.ParseDelimiters(delimitersStr)
+	if err != nil {
+		return err
+	}
+
+	return template.RenderAll(templatePath, excludedPaths, outputPath, values, delimiters)
 }
 
 func overrideValues(values template.Scope, overrides map[string]interface{}) error {

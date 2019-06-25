@@ -25,21 +25,21 @@ type Template interface {
 }
 
 // Load loads template from the path.
-func Load(path string) (Template, error) {
+func Load(path string, delimiters Delimiters) (Template, error) {
 	source, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	return Parse(string(source))
+	return Parse(string(source), delimiters)
 }
 
 // Parse parses template in the source string.
-func Parse(source string) (Template, error) {
-	return parsePlush(source)
+func Parse(source string, delimiters Delimiters) (Template, error) {
+	return parsePlush(source, delimiters)
 }
 
 // RenderAll renders all templates in the path (directory or a single file) to an output path (directory or file) using the provided value scope.
-func RenderAll(templatePath string, excludedPaths []string, outputPath string, values Scope) error {
+func RenderAll(templatePath string, excludedPaths []string, outputPath string, values Scope, delimiters Delimiters) error {
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -59,7 +59,7 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 			return err // err is nil if ok
 		}
 
-		filePath, err := renderString(filepath.Join(outputPath, relPath), values)
+		filePath, err := renderString(filepath.Join(outputPath, relPath), values, delimiters)
 		if err != nil {
 			return errors.Wrap(
 				err,
@@ -70,7 +70,7 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 				},
 			)
 		}
-		err = renderFile(path, filePath, values)
+		err = renderFile(path, filePath, values, delimiters)
 		if err != nil {
 			return errors.Wrap(err,
 				ErrRenderFail{},
@@ -84,8 +84,8 @@ func RenderAll(templatePath string, excludedPaths []string, outputPath string, v
 	})
 }
 
-func renderFile(templatePath, outputPath string, values Scope) error {
-	t, err := Load(templatePath)
+func renderFile(templatePath, outputPath string, values Scope, delimiters Delimiters) error {
+	t, err := Load(templatePath, delimiters)
 	if err != nil {
 		return err
 	}
@@ -106,8 +106,8 @@ func renderFile(templatePath, outputPath string, values Scope) error {
 	return t.Render(out, values)
 }
 
-func renderString(templateSource string, values Scope) (string, error) {
-	t, err := Parse(templateSource)
+func renderString(templateSource string, values Scope, delimiters Delimiters) (string, error) {
+	t, err := Parse(templateSource, delimiters)
 	if err != nil {
 		return "", err
 	}

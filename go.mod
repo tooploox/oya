@@ -9,6 +9,7 @@ require (
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible
 	github.com/aws/aws-sdk-go v1.16.28
+	github.com/bart84ek/plush v3.8.2+incompatible // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cheggaaa/pb v2.0.6+incompatible // indirect
@@ -18,20 +19,13 @@ require (
 	github.com/dimchansky/utfbom v1.1.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fako1024/topo v1.0.1 // indirect
-	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-delve/delve v1.1.0 // indirect
 	github.com/go-distributed/gog v0.0.0-20150108052914-831f302c7b3c
 	github.com/go-test/deep v1.0.1
-	github.com/gobuffalo/envy v1.6.15 // indirect
-	github.com/gobuffalo/flect v0.1.1 // indirect
-	github.com/gobuffalo/github_flavored_markdown v1.0.7 // indirect
-	github.com/gobuffalo/plush v3.7.33+incompatible
-	github.com/gobuffalo/tags v2.0.15+incompatible // indirect
-	github.com/gobuffalo/uuid v2.0.5+incompatible // indirect
-	github.com/gobuffalo/validate v2.0.3+incompatible // indirect
+	github.com/gobuffalo/helpers v0.2.2 // indirect
+	github.com/gobuffalo/plush v3.8.2+incompatible
 	github.com/gobwas/glob v0.2.3
-	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/google/pprof v0.0.0-20190208070709-b421f19a5c07 // indirect
 	github.com/google/shlex v0.0.0-20181106134648-c34317bd91bf
 	github.com/google/uuid v1.1.0 // indirect
@@ -46,7 +40,6 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kr/pty v1.1.3
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
@@ -58,23 +51,21 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/mozilla-services/yaml v0.0.0-20180922153656-28ffe5d0cafb // indirect
-	github.com/onsi/ginkgo v1.7.0 // indirect
-	github.com/onsi/gomega v1.4.3 // indirect
+	github.com/nsf/gocode v0.0.0-20190302080247-5bee97b48836 // indirect
 	github.com/pelletier/go-toml v1.2.0
 	github.com/peterh/liner v1.1.0 // indirect
 	github.com/pkg/errors v0.8.1
-	github.com/rogpeppe/go-internal v1.2.0
+	github.com/rogpeppe/go-internal v1.3.0
 	github.com/sanity-io/litter v0.0.0-20181009143221-cdb60d0035dc
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516 // indirect
-	github.com/sirupsen/logrus v1.2.0
+	github.com/sirupsen/logrus v1.4.2
 	github.com/sosedoff/gitkit v0.2.0
 	github.com/spf13/afero v1.1.2
 	github.com/spf13/cast v1.3.0
-	github.com/spf13/cobra v0.0.0-20181021141114-fe5e611709b0
+	github.com/spf13/cobra v0.0.5
 	github.com/spf13/jwalterweatherman v1.0.0
-	github.com/spf13/pflag v1.0.2
-	github.com/spf13/viper v0.0.0-20181107110859-ae103d7e593e
+	github.com/spf13/pflag v1.0.3
+	github.com/spf13/viper v1.3.2
 	github.com/src-d/go-git v4.7.0+incompatible
 	github.com/ulikunitz/xz v0.5.5
 	github.com/xeoncross/goworkqueue v0.0.0-20180512210549-cc56da012079
@@ -82,9 +73,9 @@ require (
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
 	go.mozilla.org/sops v0.0.0-20190313223743-c3c3b7c76d4d // indirect
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-	golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
-	golang.org/x/text v0.3.0
+	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+	golang.org/x/sys v0.0.0-20190515120540-06a5c4944438
+	golang.org/x/text v0.3.2
 	google.golang.org/api v0.2.0 // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
