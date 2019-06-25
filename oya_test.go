@@ -17,7 +17,7 @@ import (
 	"github.com/tooploox/oya/cmd"
 )
 
-const SOPS_PGP_KEY = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
+const sopsPgpKey = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
 
 type SuiteContext struct {
 	projectDir string
@@ -53,7 +53,7 @@ func setEnv(projectDir string) {
 	if err != nil {
 		panic(err)
 	}
-	err = os.Setenv("SOPS_PGP_FP", SOPS_PGP_KEY)
+	err = os.Setenv("SOPS_PGP_FP", sopsPgpKey)
 	if err != nil {
 		panic(err)
 	}

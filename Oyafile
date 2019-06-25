@@ -13,6 +13,7 @@ Ignore:
 develop.Doc: Install development prerequisites.
 develop: |
   go get -u github.com/DATA-DOG/godog/cmd/godog
+  go get -u golang.org/x/lint/golint
   go get -u go.mozilla.org/sops/cmd/sops
 
 install.Doc: Install oya.
@@ -53,6 +54,7 @@ lint.Doc: Lint files
 lint: |
   set -e
   ./node_modules/.bin/remark -f .
+  golint
 
 lintFix.Doc: Lint files and apply fixes where possible
 lintFix: |
