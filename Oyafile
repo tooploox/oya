@@ -24,6 +24,7 @@ test.Doc: Run tests.
 test: |
   set -e
   go test -v ./... && \
+  godog features/render.feature:410 && \
   godog $@
 
 test.Doc: Run installer tests.
