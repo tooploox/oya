@@ -85,3 +85,30 @@ Scenario: It correctly merges secrets
   peach
 
   """
+
+Scenario: It can quickly generate and import PGP key
+  Given file ./Oyafile containing
+    """
+    Project: Secrets
+    all: |
+      echo ${Oya[foo.bar]}
+      echo ${Oya[foo.baz]}
+      echo ${Oya[foo.qux]}
+    """
+  And file ./secrets.oya containing
+    """
+    foo:
+      bar: banana
+      qux: peach
+    """
+  When I run "oya secrets init --name 'Joe Public' --email 'joe@example.com' --description 'Test key'"
+  And I run "oya secrets encrypt secrets.oya"
+  And I run "oya run all"
+  Then the command succeeds
+  And the command outputs
+  """
+  banana
+  apple
+  peach
+
+  """

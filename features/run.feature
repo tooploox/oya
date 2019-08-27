@@ -337,7 +337,6 @@ Scenario: Command in task exits with non-zero code when set -e is in effect
   And the command exit code is 27
 
 # https://github.com/mvdan/sh/issues/404
-@current
 Scenario: set -e behaves correctly in conditionals etc.
   Given file ./Oyafile containing
     """
