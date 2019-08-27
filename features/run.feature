@@ -335,3 +335,26 @@ Scenario: Command in task exits with non-zero code when set -e is in effect
     > 2\\| bash -c 'exit 27'
     """
   And the command exit code is 27
+
+# https://github.com/mvdan/sh/issues/404
+@current
+Scenario: set -e behaves correctly in conditionals etc.
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    test: |
+      set -e
+      aa=uu
+      if test "$aa" == ""; then
+          exit 1
+      fi
+      echo "hello after if"
+    """
+  When I run "oya run test"
+  Then the command succeeds
+  And the command outputs text matching
+    """
+    hello after if
+
+    """
