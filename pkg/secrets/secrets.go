@@ -7,6 +7,16 @@ import (
 	"os/exec"
 )
 
+type KeyPair struct {
+	Public      string `json:"public_key"`
+	Private     string `json:"private_key"`
+	Fingerprint string `json:"fingerprint"`
+}
+
+func Init(email, name, desc string) (KeyPair, error) {
+	return generatePGPKeyPair(email, name, desc)
+}
+
 func Decrypt(path string) ([]byte, bool, error) {
 	if ok, err := isSopsFile(path); !ok || err != nil {
 		return nil, false, err
