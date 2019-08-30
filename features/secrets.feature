@@ -46,6 +46,10 @@ Scenario: Views secrets file
     """
     foo: SECRETPHRASE
     """
+  Then file ./secrets.oya contains
+    """
+    foo: SECRETPHRASE
+    """
   And I run "oya secrets encrypt secrets.oya"
   Then the command succeeds
   When I run "oya secrets view secrets.oya"
@@ -93,22 +97,22 @@ Scenario: It can quickly generate and import PGP key
     all: |
       echo ${Oya[foo.bar]}
       echo ${Oya[foo.baz]}
-      echo ${Oya[foo.qux]}
     """
   And file ./secrets.oya containing
     """
     foo:
       bar: banana
-      qux: peach
+      baz: peach
     """
-  When I run "oya secrets init --name 'Joe Public' --email 'joe@example.com' --description 'Test key'"
+  # When I run "oya secrets init --name 'John Public' --email 'john@example.com' --description 'Test key'"
+  When I run "oya secrets init"
+  Then the command succeeds
   And I run "oya secrets encrypt secrets.oya"
   And I run "oya run all"
   Then the command succeeds
   And the command outputs
   """
   banana
-  apple
   peach
 
   """

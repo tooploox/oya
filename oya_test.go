@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/cmd"
+	"github.com/tooploox/oya/pkg/secrets"
 )
 
 const sopsPgpKey = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -42,8 +43,11 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
-	err := os.RemoveAll(c.projectDir)
-	if err != nil {
+	if err := removePGPKeys(c.projectDir); err != nil {
+		panic(err)
+	}
+
+	if err := os.RemoveAll(c.projectDir); err != nil {
 		panic(err)
 	}
 }
@@ -57,6 +61,26 @@ func setEnv(projectDir string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func removePGPKeys(projectDir string) error {
+	if err := os.Chdir(projectDir); err != nil {
+		return err
+	}
+	sops, err := secrets.LoadPGPSopsYaml()
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+
+		return err
+	}
+	fingerprints := make([]string, 0)
+
+	for _, rule := range sops.CreationRules {
+		fingerprints = append(fingerprints, strings.Split(rule.PGP, ",")...)
+	}
+	return secrets.RemovePGPKeypairs(fingerprints)
 }
 
 // overrideOyaCmd overrides `oya` command used by $Tasks in templates

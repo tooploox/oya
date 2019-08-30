@@ -42,6 +42,16 @@ func GeneratePGPSopsYaml(keyPair KeyPair) error {
 	return ioutil.WriteFile(".sops.yaml", content, 0644)
 }
 
+func LoadPGPSopsYaml() (SopsYaml, error) {
+	contents, err := ioutil.ReadFile(".sops.yaml")
+	if err != nil {
+		return SopsYaml{}, err
+	}
+
+	var sops SopsYaml
+	return sops, yaml.Unmarshal(contents, &sops)
+}
+
 func ImportPGPKeypair(keyPair KeyPair) error {
 	cmd := exec.Command("gpg", "--import")
 	in, err := cmd.StdinPipe()
@@ -59,4 +69,16 @@ func ImportPGPKeypair(keyPair KeyPair) error {
 	in.Close()
 
 	return cmd.Wait()
+}
+
+func RemovePGPKeypairs(fingerprints []string) error {
+	for _, fingerprint := range fingerprints {
+		if err := exec.Command("gpg", "--batch", "--yes", "--delete-secret-keys", fingerprint).Run(); err != nil {
+			return err
+		}
+		if err := exec.Command("gpg", "--batch", "--yes", "--delete-key", fingerprint).Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
