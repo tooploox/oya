@@ -11,8 +11,8 @@ type ErrSecretsAlreadyEncrypted struct {
 }
 
 type ErrSecretsFailure struct {
-	Path     string
-	CmdError string
+	Path string
+	Err  error
 }
 
 func (err ErrNoSecretsFile) Error() string {
@@ -25,5 +25,5 @@ func (err ErrSecretsAlreadyEncrypted) Error() string {
 
 func (err ErrSecretsFailure) Error() string {
 	return fmt.Sprintf("error procesing secret file %q: %v",
-		err.Path, err.CmdError)
+		err.Path, err.Err)
 }
