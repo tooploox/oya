@@ -58,16 +58,13 @@ func ImportPGPKeypair(keyPair KeyPair) error {
 	if err != nil {
 		return err
 	}
-
 	if err = cmd.Start(); err != nil {
 		return err
 	}
-
 	if _, err := in.Write(([]byte)(keyPair.Private)); err != nil {
 		return err
 	}
 	in.Close()
-
 	return cmd.Wait()
 }
 

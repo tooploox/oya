@@ -16,7 +16,6 @@ var secretsInitCmd = &cobra.Command{
 	Use:          "init",
 	Short:        "Initialize secret management",
 	SilenceUsage: true,
-	Args:         cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		typ, err := cmd.Flags().GetString("type")
 		if err != nil {
