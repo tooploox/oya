@@ -8,8 +8,8 @@ import (
 
 	"github.com/tooploox/oya/pkg/errors"
 	"github.com/tooploox/oya/pkg/template"
-	"mvdan.cc/sh/interp"
-	"mvdan.cc/sh/syntax"
+	"mvdan.cc/sh/v3/interp"
+	"mvdan.cc/sh/v3/syntax"
 )
 
 type ErrScriptFail struct {
@@ -52,7 +52,6 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		}
 	}
 	r, err := interp.New(interp.StdIO(nil, stdout, stderr),
-		interp.Module(interp.DefaultExec),
 		interp.Dir(workDir),
 		interp.Env(nil),
 		interp.Params(toParams(args)...))

@@ -14,13 +14,17 @@ func Decrypt(path string) ([]byte, bool, error) {
 
 	var output []byte
 	if _, err := os.Stat(path); err != nil {
-		return output, false, ErrNoSecretsFile{Path: path}
+		if os.IsNotExist(err) {
+			return output, false, ErrNoSecretsFile{Path: path}
+		} else {
+			return output, false, err
+		}
 	}
 	decryptCmd := exec.Command("sops", "-d", path)
 	decrypted, err := decryptCmd.CombinedOutput()
 	if err != nil {
 		return output, false,
-			ErrSecretsFailure{Path: path, CmdError: string(decrypted)}
+			ErrSecretsFailure{Path: path, Err: err}
 	}
 	return decrypted, true, nil
 }
@@ -32,7 +36,7 @@ func Encrypt(inputPath, outputPath string) error {
 	cmd := exec.Command("sops", "-e", inputPath)
 	encoded, err := cmd.CombinedOutput()
 	if err != nil {
-		return ErrSecretsFailure{Path: inputPath, CmdError: string(encoded)}
+		return ErrSecretsFailure{Path: inputPath, Err: err}
 	}
 	fi, err := os.Stat(inputPath)
 	if err != nil {

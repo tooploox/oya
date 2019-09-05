@@ -40,12 +40,14 @@ Scenario: Encrypts secrets file
     SECRETPHRASE
     """
 
+@bug
 Scenario: Views secrets file
   Given file ./secrets.oya containing
     """
     foo: SECRETPHRASE
     """
   And I run "oya secrets encrypt secrets.oya"
+  Then the command succeeds
   When I run "oya secrets view secrets.oya"
   Then the command succeeds
   And the command outputs
