@@ -68,6 +68,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mozilla-services/yaml v0.0.0-20180922153656-28ffe5d0cafb // indirect
+	github.com/mozilla/mig v0.0.0-20190703170622-33eefe9c974e
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/openzipkin/zipkin-go v0.1.3 // indirect
 	github.com/pelletier/go-toml v1.4.0

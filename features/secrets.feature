@@ -40,9 +40,12 @@ Scenario: Encrypts secrets file
     SECRETPHRASE
     """
 
-@bug
 Scenario: Views secrets file
   Given file ./secrets.oya containing
+    """
+    foo: SECRETPHRASE
+    """
+  Then file ./secrets.oya contains
     """
     foo: SECRETPHRASE
     """
@@ -85,3 +88,30 @@ Scenario: It correctly merges secrets
   peach
 
   """
+
+Scenario: It can quickly generate and import PGP key
+  Given file ./Oyafile containing
+    """
+    Project: Secrets
+    all: |
+      echo ${Oya[foo.bar]}
+      echo ${Oya[foo.baz]}
+    """
+  And file ./secrets2.oya containing
+    """
+    foo:
+      bar: banana
+      baz: peach
+    """
+  And the SOPS_PGP_FP environment variable set to ""
+  When I run "oya secrets init --name 'Oya test key' --email 'oya@example.com'"
+  And I run "oya secrets encrypt secrets2.oya"
+  And I run "oya run all"
+  Then the command succeeds
+  And the command outputs
+  """
+  banana
+  peach
+
+  """
+  And secrets2.oya is encrypted using PGP key in .sops.yaml

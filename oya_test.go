@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/cmd"
+	"github.com/tooploox/oya/pkg/secrets"
 )
 
 const sopsPgpKey = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -42,8 +43,11 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
-	err := os.RemoveAll(c.projectDir)
-	if err != nil {
+	if err := removePGPKeys(c.projectDir); err != nil {
+		panic(err)
+	}
+
+	if err := os.RemoveAll(c.projectDir); err != nil {
 		panic(err)
 	}
 }
@@ -57,6 +61,27 @@ func setEnv(projectDir string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// removePGPKeys removes PGP keys based on fingerprints(s) in .sops.yaml, NOT sopsPgpKey ^.
+func removePGPKeys(projectDir string) error {
+	if err := os.Chdir(projectDir); err != nil {
+		return err
+	}
+	sops, err := secrets.LoadPGPSopsYaml()
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+
+		return err
+	}
+	fingerprints := make([]string, 0)
+
+	for _, rule := range sops.CreationRules {
+		fingerprints = append(fingerprints, strings.Split(rule.PGP, ",")...)
+	}
+	return secrets.RemovePGPKeypairs(fingerprints)
 }
 
 // overrideOyaCmd overrides `oya` command used by $Tasks in templates
@@ -156,13 +181,27 @@ func (c *SuiteContext) execute(command string) error {
 	cmd.ResetFlags()
 
 	oldArgs := os.Args
-	os.Args = strings.Fields(command)
+	os.Args = parseCommand(command)
 	defer func() {
 		os.Args = oldArgs
 	}()
 	cmd.SetOutput(c.stdout)
 	c.lastCommandExitCode, c.lastCommandErr = cmd.ExecuteE()
 	return nil
+}
+
+func parseCommand(command string) []string {
+	argv := make([]string, 0)
+	r := regexp.MustCompile(`([^\s"']+)|"([^"]*)"|'([^']*)'`)
+	matches := r.FindAllStringSubmatch(command, -1)
+	for _, match := range matches {
+		for _, group := range match[1:] {
+			if group != "" {
+				argv = append(argv, group)
+			}
+		}
+	}
+	return argv
 }
 
 func (c *SuiteContext) iRunOya(command string) error {
@@ -230,6 +269,25 @@ func (c *SuiteContext) theCommandExitCodeIs(expectedExitCode int) error {
 	return nil
 }
 
+func (c *SuiteContext) oyafileIsEncryptedUsingKeyInSopsyaml(oyafilePath string) error {
+	sops, err := secrets.LoadPGPSopsYaml()
+	if err != nil {
+		return err
+	}
+	contents, err := ioutil.ReadFile(oyafilePath)
+	if err != nil {
+		return err
+	}
+	for _, rule := range sops.CreationRules {
+		fingerprint := rule.PGP
+		if strings.Contains(string(contents), fingerprint) {
+			return nil
+		}
+	}
+
+	return errors.Errorf("%q not encrypted using key is .sops.yaml", oyafilePath)
+}
+
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
@@ -249,7 +307,7 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command outputs text matching$`, c.theCommandOutputsTextMatching)
 	s.Step(`^the command exit code is (.+)$`, c.theCommandExitCodeIs)
 	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
-
+	s.Step(`^([^ ]+) is encrypted using PGP key in .sops.yaml$`, c.oyafileIsEncryptedUsingKeyInSopsyaml)
 	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
 	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
 }
