@@ -50,16 +50,6 @@ testKeysRemove: |
     echo "Oya test PGP Key deleted"
   fi
 
-lint.Doc: Lint files
-lint: |
-  set -e
-  ./node_modules/.bin/remark -f .
-  golint
-
-lintFix.Doc: Lint files and apply fixes where possible
-lintFix: |
-  ./node_modules/.bin/remark . -o
-
 release: |
   go get -u github.com/mitchellh/gox
   go get -u github.com/tcnksm/ghr
