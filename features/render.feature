@@ -412,15 +412,15 @@ Scenario: Override a nested value
     """
     Project: project
     Values:
-      foo:
-        bar:
+      bar:
+        foo:
           baz: xxx
     """
   Given file ./templates/file.txt containing
     """
-    <%= foo["bar"]["baz"] %>
+    <%= bar["foo"]["baz"] %>
     """
-  When I run "oya render --set foo.bar.baz=yyy ./templates/file.txt"
+  When I run "oya render --set bar.foo.baz=yyy ./templates/file.txt"
   Then the command succeeds
   And file ./file.txt contains
   """
