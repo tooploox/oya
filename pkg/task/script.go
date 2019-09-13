@@ -59,30 +59,35 @@ func (s Script) Exec(workDir string, args []string, values template.Scope, stdou
 		return err
 	}
 
+	var lastFailure error
 	ctx := context.Background()
+LOOP:
 	for _, stmt := range file.Stmts {
 		err := r.Run(ctx, stmt)
 		switch err := err.(type) {
 		case nil:
 			// Continue with next statement in script.
+			lastFailure = nil
 		case interp.ExitStatus:
-			// Sub-command exited.
-			// Disregard, as either:
-			//   - "set -e" is in effect -> and shell will exit if needed,
-			//   - or not -> and exit status should be ignored anyway
+			// Record to use if it's the last command.
+			errCode := int(err)
+			if errCode != 0 {
+				lastFailure = s.errScriptFail(stmt.Pos(), headLines, err, errCode)
+			}
 		case interp.ShellExitStatus:
 			// Shell interpreter exited.
 			// Either early return (due to "exit" or "set -e"), or task is finished.
 			errCode := int(err)
 			if errCode != 0 {
-				return s.errScriptFail(stmt.Pos(), headLines, err, errCode)
+				lastFailure = s.errScriptFail(stmt.Pos(), headLines, err, errCode)
 			}
-			return nil
+			break LOOP
+
 		default:
 			return s.errScriptFail(stmt.Pos(), headLines, err, -1)
 		}
 	}
-	return nil
+	return lastFailure
 }
 
 func (s Script) errScriptFail(pos syntax.Pos, headLines uint, err error, exitCode int) error {

@@ -23,6 +23,50 @@ Scenario: Successfully run task
   """
   And file ./OK exists
 
+Scenario: Failing task's exit code propagates
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      rm does_not_exist_398849834983
+    """
+  When I run "oya run all"
+  Then the command fails
+  And the command exit code is 1
+
+Scenario: Exit code doesn't propagate from sub-expressions
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      rm does_not_exist_398849834983 || echo "fail"
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs
+  """
+  rm: does_not_exist_398849834983: No such file or directory
+  fail
+
+  """
+
+Scenario: Last exit code is propagated
+  Given file ./Oyafile containing
+    """
+    Project: project
+    all: |
+      rm does_not_exist_398849834983
+      echo "fail"
+    """
+  When I run "oya run all"
+  Then the command succeeds
+  And the command outputs
+  """
+  rm: does_not_exist_398849834983: No such file or directory
+  fail
+
+  """
+
 Scenario: Nested Oyafiles are not processed recursively by default
   Given file ./Oyafile containing
     """
