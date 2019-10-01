@@ -23,7 +23,7 @@ install: |
 test.Doc: Run tests.
 test: |
   set -e
-  go test -v ./...
+  go test -v ./... && \
   godog $@
 
 test.Doc: Run installer tests.
