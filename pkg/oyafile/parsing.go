@@ -94,6 +94,7 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	return oyafile, nil
 }
 
+// resolveReplacements replaces Requires paths based on Requires directives, if any.
 func (oyafile *Oyafile) resolveReplacements() error {
 	for i, ref := range oyafile.Requires {
 		replPath, ok := oyafile.Replacements[ref.ImportPath]
