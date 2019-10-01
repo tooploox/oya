@@ -103,6 +103,7 @@ require (
 	go.mozilla.org/sops v0.0.0-20190313223743-c3c3b7c76d4d // indirect
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
@@ -117,7 +118,6 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.0
 	gopkg.in/src-d/go-git-fixtures.v3 v3.3.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.9.1
-	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	honnef.co/go/tools v0.0.1-2019.2.2 // indirect
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
@@ -127,3 +127,5 @@ require (
 )
 
 replace github.com/gobuffalo/plush => github.com/bart84ek/plush v3.8.2-oya+incompatible
+
+replace gopkg.in/urfave/cli.v1 => github.com/urfave/cli v1.20.0
