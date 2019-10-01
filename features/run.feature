@@ -28,7 +28,7 @@ Scenario: Failing task's exit code propagates
     """
     Project: project
     all: |
-      rm does_not_exist_398849834983
+      rm does_not_exist
     """
   When I run "oya run all"
   Then the command fails
@@ -39,13 +39,13 @@ Scenario: Exit code doesn't propagate from sub-expressions
     """
     Project: project
     all: |
-      rm does_not_exist_398849834983 || echo "fail"
+      rm does_not_exist || echo "fail"
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs
+  And the command outputs text matching
   """
-  rm: does_not_exist_398849834983: No such file or directory
+  rm:.*does_not_exist.*No such file or directory
   fail
 
   """
@@ -55,14 +55,14 @@ Scenario: Last exit code is propagated
     """
     Project: project
     all: |
-      rm does_not_exist_398849834983
+      rm does_not_exist
       echo "fail"
     """
   When I run "oya run all"
   Then the command succeeds
-  And the command outputs
+  And the command outputs text matching
   """
-  rm: does_not_exist_398849834983: No such file or directory
+  rm:.*does_not_exist.*No such file or directory
   fail
 
   """
