@@ -1,5 +1,7 @@
 module github.com/tooploox/oya
 
+go 1.14
+
 require (
 	cloud.google.com/go v0.44.3 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.4.7 // indirect
