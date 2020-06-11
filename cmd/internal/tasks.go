@@ -75,7 +75,3 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 	w.Flush()
 	return nil
 }
-
-func println(out io.Writer, s string) {
-	out.Write([]byte(fmt.Sprintf("%s\n", s)))
-}
