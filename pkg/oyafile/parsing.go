@@ -21,6 +21,7 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	for nameI, value := range of {
 		name, ok := nameI.(string)
 		if !ok {
@@ -53,13 +54,18 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
 		case "Require":
-			err := parseRequire(name, value, oyafile)
+			if err := ensureProject(raw); err != nil {
+				return nil, errors.Wrapf(err, "unexpected Require directive")
+			}
+			err = parseRequire(name, value, oyafile)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
 		case "Replace":
-			err := parseReplace(name, value, oyafile)
-			if err != nil {
+			if err := ensureProject(raw); err != nil {
+				return nil, errors.Wrapf(err, "unexpected Replace directive")
+			}
+			if err := parseReplace(name, value, oyafile); err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
 
@@ -70,8 +76,7 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 				continue
 			}
 
-			err := parseTask(name, value, oyafile)
-			if err != nil {
+			if err := parseTask(name, value, oyafile); err != nil {
 				return nil, errors.Wrapf(err, "error parsing key %q", name)
 			}
 		}
@@ -191,6 +196,7 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 	if value == nil {
 		return nil
 	}
+
 	defaultErr := fmt.Errorf("expected entries mapping pack import paths to their version, example: \"github.com/tooploox/oya-packReferences/docker: v1.0.0\"")
 
 	requires, ok := value.(map[interface{}]interface{})
@@ -247,4 +253,15 @@ func parseReplace(name string, value interface{}, o *Oyafile) error {
 
 	return nil
 
+}
+
+func ensureProject(raw *raw.Oyafile) error {
+	_, hasProject, err := raw.Project()
+	if err != nil {
+		return err
+	}
+	if hasProject {
+		return nil
+	}
+	return errors.Errorf("must be in file with a Project directive")
 }
