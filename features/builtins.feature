@@ -153,7 +153,6 @@ Scenario: Use sprig functions when rendering (http://masterminds.github.io/sprig
     1, 2, 3
     """
 
-@current
 Scenario: Use imported pack alias in pack's tasks
   Given file ./Oyafile containing
     """
@@ -168,7 +167,7 @@ Scenario: Use imported pack alias in pack's tasks
   And file ./.oya/packs/github.com/test/foo@v0.0.1/Oyafile containing
     """
     bar: |
-      echo "${Oya[Alias]}"
+      echo "${Oya[Import.Alias]}"
     """
   When I run "oya run foo.bar"
   Then the command succeeds

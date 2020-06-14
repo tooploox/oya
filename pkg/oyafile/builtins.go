@@ -36,7 +36,9 @@ func (o *Oyafile) defaultValues() template.Scope {
 
 func aliasBuiltin(alias types.Alias) template.Scope {
 	return template.Scope{
-		"Alias": string(alias),
+		"Import": template.Scope{
+			"Alias": string(alias),
+		},
 	}
 }
 
