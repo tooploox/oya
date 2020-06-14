@@ -796,7 +796,7 @@ TODO: For a working example, clone ...
 
 1.  Install go 1.11 (goenv is recommended, example: `goenv install 1.11.4`).
 2.  Checkout oya outside GOHOME.
-3.  Install godog: `go get -u github.com/DATA-DOG/godog/cmd/godog`.
+3.  Install godog: `go get -u github.com/cucumber/godog/cmd/godog`.
 4.  Run acceptance tests: `godog`.
 
 > For all test to pass you need to import the PGP key used to encrypt secrets.

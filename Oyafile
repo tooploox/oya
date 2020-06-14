@@ -12,7 +12,7 @@ Ignore:
 
 develop.Doc: Install development prerequisites.
 develop: |
-  go get github.com/DATA-DOG/godog/cmd/godog
+  go get github.com/cucumber/godog/cmd/godog
 
 install.Doc: Install oya.
 install: |
