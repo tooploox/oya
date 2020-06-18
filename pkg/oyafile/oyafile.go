@@ -46,7 +46,7 @@ type Oyafile struct {
 
 func New(oyafilePath string, rootDir string) (*Oyafile, error) {
 	relPath, err := filepath.Rel(rootDir, oyafilePath)
-	log.Debug("Oyafile at ", oyafilePath)
+	log.Debug("Oyafile at ", oyafilePath, " root dir: ", rootDir)
 	if err != nil {
 		return nil, err
 	}

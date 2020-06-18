@@ -8,7 +8,6 @@ require (
 	git.apache.org/thrift.git v0.12.0 // indirect
 	github.com/Azure/azure-sdk-for-go v26.4.0+incompatible // indirect
 	github.com/Azure/go-autorest v11.5.2+incompatible // indirect
-	github.com/DATA-DOG/godog v0.7.13
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible
@@ -21,6 +20,9 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/cosiner/argv v0.0.1 // indirect
+	github.com/cucumber/godog v0.9.0
+	github.com/cucumber/messages-go/v10 v10.0.3
+	github.com/cucumber/messages-go/v9 v9.0.3 // indirect
 	github.com/derekparker/delve v1.1.0 // indirect
 	github.com/dimchansky/utfbom v1.1.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
@@ -93,7 +95,6 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/src-d/go-git v4.7.0+incompatible
 	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/ugorji/go v1.1.7 // indirect
 	github.com/ulikunitz/xz v0.5.5
 	github.com/xeoncross/goworkqueue v0.0.0-20180512210549-cc56da012079
@@ -103,6 +104,7 @@ require (
 	go.mozilla.org/sops v0.0.0-20190313223743-c3c3b7c76d4d // indirect
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
@@ -117,8 +119,7 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.0
 	gopkg.in/src-d/go-git-fixtures.v3 v3.3.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.9.1
-	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.8
 	honnef.co/go/tools v0.0.1-2019.2.2 // indirect
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
 	k8s.io/helm v2.12.3+incompatible
@@ -127,3 +128,5 @@ require (
 )
 
 replace github.com/gobuffalo/plush => github.com/bart84ek/plush v3.8.2-oya+incompatible
+
+replace gopkg.in/urfave/cli.v1 => github.com/urfave/cli v1.20.0

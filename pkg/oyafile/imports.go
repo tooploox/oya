@@ -39,6 +39,7 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 			func(scope template.Scope) template.Scope {
 				// Values in the main Oyafile overwrite values in the pack Oyafile.
 				merged := packOyafile.Values.Merge(scope)
+				merged = merged.Merge(aliasBuiltin(alias))
 				// Task is keeping a pointed to the scope.
 				packOyafile.Values.Replace(merged)
 				return merged
@@ -49,7 +50,6 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 
 		oyafile.Tasks.ImportTasks(alias, packOyafile.Tasks)
 	}
-
 	return nil
 }
 

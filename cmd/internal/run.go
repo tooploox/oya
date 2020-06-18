@@ -49,7 +49,7 @@ func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdou
 	if err := setOyaScope(alias.String()); err != nil {
 		return err
 	}
-	defer setOyaScope(passedOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
+	defer mustSetOyaScope(passedOyaScope) // Mostly useful in tests, child processes naturally implement stacks.
 
 	oyaCmd, found := lookupOyaCmd()
 	if found {

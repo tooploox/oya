@@ -10,12 +10,12 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/DATA-DOG/godog"
-	"github.com/DATA-DOG/godog/gherkin"
+	"github.com/cucumber/godog"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/tooploox/oya/cmd"
 	"github.com/tooploox/oya/pkg/secrets"
+	"github.com/tooploox/oya/testutil/gherkin"
 )
 
 const sopsPgpKey = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
@@ -308,8 +308,8 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the command exit code is (.+)$`, c.theCommandExitCodeIs)
 	s.Step(`^the ([^ ]+) environment variable set to "([^"]*)"$`, c.environmentVariableSet)
 	s.Step(`^([^ ]+) is encrypted using PGP key in .sops.yaml$`, c.oyafileIsEncryptedUsingKeyInSopsyaml)
-	s.BeforeScenario(func(interface{}) { c.MustSetUp() })
-	s.AfterScenario(func(interface{}, error) { c.MustTearDown() })
+	s.BeforeScenario(func(*gherkin.Scenario) { c.MustSetUp() })
+	s.AfterScenario(func(*gherkin.Scenario, error) { c.MustTearDown() })
 }
 
 // sourceFileDirectory returns the current .go source file directory.
