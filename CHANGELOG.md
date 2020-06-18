@@ -3,11 +3,28 @@
 
 ## v0.0.20 (Upcoming)
 
+### Added
+
+- Added an `Import.Alias` built-in variable, usable inside packs, containing the
+  alias under which the pack was imported. Consider the following import:
+
+    ```yaml
+    Import:
+       bar: github.com/bilus/foo
+    ```
+    
+    When you run the task below, defined inside the `foo` pack, it'll print "bar":
+    
+    ```yaml
+    whoami: |
+       echo ${Oya[Import.Alias]}
+    ```
+
 ### Changed
 
 - Report an error if a `Require` or `Replace` directive appears in an `Oyafile`
-  without a `Project` directive; Oya dependencies are managed in the top-level
-  `Oyafile`.
+  without a `Project` directive; you can manage an Oya project dependencies in
+  the top-level `Oyafile`.
 
 ### Fixed
 

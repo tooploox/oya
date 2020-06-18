@@ -6,6 +6,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/tooploox/oya/pkg/template"
+	"github.com/tooploox/oya/pkg/types"
 )
 
 var sprigFunctions = upcaseFuncNames(sprig.GenericFuncMap())
@@ -31,6 +32,14 @@ func (o *Oyafile) defaultValues() template.Scope {
 	}
 
 	return scope
+}
+
+func aliasBuiltin(alias types.Alias) template.Scope {
+	return template.Scope{
+		"Import": template.Scope{
+			"Alias": string(alias),
+		},
+	}
 }
 
 func upcaseFuncNames(funcs map[string]interface{}) map[string]interface{} {
