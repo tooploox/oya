@@ -354,5 +354,19 @@ Scenario: Indirectly required higher version
 
     """
 
-#   # Two different major versions -- different paths
-#   # Two different major versions -- same path (conflict)
+Scenario: Error for Require in non-root Oyafile
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  And file ./subdir/Oyafile containing
+    """
+    Require:
+      github.com/tooploox/oya-fixtures/pack3: v1.0.0  # Requires pack1@v1.1.1
+    """
+  When I'm in the subdir dir
+  And I run "oya tasks"
+  Then the command fails with error matching
+    """
+    .*unexpected Require directive.*
+    """

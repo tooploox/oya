@@ -1,4 +1,4 @@
-Feature: Support for pack development
+Feature: Replace directive
 
 Background:
   Given I'm in project dir
@@ -55,3 +55,20 @@ Scenario: With local require oya doesn't attempt to lookup requirements remotely
     """
   When I run "oya run foo.version"
   Then the command succeeds
+
+Scenario: Error for Replace in non-root Oyafile
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  And file ./subdir/Oyafile containing
+    """
+    Replace:
+      github.com/tooploox/oya-fixtures/pack3: ./pack3
+    """
+  When I'm in the subdir dir
+  And I run "oya tasks"
+  Then the command fails with error matching
+    """
+    .*unexpected Replace directive.*
+    """
