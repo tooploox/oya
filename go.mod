@@ -56,7 +56,6 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
-	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kr/pty v1.1.8
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/magefile/mage v0.0.0-20180920151403-1426fb6b9761
@@ -81,7 +80,7 @@ require (
 	github.com/prometheus/client_golang v1.1.0 // indirect
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4 // indirect
 	github.com/rogpeppe/fastuuid v1.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.3.0
+	github.com/rogpeppe/go-internal v1.5.2
 	github.com/russross/blackfriday v2.0.0+incompatible // indirect
 	github.com/sanity-io/litter v0.0.0-20181009143221-cdb60d0035dc
 	github.com/satori/go.uuid v1.2.0 // indirect
@@ -103,14 +102,16 @@ require (
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
 	go.mozilla.org/sops v0.0.0-20190313223743-c3c3b7c76d4d // indirect
 	golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 // indirect
-	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
 	golang.org/x/lint v0.0.0-20190930215403-16217165b5de // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
-	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
+	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
+	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20190826234050-71894ab67ee3 // indirect
 	google.golang.org/api v0.9.0 // indirect
+	google.golang.org/appengine v1.6.1
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
 	google.golang.org/grpc v1.23.0 // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
@@ -124,7 +125,7 @@ require (
 	k8s.io/apimachinery v0.0.0-20181015213631-60666be32c5d
 	k8s.io/helm v2.12.3+incompatible
 	mvdan.cc/sh v2.6.5-0.20190408145316-ee3cf905f3a4+incompatible
-	mvdan.cc/sh/v3 v3.0.0-alpha2.0.20190827105346-6af96bc17993
+	mvdan.cc/sh/v3 v3.1.1
 )
 
 replace github.com/gobuffalo/plush => github.com/bart84ek/plush v3.8.2-oya+incompatible
