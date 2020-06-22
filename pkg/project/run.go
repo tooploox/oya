@@ -2,12 +2,17 @@ package project
 
 import (
 	"io"
+	"log"
+	"path/filepath"
 
 	"github.com/tooploox/oya/pkg/oyafile"
+	"github.com/tooploox/oya/pkg/raw"
+	"github.com/tooploox/oya/pkg/shell"
 	"github.com/tooploox/oya/pkg/task"
 	"github.com/tooploox/oya/pkg/template"
 )
 
+// Run runs a task within a project's context.
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
 	args []string, scope template.Scope, stdout, stderr io.Writer) error {
 
@@ -51,6 +56,29 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 		}
 	}
 	return nil
+}
+
+func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.Writer) error {
+	builtins, err := p.values()
+	if err != nil {
+		return err
+	}
+	o, found, err := p.Oyafile(filepath.Join(workDir, raw.DefaultName))
+	if err != nil {
+		return err
+	}
+
+	var scope template.Scope
+	if found {
+		scope = builtins.Merge(o.Values)
+	} else {
+		log.Println("WARNING: No Oyafile in the current directory")
+
+	}
+
+	// TODO: Pass oya-cmd-override.
+	return shell.StartREPL(workDir, scope, stdin, stdout, stderr, nil)
+
 }
 
 func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {

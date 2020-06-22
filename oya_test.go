@@ -45,12 +45,18 @@ func (c *SuiteContext) MustSetUp() {
 }
 
 func (c *SuiteContext) MustTearDown() {
+	if c.stdin != nil {
+		if err := c.stdin.Close(); err != nil {
+			log.Fatalf("Error closing stdin during suite tear down: %v", err)
+		}
+		c.stdin = nil
+	}
 	if err := removePGPKeys(c.projectDir); err != nil {
-		panic(err)
+		log.Fatalf("Error removing PGP keys during suite tear down: %v", err)
 	}
 
 	if err := os.RemoveAll(c.projectDir); err != nil {
-		panic(err)
+		log.Fatalf("Error removing %q during suite tear down: %v", c.projectDir, err)
 	}
 }
 
@@ -178,9 +184,7 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 	return errors.Errorf("expected %v to not exist", path)
 }
 
-func (c *SuiteContext) execute(command string) error {
-	r, w := io.Pipe()
-	c.stdin = w
+func (c *SuiteContext) execute(command string, stdin io.Reader) error {
 	c.stdout.Reset()
 	cmd.ResetFlags()
 
@@ -189,7 +193,9 @@ func (c *SuiteContext) execute(command string) error {
 	defer func() {
 		os.Args = oldArgs
 	}()
-	cmd.SetInput(r)
+	if stdin != nil {
+		cmd.SetInput(stdin)
+	}
 	cmd.SetOutput(c.stdout)
 	c.lastCommandExitCode, c.lastCommandErr = cmd.ExecuteE()
 	return nil
@@ -210,12 +216,18 @@ func parseCommand(command string) []string {
 }
 
 func (c *SuiteContext) iRunOya(command string) error {
-	return c.execute("oya " + command)
+	return c.execute("oya "+command, nil)
 }
 
 func (c *SuiteContext) iRunOyaInteractively(command string) error {
+	if c.stdin != nil {
+		log.Fatalf("stdin already set; only one interactive command per test is supported")
+	}
+	r, w := io.Pipe()
+	c.stdin = w
+
 	go func() {
-		err := c.execute("oya " + command)
+		err := c.execute("oya "+command, r)
 		if err != nil {
 			log.Fatalf("Unexpected error from interactive oya command: %v", err)
 		}

@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/task"
 	"github.com/tooploox/oya/pkg/template"
 	"github.com/tooploox/oya/pkg/types"
@@ -18,18 +17,11 @@ type Args struct {
 }
 
 func Run(workDir, taskName string, taskArgs Args, recurse, changeset bool, stdout, stderr io.Writer) error {
-	installDir, err := installDir()
+	p, err := prepareProject(workDir)
 	if err != nil {
 		return err
 	}
-	p, err := project.Detect(workDir, installDir)
-	if err != nil {
-		return err
-	}
-	err = p.InstallPacks()
-	if err != nil {
-		return err
-	}
+
 	tn := task.Name(taskName)
 
 	// If OYA_SCOPE alias is present, prefix task with the alias.

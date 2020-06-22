@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 	"github.com/tooploox/oya/cmd/internal"
 )
@@ -13,7 +15,11 @@ var replCmd = &cobra.Command{
 to build Oya tasks interactively, evaluating shell commands
 in an identical environment.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return internal.REPL(cmd.InOrStdin(), cmd.OutOrStdout(), cmd.OutOrStderr())
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		return internal.REPL(cwd, cmd.InOrStdin(), cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 

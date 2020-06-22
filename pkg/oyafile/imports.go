@@ -13,6 +13,7 @@ type PackLoader interface {
 	Load(importPath types.ImportPath) (*Oyafile, bool, error)
 }
 
+// Build resolves Oyafile imports.
 func (oyafile *Oyafile) Build(loader PackLoader) error {
 	// Do not resolve imports when loading Oyafile. Sometimes, we need to load Oyafile before packs are ready to be imported.
 	if !oyafile.IsBuilt {
