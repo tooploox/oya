@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,6 +26,7 @@ type SuiteContext struct {
 
 	lastCommandErr      error
 	lastCommandExitCode int
+	stdin               io.WriteCloser
 	stdout              *bytes.Buffer
 }
 
@@ -177,6 +179,8 @@ func (c *SuiteContext) fileDoesNotExist(path string) error {
 }
 
 func (c *SuiteContext) execute(command string) error {
+	r, w := io.Pipe()
+	c.stdin = w
 	c.stdout.Reset()
 	cmd.ResetFlags()
 
@@ -185,6 +189,7 @@ func (c *SuiteContext) execute(command string) error {
 	defer func() {
 		os.Args = oldArgs
 	}()
+	cmd.SetInput(r)
 	cmd.SetOutput(c.stdout)
 	c.lastCommandExitCode, c.lastCommandErr = cmd.ExecuteE()
 	return nil
@@ -208,8 +213,24 @@ func (c *SuiteContext) iRunOya(command string) error {
 	return c.execute("oya " + command)
 }
 
+func (c *SuiteContext) iRunOyaInteractively(command string) error {
+	go func() {
+		err := c.execute("oya " + command)
+		if err != nil {
+			log.Fatalf("Unexpected error from interactive oya command: %v", err)
+		}
+	}()
+
+	return nil
+}
+
 func (c *SuiteContext) modifyFileToContain(path string, contents *gherkin.DocString) error {
 	return c.writeFile(path, contents.Content)
+}
+
+func (c *SuiteContext) iSendToRepl(line string) error {
+	_, err := c.stdin.Write([]byte(line + "\n"))
+	return err
 }
 
 func (c *SuiteContext) theCommandSucceeds() error {
@@ -294,7 +315,9 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
+	s.Step(`^I run "oya (.+)" interactively$`, c.iRunOyaInteractively)
 	s.Step(`^I modify file (.+) to contain$`, c.modifyFileToContain)
+	s.Step(`^I send "([^"]*)" to repl$`, c.iSendToRepl)
 	s.Step(`^file (.+) contains$`, c.fileContains)
 	s.Step(`^file (.+) does not contain$`, c.fileDoesNotContain)
 	s.Step(`^file (.+) exists$`, c.fileExists)

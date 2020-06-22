@@ -9,6 +9,7 @@ Scenario: Successfully run a command
     """
     Project: project
     """
-  When I run "oya repl"
+  When I run "oya repl" interactively
   And I send "touch ./OK" to repl
+  And I send "exit" to repl
   Then file ./OK exists
