@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"log"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -31,6 +32,13 @@ func lookupOyaScope() (string, bool) {
 
 func setOyaScope(scope string) error {
 	return os.Setenv("OYA_SCOPE", scope)
+}
+
+func mustSetOyaScope(scope string) {
+	err := setOyaScope(scope)
+	if err != nil {
+		log.Fatalf("Internal error setting Oya scope: %v", err)
+	}
 }
 
 func lookupOyaCmd() (string, bool) {

@@ -19,6 +19,9 @@ func Get(workDir, uri string, update bool, stdout, stderr io.Writer) error {
 	}
 	importPath := types.ImportPath(importPathStr)
 	library, err := repo.Open(importPath)
+	if err != nil {
+		return wrapErr(err, uri)
+	}
 
 	installDir, err := installDir()
 	if err != nil {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -65,10 +66,16 @@ func resetFlagsRecurse(cmd *cobra.Command) {
 		func(flag *pflag.Flag) {
 			if flag.DefValue == "[]" {
 				// BUG(bilus): I don't know how to set default value for StringArray flag type.
-				flag.Value.Set("")
+				err := flag.Value.Set("")
+				if err != nil {
+					log.Fatalf("Internal error: %v", err)
+				}
 
 			} else {
-				flag.Value.Set(flag.DefValue)
+				err := flag.Value.Set(flag.DefValue)
+				if err != nil {
+					log.Fatalf("Internal error: %v", err)
+				}
 			}
 
 		})

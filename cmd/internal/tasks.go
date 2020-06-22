@@ -12,7 +12,6 @@ import (
 )
 
 func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) error {
-
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
 	installDir, err := installDir()
@@ -74,8 +73,4 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 	}
 	w.Flush()
 	return nil
-}
-
-func println(out io.Writer, s string) {
-	out.Write([]byte(fmt.Sprintf("%s\n", s)))
 }
