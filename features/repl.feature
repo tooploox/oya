@@ -3,6 +3,7 @@ Feature: REPL
 Background:
    Given I'm in project dir
 
+@current
 Scenario: Successfully run a command
   Given file ./Oyafile containing
     """
@@ -24,6 +25,21 @@ Scenario: Access a value
     """
   When I run "oya repl" interactively
   And I send "echo foo: ${Oya[foo]}" to repl
+  And I send "exit" to repl
+  Then the command outputs text matching
+    """
+    foo: bar
+    """
+
+@current
+Scenario: Pass an environmental variable
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  And the FOO environment variable set to "bar"
+  When I run "oya repl" interactively
+  And I send "echo foo: $FOO" to repl
   And I send "exit" to repl
   Then the command outputs text matching
     """
