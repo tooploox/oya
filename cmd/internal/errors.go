@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/tooploox/oya/pkg/errors"
-	"github.com/tooploox/oya/pkg/task"
+	"github.com/tooploox/oya/pkg/shell"
 )
 
 func HandleError(out io.Writer, err error) int {
@@ -25,7 +25,7 @@ func PrintError(out io.Writer, err error) {
 }
 
 func ExitCode(err error) int {
-	var sfe task.ErrScriptFail
+	var sfe shell.ErrExecFail
 	if errors.As(err, &sfe) {
 		return sfe.ExitCode
 	}

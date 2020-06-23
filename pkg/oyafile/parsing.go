@@ -180,7 +180,6 @@ func parseTask(name string, value interface{}, o *Oyafile) error {
 	} else {
 		o.Tasks.AddTask(task.Name(name), task.Script{
 			Script: s,
-			Shell:  o.Shell,
 			Scope:  &o.Values,
 		})
 	}

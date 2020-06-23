@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
-	"strings"
 
 	"github.com/tooploox/oya/pkg/template"
 	"mvdan.cc/sh/v3/interp"
@@ -16,6 +14,8 @@ const prompt = "$ "
 const lineCont = "> "
 
 func StartREPL(workDir string, values template.Scope, stdin io.Reader, stdout, stderr io.Writer, customPreamble *string) error {
+	ctx := context.Background()
+
 	r, err := interp.New(interp.StdIO(nil, stdout, stderr),
 		interp.Dir("."),
 		interp.Env(nil))
@@ -23,26 +23,14 @@ func StartREPL(workDir string, values template.Scope, stdin io.Reader, stdout, s
 		return err
 	}
 
-	var lastErr error
-
-	ctx := context.Background()
-
 	parser := syntax.NewParser()
 	fmt.Fprint(stdout, prompt)
 
-	preamble, _ := buildPreamble(values, customPreamble)
-	if err != nil {
+	if err := addPreamble(ctx, r, parser, values, customPreamble); err != nil {
 		return err
 	}
-	file, err := parser.Parse(strings.NewReader(preamble), "")
-	for _, stmt := range file.Stmts {
-		if err := r.Run(ctx, stmt); err != nil {
-			log.Fatalf("Unexpected error in by script preamble: %v", err)
-		}
-		if r.Exited() {
-			log.Fatalf("Unexpected exit caused by script preamble")
-		}
-	}
+
+	var lastErr error
 
 	err = parser.Interactive(stdin, func(stmts []*syntax.Stmt) bool {
 		if parser.Incomplete() {
@@ -70,41 +58,4 @@ func StartREPL(workDir string, values template.Scope, stdin io.Reader, stdout, s
 	}
 
 	return lastErr
-}
-
-func buildPreamble(scope template.Scope, customPreamble *string) (string, uint) {
-	declarations := declarations(scope)
-	preamble := strings.Join(declarations, "; ") + ";"
-	if customPreamble != nil {
-		preamble = *customPreamble + "; " + preamble
-	}
-	numPreambleLines := uint(strings.Count(preamble, "\n") + 1)
-	return preamble, numPreambleLines
-}
-
-func declarations(scope template.Scope) []string {
-	dfs := append([]string{}, "declare -A Oya=()")
-
-	for k, v := range scope.Flat() {
-		ks, ok := k.(string)
-		if !ok {
-			continue
-		}
-		dfs = append(dfs, declaration(ks, v))
-	}
-	return dfs
-}
-
-func declaration(k, v interface{}) string {
-	switch vt := v.(type) {
-	case string:
-		return fmt.Sprintf("Oya[%v]='%v'", k, escapeQuotes(vt))
-	default:
-		return fmt.Sprintf("Oya[%v]='%v'", k, v)
-	}
-}
-
-func escapeQuotes(s string) string {
-	s1 := strings.Replace(s, "\\", "\\\\", -1)
-	return strings.Replace(s1, "'", "\\'", -1)
 }

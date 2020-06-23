@@ -110,10 +110,11 @@ func (l Location) Print(out io.Writer) {
 	}
 	if l.Line != 0 {
 		fmt.Fprintf(out, "at line %v", l.Line)
+		if l.Col != 0 {
+			fmt.Fprintf(out, ", column %v", l.Col)
+		}
 	}
-	if l.Col != 0 {
-		fmt.Fprintf(out, ", column %v", l.Col)
-	}
+
 	fmt.Fprintln(out)
 
 	if !l.Snippet.IsEmpty() {
