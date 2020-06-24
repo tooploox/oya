@@ -77,7 +77,7 @@ func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.W
 	}
 
 	// TODO: Pass oya-cmd-override.
-	return shell.StartREPL(workDir, scope, stdin, stdout, stderr, nil)
+	return shell.StartREPL(scope, workDir, stdin, stdout, stderr, nil)
 
 }
 
