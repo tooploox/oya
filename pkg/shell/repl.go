@@ -4,11 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
-	"os"
 
 	"github.com/tooploox/oya/pkg/template"
-	"golang.org/x/crypto/ssh/terminal"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
 )
@@ -18,64 +15,22 @@ import (
 // version if no TTY available, the function blocking until the shell exits.
 func StartREPL(values template.Scope, workDir string, stdin io.Reader, stdout, stderr io.Writer, customPreamble *string) error {
 	ctx := context.Background()
-	// f, ok := stdin.(*os.File)
-	// fmt.Println("file?", ok)
-	// if ok {
-	// 	log.Debugf("Terminal detected")
-	// } else {
-	// 	log.Debugf("WARN: No terminal detected")
-	// }
-	//
-	_, haveTerminal := detectTerminal(stdin)
-	if !haveTerminal {
-		log.Println("WARN: No terminal detected")
-	}
 
-	var (
-		evalStdin              io.Reader
-		evalStdout, evalStderr io.Writer
-
-		prompt *Prompt
-	)
-
-	if haveTerminal {
-		prompt = NewPrompt()
-		evalStdin = prompt.Stdin
-		evalStdout = prompt.Stdout
-		evalStderr = prompt.Stderr
-
-	} else {
-		evalStdin = stdin
-		evalStdout = stdout
-		evalStderr = stderr
-	}
+	results := make(chan Result)
+	prompt := NewPrompt(stdin, stdout, stderr, results)
 
 	lastErr := make(chan error, 1)
 	go func() {
-		lastErr <- evalLoop(ctx, values, workDir, evalStdin, evalStdout, evalStderr, customPreamble, prompt == nil)
+		lastErr <- evalLoop(ctx, values, workDir, prompt.Stdin(), prompt.Stdout(), prompt.Stderr(), results, customPreamble)
 	}()
 
-	if prompt != nil {
-		prompt.Run()
-	}
+	prompt.Run()
 
 	return <-lastErr
 }
 
-// detectTerminal determines if the Reader passed as stdin is a file and a TTY.
-func detectTerminal(stdin io.Reader) (*os.File, bool) {
-	f, ok := stdin.(*os.File)
-	if !ok {
-		return nil, false
-	}
-	return f, terminal.IsTerminal(int(f.Fd()))
-}
-
 // evalLoop runns the eval part of REPL.
-func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin io.Reader, stdout, stderr io.Writer, customPreamble *string, showPrompt bool) error {
-	const promptStr = "$ "
-	const lineCont = "> "
-
+func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin io.Reader, stdout, stderr io.Writer, results chan Result, customPreamble *string) error {
 	r, err := interp.New(interp.StdIO(nil, stdout, stderr),
 		interp.Dir("."),
 		interp.Env(nil))
@@ -84,9 +39,6 @@ func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin 
 	}
 
 	parser := syntax.NewParser()
-	if showPrompt {
-		fmt.Fprint(stdout, promptStr)
-	}
 
 	if err := addPreamble(ctx, r, parser, values, customPreamble); err != nil {
 		return err
@@ -96,21 +48,17 @@ func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin 
 
 	err = parser.Interactive(stdin, func(stmts []*syntax.Stmt) bool {
 		if parser.Incomplete() {
-			if showPrompt {
-				fmt.Fprint(stdout, lineCont)
-			}
+			results <- Result{incomplete: true}
 			return true
 		}
 		for _, stmt := range stmts {
 			lastErr = r.Run(ctx, stmt)
-			stdout.(IOWriterAdapter).ConsoleWriter.Flush()
 			if r.Exited() {
+				results <- Result{exited: true}
 				return false
 			}
 		}
-		if showPrompt {
-			fmt.Fprint(stdout, promptStr)
-		}
+		results <- Result{}
 		return true
 	})
 	if err != nil {

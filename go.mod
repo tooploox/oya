@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/c-bata/go-prompt v0.2.3
+	github.com/c-bata/go-prompt v0.2.4-0.20200321140817-d043be076398
 	github.com/cucumber/godog v0.9.0
 	github.com/cucumber/messages-go/v10 v10.0.3
 	github.com/emirpasic/gods v1.12.0 // indirect
@@ -22,7 +22,9 @@ require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
+	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mattn/go-tty v0.0.3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mozilla/mig v0.0.0-20190703170622-33eefe9c974e
 	github.com/pelletier/go-toml v1.4.0 // indirect
