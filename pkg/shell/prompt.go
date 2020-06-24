@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/tooploox/oya/pkg/template"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -19,14 +20,14 @@ type Prompt interface {
 	Stderr() io.Writer
 }
 
-func NewPrompt(stdin io.Reader, stdout, stderr io.Writer, results chan Result) Prompt {
+func NewPrompt(scope template.Scope, stdin io.Reader, stdout, stderr io.Writer, results chan Result) Prompt {
 	_, haveTerminal := detectTerminal(stdin)
 	if !haveTerminal {
 		// TODO: Move it up.
 		log.Println("WARN: No terminal detected")
 		return newBasicPrompt(stdin, stdout, stderr, results)
 	} else {
-		return newTTYPrompt(results) // Ignored stdin, stdout, stderr.
+		return newTTYPrompt(scope, results) // Ignored stdin, stdout, stderr.
 	}
 }
 

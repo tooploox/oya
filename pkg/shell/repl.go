@@ -17,7 +17,7 @@ func StartREPL(values template.Scope, workDir string, stdin io.Reader, stdout, s
 	ctx := context.Background()
 
 	results := make(chan Result)
-	prompt := NewPrompt(stdin, stdout, stderr, results)
+	prompt := NewPrompt(values, stdin, stdout, stderr, results)
 
 	lastErr := make(chan error, 1)
 	go func() {

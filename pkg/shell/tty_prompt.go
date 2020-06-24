@@ -1,10 +1,13 @@
 package shell
 
 import (
+	"fmt"
 	"io"
 	"log"
+	"reflect"
 
 	"github.com/c-bata/go-prompt"
+	"github.com/tooploox/oya/pkg/template"
 )
 
 type TTYPrompt struct {
@@ -30,17 +33,30 @@ func (p TTYPrompt) Run() {
 	p.prompt.Run()
 }
 
-func completer(d prompt.Document) []prompt.Suggest {
-	s := []prompt.Suggest{
-		{Text: "${Oya[foo]}", Description: "bar"},
-		{Text: "${Oya[somePassword]}", Description: "******"},
-		{Text: "${Oya[first]}", Description: "111"},
+func completer(scope template.Scope) prompt.Completer {
+	return func(d prompt.Document) []prompt.Suggest {
+		completions := make([]prompt.Suggest, 0, len(scope))
+		for k, v := range scope {
+			if reflect.TypeOf(v).Kind() != reflect.Func {
+				completions = append(completions, completion(k, v))
+			}
+		}
+		w := d.GetWordBeforeCursor()
+		if w == "" {
+			return nil
+		}
+		candidates := prompt.FilterHasPrefix(completions, "${", false) // Bash variable.
+		return prompt.FilterFuzzy(candidates, w, false)
 	}
-	w := d.GetWordBeforeCursor()
-	if w == "" {
-		return nil
+}
+
+func completion(k, v interface{}) prompt.Suggest {
+	var description string
+
+	return prompt.Suggest{
+		Text:        fmt.Sprintf("${Oya[%v]}", k),
+		Description: description,
 	}
-	return prompt.FilterHasPrefix(s, w, true)
 }
 
 type ConsoleWriter struct {
@@ -76,7 +92,7 @@ func (w *ConsoleWriter) WriteStr(data string) {
 	}
 }
 
-func newTTYPrompt(results chan Result) Prompt {
+func newTTYPrompt(scope template.Scope, results chan Result) Prompt {
 	stdin, evalIn := io.Pipe()
 	stdout := &ConsoleWriter{ConsoleWriter: prompt.NewStdoutWriter()}
 	stderr := &ConsoleWriter{ConsoleWriter: prompt.NewStderrWriter()}
@@ -104,9 +120,12 @@ func newTTYPrompt(results chan Result) Prompt {
 					exited = true
 				}
 			},
-			completer,
+			completer(scope),
 			prompt.OptionWriter(stdout),
 			prompt.OptionSetExitCheckerOnInput(func(line string, breakline bool) bool { return exited }),
+			prompt.OptionMaxSuggestion(10),
+			prompt.OptionSuggestionBGColor(prompt.White),
+			prompt.OptionSuggestionTextColor(prompt.Black),
 		),
 		stdin:   stdin,
 		stdout:  writerAdapter{stdout},
