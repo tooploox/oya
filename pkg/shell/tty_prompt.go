@@ -1,14 +1,16 @@
 package shell
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"reflect"
+	"strings"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/tooploox/oya/pkg/template"
 )
+
+const maxPreviewLen = 40
 
 type TTYPrompt struct {
 	prompt         *prompt.Prompt
@@ -34,28 +36,40 @@ func (p TTYPrompt) Run() {
 }
 
 func completer(scope template.Scope) prompt.Completer {
+	const trigger = "${"
+
 	return func(d prompt.Document) []prompt.Suggest {
-		completions := make([]prompt.Suggest, 0, len(scope))
-		for k, v := range scope {
+		values := scope.Flat()
+
+		completions := make([]prompt.Suggest, 0, len(values))
+		for k, v := range values {
 			if reflect.TypeOf(v).Kind() != reflect.Func {
+
 				completions = append(completions, completion(k, v))
 			}
 		}
 		w := d.GetWordBeforeCursor()
-		if w == "" {
+		if !strings.HasPrefix(w, trigger) {
 			return nil
 		}
-		candidates := prompt.FilterHasPrefix(completions, "${", false) // Bash variable.
-		return prompt.FilterFuzzy(candidates, w, false)
+
+		return prompt.FilterFuzzy(completions, strings.TrimPrefix(w, trigger), false)
+	}
+}
+
+func previewValue(v interface{}) string {
+	s, ok := v.(string)
+	if ok {
+		return shorten(firstLine(s), maxPreviewLen)
+	} else {
+		return "(object)"
 	}
 }
 
 func completion(k, v interface{}) prompt.Suggest {
-	var description string
-
 	return prompt.Suggest{
-		Text:        fmt.Sprintf("${Oya[%v]}", k),
-		Description: description,
+		Text:        substitution(k),
+		Description: previewValue(v),
 	}
 }
 

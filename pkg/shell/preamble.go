@@ -72,3 +72,7 @@ func escapeQuotes(s string) string {
 	s1 := strings.Replace(s, "\\", "\\\\", -1)
 	return strings.Replace(s1, "'", "\\'", -1)
 }
+
+func substitution(k interface{}) string {
+	return fmt.Sprintf("${Oya[%v]}", k)
+}
