@@ -1,9 +1,11 @@
 package shell
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/c-bata/go-prompt"
@@ -32,7 +34,13 @@ func (p TTYPrompt) Stderr() io.Writer {
 }
 
 func (p TTYPrompt) Run() {
+	printWelcome(p.stdout)
 	p.prompt.Run()
+}
+
+func printWelcome(stdout io.Writer) {
+	fmt.Fprintln(stdout, "Welcome to Oya REPL! To exit, press Ctrl-D.")
+	fmt.Fprintln(stdout, "Type ${ to auto-complete Oya values.")
 }
 
 func completer(scope template.Scope) prompt.Completer {
@@ -48,6 +56,10 @@ func completer(scope template.Scope) prompt.Completer {
 				completions = append(completions, completion(k, v))
 			}
 		}
+		sort.Slice(completions,
+			func(i, j int) bool {
+				return completions[i].Text < completions[j].Text
+			})
 		w := d.GetWordBeforeCursor()
 		if !strings.HasPrefix(w, trigger) {
 			return nil
