@@ -1,4 +1,4 @@
-# Oya changelog
+# Oya Changelog
 
 ## v0.0.20 (Unreleased)
 
@@ -9,11 +9,10 @@
   
 ### Added 
 
-- A simple REPL, started using `oya repl`, helping build scripts interactively
-  with access to values in .oya files, example session:
+- REPL, helping build scripts interactively with access to values in .oya files
+  and auto-completion, started using `oya repl`, an example session:
   
-  ```
-  oya run repl
-  $ echo ${Oya[someValue]}
-  foobar
-  ```
+        oya run repl
+        $ echo ${Oya[someValue]}
+        foobar
+  
