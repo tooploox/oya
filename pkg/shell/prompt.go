@@ -18,6 +18,7 @@ type Prompt interface {
 	Stdin() io.Reader
 	Stdout() io.Writer
 	Stderr() io.Writer
+	Shutdown()
 }
 
 func NewPrompt(scope template.Scope, stdin io.Reader, stdout, stderr io.Writer, results chan Result) Prompt {

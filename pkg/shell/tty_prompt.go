@@ -19,6 +19,8 @@ type TTYPrompt struct {
 	stdin          io.Reader
 	stdout, stderr io.Writer
 	results        chan Result
+
+	shutdown func()
 }
 
 func (p TTYPrompt) Stdin() io.Reader {
@@ -36,6 +38,53 @@ func (p TTYPrompt) Stderr() io.Writer {
 func (p TTYPrompt) Run() {
 	printWelcome(p.stdout)
 	p.prompt.Run()
+}
+
+func (p TTYPrompt) Shutdown() {
+	p.shutdown()
+}
+
+func newTTYPrompt(scope template.Scope, results chan Result) Prompt {
+	stdin, evalIn := io.Pipe()
+	stdout := &ConsoleWriter{ConsoleWriter: prompt.NewStdoutWriter()}
+	stderr := &ConsoleWriter{ConsoleWriter: prompt.NewStderrWriter()}
+
+	exited := false
+	return TTYPrompt{
+		prompt: prompt.New(
+			func(line string) {
+				_, err := evalIn.Write([]byte(line))
+				if err != nil {
+					log.Fatalf("Internal error sending data to eval loop: %v", err)
+				}
+				_, err = evalIn.Write([]byte("\n"))
+				if err != nil {
+					log.Fatalf("Internal error sending data to eval loop: %v", err)
+				}
+				result := <-results // Synchronize with eval loop.
+				stdout.Flush()
+				stderr.Flush()
+				if result.exited {
+					// Prevent prompt from appearing.
+					// See https://github.com/c-bata/go-prompt/issues/182
+					stdout.suppressed = true
+					stderr.suppressed = true
+					exited = true
+				}
+			},
+			completer(scope),
+			prompt.OptionWriter(stdout),
+			prompt.OptionSetExitCheckerOnInput(func(line string, breakline bool) bool { return exited }),
+			prompt.OptionMaxSuggestion(10),
+			prompt.OptionSuggestionBGColor(prompt.White),
+			prompt.OptionSuggestionTextColor(prompt.Black),
+		),
+		stdin:    stdin,
+		stdout:   writerAdapter{stdout},
+		stderr:   writerAdapter{stderr},
+		results:  results,
+		shutdown: func() { stdin.Close() },
+	}
 }
 
 func printWelcome(stdout io.Writer) {
@@ -115,48 +164,6 @@ func (w *ConsoleWriter) WriteRawStr(data string) {
 func (w *ConsoleWriter) WriteStr(data string) {
 	if !w.suppressed {
 		w.ConsoleWriter.WriteStr(data)
-	}
-}
-
-func newTTYPrompt(scope template.Scope, results chan Result) Prompt {
-	stdin, evalIn := io.Pipe()
-	stdout := &ConsoleWriter{ConsoleWriter: prompt.NewStdoutWriter()}
-	stderr := &ConsoleWriter{ConsoleWriter: prompt.NewStderrWriter()}
-
-	exited := false
-	return TTYPrompt{
-		prompt: prompt.New(
-			func(line string) {
-				_, err := evalIn.Write([]byte(line))
-				if err != nil {
-					log.Fatalf("Internal error sending data to eval loop: %v", err)
-				}
-				_, err = evalIn.Write([]byte("\n"))
-				if err != nil {
-					log.Fatalf("Internal error sending data to eval loop: %v", err)
-				}
-				result := <-results // Synchronize with eval loop.
-				stdout.Flush()
-				stderr.Flush()
-				if result.exited {
-					// Prevent prompt from appearing.
-					// See https://github.com/c-bata/go-prompt/issues/182
-					stdout.suppressed = true
-					stderr.suppressed = true
-					exited = true
-				}
-			},
-			completer(scope),
-			prompt.OptionWriter(stdout),
-			prompt.OptionSetExitCheckerOnInput(func(line string, breakline bool) bool { return exited }),
-			prompt.OptionMaxSuggestion(10),
-			prompt.OptionSuggestionBGColor(prompt.White),
-			prompt.OptionSuggestionTextColor(prompt.Black),
-		),
-		stdin:   stdin,
-		stdout:  writerAdapter{stdout},
-		stderr:  writerAdapter{stderr},
-		results: results,
 	}
 }
 

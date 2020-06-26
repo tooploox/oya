@@ -32,6 +32,8 @@ func (p BasicPrompt) Stderr() io.Writer {
 	return p.stderr
 }
 
+func (p BasicPrompt) Shutdown() {}
+
 func (p BasicPrompt) Run() {
 	const prompt = "$ "
 	const lineCont = "> "

@@ -14,7 +14,7 @@ import (
 // experience with autocompletion and command history, falling back to simpler
 // version if no TTY available, the function blocking until the shell exits.
 func StartREPL(values template.Scope, workDir string, stdin io.Reader, stdout, stderr io.Writer, customPreamble *string) error {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	results := make(chan Result)
 	prompt := NewPrompt(values, stdin, stdout, stderr, results)
@@ -25,6 +25,8 @@ func StartREPL(values template.Scope, workDir string, stdin io.Reader, stdout, s
 	}()
 
 	prompt.Run()
+	cancel()
+	prompt.Shutdown() // Close stdin read from in the Interactive call below.
 
 	return <-lastErr
 }
@@ -49,7 +51,7 @@ func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin 
 	err = parser.Interactive(stdin, func(stmts []*syntax.Stmt) bool {
 		if parser.Incomplete() {
 			results <- Result{incomplete: true}
-			return true
+			return ctx.Err() != context.Canceled
 		}
 		for _, stmt := range stmts {
 			lastErr = r.Run(ctx, stmt)
@@ -59,8 +61,12 @@ func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin 
 			}
 		}
 		results <- Result{}
-		return true
+		return ctx.Err() != context.Canceled
 	})
+	// Ctrl-d pressed.
+	if ctx.Err() == context.Canceled {
+		return nil
+	}
 	if err != nil {
 		switch err := err.(type) {
 		case syntax.ParseError:
