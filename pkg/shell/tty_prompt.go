@@ -62,6 +62,9 @@ func newTTYPrompt(scope template.Scope, results chan Result) Prompt {
 					log.Fatalf("Internal error sending data to eval loop: %v", err)
 				}
 				result := <-results // Synchronize with eval loop.
+				if result.err != nil {
+					stderr.WriteStr(fmt.Sprintf("Error: %v\n", result.err))
+				}
 				stdout.Flush()
 				stderr.Flush()
 				if result.exited {

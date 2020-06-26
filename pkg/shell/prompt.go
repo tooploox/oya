@@ -11,6 +11,7 @@ import (
 
 type Result struct {
 	incomplete, exited bool
+	err                error
 }
 
 type Prompt interface {

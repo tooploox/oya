@@ -39,15 +39,16 @@ func (p BasicPrompt) Run() {
 	const lineCont = "> "
 
 	fmt.Fprint(p.stdout, prompt)
-	go func() {
-		for r := range p.results {
-			if r.exited {
-				break
-			} else if r.incomplete {
-				fmt.Fprint(p.stdout, lineCont)
-			} else {
-				fmt.Fprint(p.stdout, prompt)
-			}
+	for r := range p.results {
+		if r.exited {
+			break
+		} else if r.incomplete {
+			fmt.Fprint(p.stdout, lineCont)
+		} else if r.err != nil {
+			fmt.Fprintln(p.stderr, r.err)
+			fmt.Fprint(p.stdout, prompt)
+		} else {
+			fmt.Fprint(p.stdout, prompt)
 		}
-	}()
+	}
 }

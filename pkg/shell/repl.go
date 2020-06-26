@@ -2,7 +2,6 @@ package shell
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	"github.com/tooploox/oya/pkg/template"
@@ -48,37 +47,29 @@ func evalLoop(ctx context.Context, values template.Scope, workDir string, stdin 
 		return err
 	}
 
-	var lastErr error
-
-	err = parser.Interactive(stdin, func(stmts []*syntax.Stmt) bool {
-		if parser.Incomplete() {
-			results <- Result{incomplete: true}
-			return ctx.Err() != context.Canceled
-		}
-		for _, stmt := range stmts {
-			lastErr = r.Run(ctx, stmt)
-			if r.Exited() {
-				results <- Result{exited: true}
-				return false
+	for {
+		err = parser.Interactive(stdin, func(stmts []*syntax.Stmt) bool {
+			var lastErr error
+			if parser.Incomplete() {
+				results <- Result{incomplete: true}
+				return ctx.Err() != context.Canceled
 			}
+			for _, stmt := range stmts {
+				lastErr = r.Run(ctx, stmt)
+				if r.Exited() {
+					results <- Result{exited: true}
+					return false
+				}
+			}
+			results <- Result{err: lastErr}
+			return ctx.Err() != context.Canceled
+		})
+		// Ctrl-d pressed or 'exit'.
+		if err == nil || ctx.Err() == context.Canceled {
+			return nil
 		}
-		results <- Result{}
-		return ctx.Err() != context.Canceled
-	})
-	// Ctrl-d pressed.
-	if ctx.Err() == context.Canceled {
-		return nil
-	}
-	if err != nil {
-		switch err := err.(type) {
-		case syntax.ParseError:
-			return fmt.Errorf("Error: %v", err)
-			// TODO: Better error reporting?
-			// return s.errScriptFail(err.Pos, preambleLines, err, -1)
-		default:
-			return err
-		}
+		results <- Result{err: err}
 	}
 
-	return lastErr
+	return nil
 }
