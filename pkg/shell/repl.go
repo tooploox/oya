@@ -16,7 +16,9 @@ import (
 func StartREPL(values template.Scope, workDir string, stdin io.Reader, stdout, stderr io.Writer, customPreamble *string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	results := make(chan Result)
+	// Accept up to 256 lines typed before TTY prompt appears,
+	// preventing REPL getting stuck.
+	results := make(chan Result, 256)
 	prompt := NewPrompt(values, stdin, stdout, stderr, results)
 
 	lastErr := make(chan error, 1)
