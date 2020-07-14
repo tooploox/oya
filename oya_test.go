@@ -22,7 +22,8 @@ import (
 const sopsPgpKey = "317D 6971 DD80 4501 A6B8  65B9 0F1F D46E 2E8C 7202"
 
 type SuiteContext struct {
-	projectDir string
+	workDir string
+	homeDir string
 
 	lastCommandErr      error
 	lastCommandExitCode int
@@ -31,16 +32,21 @@ type SuiteContext struct {
 }
 
 func (c *SuiteContext) MustSetUp() {
-	projectDir, err := ioutil.TempDir("", "oya")
+	workDir, err := ioutil.TempDir("", "oya")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+	homeDir, err := ioutil.TempDir("", "oya")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	overrideOyaCmd(projectDir)
-	setEnv(projectDir)
+	overrideOyaCmd(workDir)
+	setEnvVars(workDir, homeDir)
 
 	log.SetLevel(log.DebugLevel)
-	c.projectDir = projectDir
+	c.workDir = workDir
+	c.homeDir = homeDir
 	c.stdout = bytes.NewBuffer(nil)
 }
 
@@ -51,29 +57,36 @@ func (c *SuiteContext) MustTearDown() {
 		}
 		c.stdin = nil
 	}
-	if err := removePGPKeys(c.projectDir); err != nil {
+	if err := removePGPKeys(c.workDir); err != nil {
 		log.Fatalf("Error removing PGP keys during suite tear down: %v", err)
 	}
 
-	if err := os.RemoveAll(c.projectDir); err != nil {
-		log.Fatalf("Error removing %q during suite tear down: %v", c.projectDir, err)
+	if err := os.RemoveAll(c.workDir); err != nil {
+		log.Fatalf("Error removing %q during suite tear down: %v", c.workDir, err)
+	}
+
+	if err := os.RemoveAll(c.homeDir); err != nil {
+		log.Fatalf("Error removing %q during suite tear down: %v", c.homeDir, err)
 	}
 }
 
-func setEnv(projectDir string) {
-	err := os.Setenv("OYA_HOME", projectDir)
-	if err != nil {
-		panic(err)
+func setEnvVars(workDir, homeDir string) {
+	if err := os.Setenv("OYA_HOME", workDir); err != nil {
+		log.Fatal(err)
 	}
-	err = os.Setenv("SOPS_PGP_FP", sopsPgpKey)
-	if err != nil {
-		panic(err)
+
+	if err := os.Setenv("HOME", homeDir); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := os.Setenv("SOPS_PGP_FP", sopsPgpKey); err != nil {
+		log.Fatal(err)
 	}
 }
 
 // removePGPKeys removes PGP keys based on fingerprints(s) in .sops.yaml, NOT sopsPgpKey ^.
-func removePGPKeys(projectDir string) error {
-	if err := os.Chdir(projectDir); err != nil {
+func removePGPKeys(workDir string) error {
+	if err := os.Chdir(workDir); err != nil {
 		return err
 	}
 	sops, err := secrets.LoadPGPSopsYaml()
@@ -95,8 +108,8 @@ func removePGPKeys(projectDir string) error {
 // overrideOyaCmd overrides `oya` command used by $Tasks in templates
 // to run oya tasks.
 // It builds oya to a temporary directory and use it to launch Oya in scripts.
-func overrideOyaCmd(projectDir string) {
-	executablePath := filepath.Join(projectDir, "_bin/oya")
+func overrideOyaCmd(workDir string) {
+	executablePath := filepath.Join(workDir, "_bin/oya")
 	oyaCmdOverride := fmt.Sprintf(
 		"function oya() { (cd %v && go build -o %v oya.go) && %v $@; }",
 		sourceFileDirectory(), executablePath, executablePath)
@@ -123,14 +136,21 @@ func (c *SuiteContext) readFile(path string) (string, error) {
 }
 
 func (c *SuiteContext) resolvePath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		return filepath.Join(c.homeDir, path[2:])
+	}
 	if filepath.IsAbs(path) {
 		return path
 	}
-	return filepath.Join(c.projectDir, path)
+	return filepath.Join(c.workDir, path)
 }
 
 func (c *SuiteContext) iAmInProjectDir() error {
-	return os.Chdir(c.projectDir)
+	return os.Chdir(c.workDir)
+}
+
+func (c *SuiteContext) iAmInAnEmptyDir() error {
+	return c.iAmInProjectDir()
 }
 
 func (c *SuiteContext) imInDir(subdir string) error {
@@ -324,6 +344,7 @@ func (c *SuiteContext) oyafileIsEncryptedUsingKeyInSopsyaml(oyafilePath string) 
 func FeatureContext(s *godog.Suite) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
+	s.Step(`^I\'m in an empty dir$`, c.iAmInAnEmptyDir)
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
 	s.Step(`^file (.+) containing$`, c.fileContaining)
 	s.Step(`^I run "oya (.+)"$`, c.iRunOya)
