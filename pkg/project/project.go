@@ -1,6 +1,7 @@
 package project
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/tooploox/oya/pkg/oyafile"
@@ -22,9 +23,18 @@ func Detect(workDir, installDir string) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if !found {
+		detectedRootDir, found, err = detectInHome()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if !found {
 		return nil, ErrNoProject{Path: workDir}
 	}
+
 	return &Project{
 		RootDir:         detectedRootDir,
 		installDir:      installDir,
@@ -60,4 +70,15 @@ func detectRoot(startDir string) (string, bool, error) {
 	}
 
 	return "", false, nil
+}
+
+// detectInHome checks if the current user's home dir contains
+// an Oyafile.
+func detectInHome() (string, bool, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", false, err
+	}
+	_, found, err := raw.LoadFromDir(home, home)
+	return home, found, err
 }
