@@ -10,7 +10,7 @@ import (
 	"k8s.io/helm/pkg/ignore"
 )
 
-func (p *Project) Oyafiles() ([]*oyafile.Oyafile, error) {
+func (p *Project) oyafiles() ([]*oyafile.Oyafile, error) {
 	return p.List(p.RootDir)
 }
 
