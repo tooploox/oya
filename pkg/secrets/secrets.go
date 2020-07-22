@@ -30,12 +30,12 @@ func Decrypt(path string) ([]byte, bool, error) {
 			return output, false, err
 		}
 	}
-	decryptCmd := exec.Command("sops", "-d", path)
-	decrypted, err := decryptCmd.CombinedOutput()
+	cmd := exec.Command("sops", "-d", path)
+	decrypted, err := runCmd(cmd, path)
 	if err != nil {
-		return output, false,
-			ErrSecretsFailure{Path: path, Err: err}
+		return nil, false, err
 	}
+
 	return decrypted, true, nil
 }
 
@@ -44,9 +44,9 @@ func Encrypt(inputPath, outputPath string) error {
 		return ErrSecretsAlreadyEncrypted{Path: inputPath}
 	}
 	cmd := exec.Command("sops", "-e", inputPath)
-	encoded, err := cmd.CombinedOutput()
+	encoded, err := runCmd(cmd, inputPath)
 	if err != nil {
-		return ErrSecretsFailure{Path: inputPath, Err: err}
+		return err
 	}
 	fi, err := os.Stat(inputPath)
 	if err != nil {
@@ -57,6 +57,18 @@ func Encrypt(inputPath, outputPath string) error {
 		return err
 	}
 	return nil
+}
+
+func runCmd(cmd *exec.Cmd, secretFilePath string) ([]byte, error) {
+	out, err := cmd.Output()
+	if err != nil {
+		var stderr []byte
+		if err, ok := err.(*exec.ExitError); ok {
+			stderr = err.Stderr
+		}
+		return nil, ErrSecretsFailure{Path: secretFilePath, Err: err, Stderr: stderr}
+	}
+	return out, nil
 }
 
 func ViewCmd(filename string) *exec.Cmd {
