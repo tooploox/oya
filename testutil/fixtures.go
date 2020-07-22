@@ -16,7 +16,7 @@ func MustListOyafiles(t *testing.T, rootDir string) []*oyafile.Oyafile {
 	t.Helper()
 	project, err := project.Detect(rootDir, filepath.Join(rootDir, ".packs"))
 	AssertNoErr(t, err, "Error detecting project")
-	oyafiles, err := project.Oyafiles()
+	oyafiles, err := project.List(rootDir)
 	AssertNoErr(t, err, "Error listing Oyafiles")
 	AssertTrue(t, len(oyafiles) > 0, "No Oyafiles found")
 	return oyafiles

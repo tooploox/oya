@@ -5,6 +5,7 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/oyafile"
 	"github.com/tooploox/oya/pkg/raw"
 	"github.com/tooploox/oya/pkg/shell"
@@ -12,7 +13,9 @@ import (
 	"github.com/tooploox/oya/pkg/template"
 )
 
-// Run runs a task within a project's context.
+// Run runs a task within a project's context, the task looked up in an Oyafile
+// in the current directory, unless recurse or useChangeset arguments are true.
+// See LoadOyafiles for details regarding these arguments.
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
 	args []string, scope template.Scope, stdout, stderr io.Writer) error {
 
@@ -22,7 +25,7 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	}
 	scope = scope.Merge(values)
 
-	targets, err := p.ListTargets(workDir, recurse, useChangeset)
+	targets, err := p.LoadOyafiles(workDir, recurse, useChangeset)
 	if err != nil {
 		return err
 	}
@@ -31,17 +34,8 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 		return nil
 	}
 
-	dependencies, err := p.Deps()
-	if err != nil {
-		return err
-	}
-
 	foundAtLeastOneTask := false
 	for _, o := range targets {
-		err = o.Build(dependencies)
-		if err != nil {
-			return err
-		}
 		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
 		if err != nil {
 			return err
@@ -58,6 +52,8 @@ func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset 
 	return nil
 }
 
+// StartREPL starts an interactivee shell. If terminal is available, it automatically upgrades,
+// turning on support for auto-completion and command history.
 func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.Writer) error {
 	builtins, err := p.values()
 	if err != nil {
@@ -81,7 +77,9 @@ func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.W
 
 }
 
-func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+func (p *Project) LoadOyafiles(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+	var oyafiles []*oyafile.Oyafile
+	var err error
 	if useChangeset {
 		changes, err := p.Changeset(workDir)
 		if err != nil {
@@ -93,17 +91,40 @@ func (p *Project) ListTargets(workDir string, recurse, useChangeset bool) ([]*oy
 		}
 
 		if !recurse {
-			return p.oneTargetIn(workDir)
+			oyafiles, err = p.oneTargetIn(workDir)
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			return changes, nil
+			oyafiles = changes
 		}
 	} else {
 		if !recurse {
-			return p.oneTargetIn(workDir)
+			oyafiles, err = p.oneTargetIn(workDir)
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			return p.List(workDir)
+			oyafiles, err = p.List(workDir)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
+
+	dependencies, err := p.Deps()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, o := range oyafiles {
+		err = o.Build(dependencies)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error in %v", o.Path)
+		}
+	}
+
+	return oyafiles, nil
 }
 
 func (p *Project) values() (template.Scope, error) {

@@ -6,11 +6,12 @@ import (
 	"path/filepath"
 	"text/tabwriter"
 
-	"github.com/pkg/errors"
 	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/task"
 )
 
+// Tasks loads Oyafiles for the project detected at workDir and prints their
+// tasks to stdout, after ensuring that all required packs have been installed.
 func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) error {
 	w := tabwriter.NewWriter(stdout, 0, 0, 2, ' ', 0)
 
@@ -26,12 +27,7 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 	if err != nil {
 		return err
 	}
-	oyafiles, err := p.ListTargets(workDir, recurse, changeset)
-	if err != nil {
-		return err
-	}
-
-	dependencies, err := p.Deps()
+	oyafiles, err := p.LoadOyafiles(workDir, recurse, changeset)
 	if err != nil {
 		return err
 	}
@@ -42,12 +38,6 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 		if err != nil {
 			return err
 		}
-
-		err = o.Build(dependencies)
-		if err != nil {
-			return errors.Wrapf(err, "error in %v", o.Path)
-		}
-
 		if !first {
 			fmt.Fprintln(w)
 		} else {
