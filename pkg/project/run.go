@@ -18,38 +18,7 @@ import (
 // See LoadOyafiles for details regarding these arguments.
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
 	args []string, scope template.Scope, stdout, stderr io.Writer) error {
-
-	values, err := p.values()
-	if err != nil {
-		return err
-	}
-	scope = scope.Merge(values)
-
-	targets, err := p.LoadOyafiles(workDir, recurse, useChangeset)
-	if err != nil {
-		return err
-	}
-
-	if len(targets) == 0 {
-		return nil
-	}
-
-	foundAtLeastOneTask := false
-	for _, o := range targets {
-		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
-		if err != nil {
-			return err
-		}
-		if found {
-			foundAtLeastOneTask = found
-		}
-	}
-	if !foundAtLeastOneTask {
-		return ErrNoTask{
-			Task: taskName,
-		}
-	}
-	return nil
+	return p.runProjectTasks(workDir, taskName, recurse, useChangeset, args, scope, stdout, stderr)
 }
 
 // StartREPL starts an interactivee shell. If terminal is available, it automatically upgrades,
@@ -77,6 +46,7 @@ func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.W
 
 }
 
+// LoadOyafiles loads & builds Oyafiles starting at workDir, optionally recursing and using changeset.
 func (p *Project) LoadOyafiles(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
 	var oyafiles []*oyafile.Oyafile
 	var err error
@@ -125,6 +95,42 @@ func (p *Project) LoadOyafiles(workDir string, recurse, useChangeset bool) ([]*o
 	}
 
 	return oyafiles, nil
+}
+
+func (p *Project) runProjectTasks(workDir string, taskName task.Name, recurse, useChangeset bool,
+	args []string, scope template.Scope, stdout, stderr io.Writer) error {
+	values, err := p.values()
+	if err != nil {
+		return err
+	}
+	scope = scope.Merge(values)
+
+	targets, err := p.LoadOyafiles(workDir, recurse, useChangeset)
+	if err != nil {
+		return err
+	}
+
+	if len(targets) == 0 {
+		return nil // Empty changeset is ok.
+	}
+
+	foundAny := false
+	for _, o := range targets {
+		found, err := o.RunTask(taskName, args, scope, stdout, stderr)
+		if err != nil {
+			return err
+		}
+		if found {
+			foundAny = found // Ran at least one target.
+		}
+	}
+
+	if !foundAny {
+		return ErrNoTask{
+			Task: taskName,
+		}
+	}
+	return nil
 }
 
 func (p *Project) values() (template.Scope, error) {
