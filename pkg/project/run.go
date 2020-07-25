@@ -15,7 +15,7 @@ import (
 
 // Run runs a task within a project's context, the task looked up in an Oyafile
 // in the current directory, unless recurse or useChangeset arguments are true.
-// See LoadOyafiles for details regarding these arguments.
+// See loadOyafiles for details regarding these arguments.
 func (p *Project) Run(workDir string, taskName task.Name, recurse, useChangeset bool,
 	args []string, scope template.Scope, stdout, stderr io.Writer) error {
 	return p.runProjectTasks(workDir, taskName, recurse, useChangeset, args, scope, stdout, stderr)
@@ -46,8 +46,8 @@ func (p *Project) StartREPL(workDir string, stdin io.Reader, stdout, stderr io.W
 
 }
 
-// LoadOyafiles loads & builds Oyafiles starting at workDir, optionally recursing and using changeset.
-func (p *Project) LoadOyafiles(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
+// loadOyafiles loads & builds Oyafiles starting at workDir, optionally recursing and using changeset.
+func (p *Project) loadOyafiles(workDir string, recurse, useChangeset bool) ([]*oyafile.Oyafile, error) {
 	var oyafiles []*oyafile.Oyafile
 	var err error
 	if useChangeset {
@@ -105,7 +105,7 @@ func (p *Project) runProjectTasks(workDir string, taskName task.Name, recurse, u
 	}
 	scope = scope.Merge(values)
 
-	targets, err := p.LoadOyafiles(workDir, recurse, useChangeset)
+	targets, err := p.loadOyafiles(workDir, recurse, useChangeset)
 	if err != nil {
 		return err
 	}

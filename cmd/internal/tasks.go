@@ -27,40 +27,33 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 	if err != nil {
 		return err
 	}
-	oyafiles, err := p.LoadOyafiles(workDir, recurse, changeset)
-	if err != nil {
-		return err
-	}
 
 	first := true
-	for _, o := range oyafiles {
-		relPath, err := filepath.Rel(workDir, o.Path)
-		if err != nil {
-			return err
-		}
-		if !first {
-			fmt.Fprintln(w)
-		} else {
-			first = false
-		}
 
-		fmt.Fprintf(w, "# in ./%s\n", relPath)
-
-		err = o.Tasks.ForEachSorted(func(taskName task.Name, task task.Task, meta task.Meta) error {
-			if !taskName.IsBuiltIn() {
-				if len(meta.Doc) > 0 {
-					fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
-				} else {
-					fmt.Fprintf(w, "oya run %s\t\n", taskName)
+	err = p.ForEachTask(workDir, recurse, changeset, false, // No built-ins.
+		func(i int, oyafilePath string, taskName task.Name, task task.Task, meta task.Meta) error {
+			if i == 0 {
+				relPath, err := filepath.Rel(workDir, oyafilePath)
+				if err != nil {
+					return err
 				}
+				if !first {
+					fmt.Fprintln(w)
+				} else {
+					first = false
+				}
+
+				fmt.Fprintf(w, "# in ./%s\n", relPath)
 			}
+
+			if len(meta.Doc) > 0 {
+				fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
+			} else {
+				fmt.Fprintf(w, "oya run %s\t\n", taskName)
+			}
+
 			return nil
 		})
-
-		if err != nil {
-			return err
-		}
-	}
 	w.Flush()
-	return nil
+	return err
 }
