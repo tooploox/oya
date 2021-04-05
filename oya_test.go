@@ -321,7 +321,7 @@ func (c *SuiteContext) oyafileIsEncryptedUsingKeyInSopsyaml(oyafilePath string) 
 	return errors.Errorf("%q not encrypted using key is .sops.yaml", oyafilePath)
 }
 
-func FeatureContext(s *godog.Suite) {
+func InitializeScenario(s *godog.ScenarioContext) {
 	c := SuiteContext{}
 	s.Step(`^I'm in project dir$`, c.iAmInProjectDir)
 	s.Step(`^I\'m in the (.+) dir$`, c.imInDir)
