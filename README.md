@@ -115,10 +115,10 @@ $ cat Oyafile
 ```
 ``` yaml
 Project: OyaExample
-    
+
 build: |
   go build .
-    
+
 start: |
   go run .
 ```
@@ -170,7 +170,7 @@ func main() {
 > Well, to really make it work, you also need the Go language tools
 > [installed](https://golang.org/doc/install).
 
-    
+
 
 Let's start the server
 
@@ -489,7 +489,7 @@ This is what the Dockerfile looks like:
 
 ``` bash
 $ cat Dockefile
-``` 
+```
 ``` dockerfile
 FROM golang
 
@@ -804,3 +804,13 @@ TODO: For a working example, clone ...
 
 5.  Run tests: `go test ./...`.
 6.  Run Oya: `go run oya.go`.
+
+Tests using the private repo at github.com/bilus/oya-fixtures-private will fail
+unless you're added to the list of contributors to the fixtures project.
+
+If that's the case, add your SSH key to the ssh-agent, example:
+
+``` bash
+eval "$(ssh-agent -s)"
+ssh-add -K ~/.ssh/id_rsa
+```
