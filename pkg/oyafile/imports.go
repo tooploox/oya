@@ -36,11 +36,13 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 		if err != nil {
 			return err
 		}
+
+		// TODO(bilus): Extract function.
 		err = oyafile.Values.UpdateScopeAt(string(alias),
 			func(scope template.Scope) template.Scope {
 				// Values in the main Oyafile overwrite values in the pack Oyafile.
 				merged := packOyafile.Values.Merge(scope)
-				// Task is keeping a pointed to the scope.
+				// Task is keeping a pointer to the scope.
 				packOyafile.Values.Replace(merged)
 				return merged
 			}, false)
@@ -51,6 +53,13 @@ func (oyafile *Oyafile) resolveImports(loader PackLoader) error {
 		oyafile.Tasks.ImportTasks(alias, packOyafile.Tasks)
 	}
 
+	return oyafile.expose()
+}
+
+func (oyafile *Oyafile) expose() error {
+	for _, alias := range oyafile.ExposedAliases {
+		oyafile.Tasks.Expose(alias)
+	}
 	return nil
 }
 

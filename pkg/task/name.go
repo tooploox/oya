@@ -23,6 +23,17 @@ func (n Name) Split() (types.Alias, string) {
 	}
 }
 
+func (n Name) IsAliased(alias types.Alias) bool {
+	// TODO(bilus): Turn Name into a a struct.
+	actualAlias, _ := n.Split()
+	return actualAlias == alias
+}
+
+func (n Name) Unaliased() Name {
+	_, s := n.Split()
+	return Name(s)
+}
+
 func (n Name) IsBuiltIn() bool {
 	firstChar := string(n)[0:1]
 	return firstChar == strings.ToUpper(firstChar)

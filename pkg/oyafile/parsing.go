@@ -13,6 +13,7 @@ import (
 )
 
 const StmtImport = "Import"
+const StmtExpose = "Expose"
 const StmtValues = "Values"
 const StmtProject = "Project"
 const StmtIgnore = "Ignore"
@@ -80,6 +81,8 @@ func parseStatement(name string, value interface{}, o *Oyafile) error {
 		return parseRequire(value, o)
 	case StmtReplace:
 		return parseReplace(value, o)
+	case StmtExpose:
+		return parseExpose(value, o)
 
 	default:
 		taskName := task.Name(name)
@@ -243,4 +246,14 @@ func parseReplace(value interface{}, o *Oyafile) error {
 
 	return nil
 
+}
+
+func parseExpose(value interface{}, o *Oyafile) error {
+	aliasStr, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("expected an import alias")
+	}
+	alias := types.Alias(aliasStr)
+	o.ExposedAliases = []types.Alias{alias}
+	return nil
 }

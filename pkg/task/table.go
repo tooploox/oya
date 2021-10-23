@@ -1,8 +1,6 @@
 package task
 
 import (
-	"fmt"
-
 	"github.com/tooploox/oya/pkg/types"
 )
 
@@ -34,10 +32,29 @@ func (tt Table) AddDoc(taskName Name, s string) {
 }
 
 func (tt Table) ImportTasks(alias types.Alias, other Table) {
-	for key, t := range other.tasks {
+	for name, t := range other.tasks {
 		// TODO: Detect if task already set.
-		tt.AddTask(Name(fmt.Sprintf("%v.%v", alias, key)), t)
+		tt.AddTask(Name(name).Aliased(alias), t)
 	}
+}
+
+// Expose copies tasks under an alias to global scope (without the alias)
+// never overriding the existing global tasks.
+func (tt Table) Expose(alias types.Alias) {
+	for name, task := range tt.tasks {
+		if name.IsAliased(alias) {
+			globalName := name.Unaliased()
+			_, ok := tt.LookupTask(globalName)
+			if !ok {
+				tt.addTaskWithMeta(globalName, task, tt.meta[name])
+			}
+		}
+	}
+}
+
+func (tt Table) addTaskWithMeta(name Name, task Task, meta Meta) {
+	tt.tasks[name] = task
+	tt.meta[name] = meta
 }
 
 func (tt Table) ForEach(f func(taskName Name, task Task, meta Meta) error) error {
