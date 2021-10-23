@@ -3,7 +3,6 @@ Feature: REPL
 Background:
    Given I'm in project dir
 
-@current
 Scenario: Successfully run a command
   Given file ./Oyafile containing
     """
@@ -14,7 +13,6 @@ Scenario: Successfully run a command
   And I send "exit" to repl
   Then file ./OK exists
 
-@current
 Scenario: Access a value
   Given file ./Oyafile containing
     """
@@ -31,7 +29,6 @@ Scenario: Access a value
     foo: bar
     """
 
-@current
 Scenario: Pass an environmental variable
   Given file ./Oyafile containing
     """

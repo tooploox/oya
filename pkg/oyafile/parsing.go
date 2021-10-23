@@ -12,6 +12,16 @@ import (
 	"github.com/tooploox/oya/pkg/types"
 )
 
+const StmtImport = "Import"
+const StmtValues = "Values"
+const StmtProject = "Project"
+const StmtIgnore = "Ignore"
+const StmtChangeset = "Changeset"
+const StmtRequire = "Require"
+const StmtReplace = "Replace"
+
+const ChangesetTaskName = StmtChangeset
+
 func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 	of, err := raw.Decode()
 	if err != nil {
@@ -26,54 +36,9 @@ func Parse(raw *raw.Oyafile) (*Oyafile, error) {
 		if !ok {
 			return nil, errors.Errorf("Incorrect value name: %v", name)
 		}
-		switch name {
-		case "Import":
-			err := parseImports(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Values":
-			err := parseValues(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Project":
-			err := parseProject(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Ignore":
-			err := parseIgnore(value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Changeset":
-			err := parseTask(name, value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Require":
-			err := parseRequire(name, value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-		case "Replace":
-			err := parseReplace(name, value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
-
-		default:
-			taskName := task.Name(name)
-			if taskName.IsBuiltIn() {
-				log.Debugf("WARNING: Unrecognized built-in task or directive %q; skipping.", name)
-				continue
-			}
-
-			err := parseTask(name, value, oyafile)
-			if err != nil {
-				return nil, errors.Wrapf(err, "error parsing key %q", name)
-			}
+		err := parseStatement(name, value, oyafile)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error parsing key %q", name)
 		}
 	}
 
@@ -97,6 +62,34 @@ func (oyafile *Oyafile) resolveReplacements() error {
 		}
 	}
 	return nil
+}
+
+func parseStatement(name string, value interface{}, o *Oyafile) error {
+	switch name {
+	case StmtImport:
+		return parseImports(value, o)
+	case StmtValues:
+		return parseValues(value, o)
+	case StmtProject:
+		return parseProject(value, o)
+	case StmtIgnore:
+		return parseIgnore(value, o)
+	case StmtChangeset:
+		return parseChangeset(value, o)
+	case StmtRequire:
+		return parseRequire(value, o)
+	case StmtReplace:
+		return parseReplace(value, o)
+
+	default:
+		taskName := task.Name(name)
+		if taskName.IsBuiltIn() {
+			log.Debugf("WARNING: Unrecognized built-in task or directive %q; skipping.", name)
+			return nil
+		}
+
+		return parseTask(name, value, o)
+	}
 }
 
 func parseMeta(metaName, key string) (task.Name, bool) {
@@ -170,6 +163,10 @@ func parseIgnore(value interface{}, o *Oyafile) error {
 	return nil
 }
 
+func parseChangeset(value interface{}, o *Oyafile) error {
+	return parseTask(ChangesetTaskName, value, o)
+}
+
 func parseTask(name string, value interface{}, o *Oyafile) error {
 	s, ok := value.(string)
 	if !ok {
@@ -186,7 +183,7 @@ func parseTask(name string, value interface{}, o *Oyafile) error {
 	return nil
 }
 
-func parseRequire(name string, value interface{}, o *Oyafile) error {
+func parseRequire(value interface{}, o *Oyafile) error {
 	if value == nil {
 		return nil
 	}
@@ -223,7 +220,7 @@ func parseRequire(name string, value interface{}, o *Oyafile) error {
 	return nil
 }
 
-func parseReplace(name string, value interface{}, o *Oyafile) error {
+func parseReplace(value interface{}, o *Oyafile) error {
 	defaultErr := fmt.Errorf("expected entries mapping pack import paths to paths relative to the project root directory, example: \"github.com/tooploox/oya-pack/docker: /packs/docker\"")
 
 	replacements, ok := value.(map[interface{}]interface{})
