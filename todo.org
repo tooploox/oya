@@ -60,9 +60,11 @@
     It's enough to have "install" task by convention in packs and then oya tasks will show it.
   :END:
 * TODO Experiment: exposing tasks
-** TODO PoC
-** TODO Flag for go import
-** TODO Multiple packages?
+** DONE PoC
+** DONE Flag for go import
+** DONE Multiple packages?
+Not for now.
+** TODO Better handling by oya tasks
 ** TODO Transient exposure (package exposing another package)
 * TODO Vendoring is only partially implemented
 ** TODO Simplify oya get/vendor (based on Import statements) TBD
