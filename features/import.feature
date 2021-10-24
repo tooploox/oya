@@ -138,3 +138,45 @@ Scenario: Import a pack with alias from a parameter
       pack3_5: github.com/tooploox/oya-fixtures/pack3-and-a-half
 
     """
+
+@current
+Scenario: Import a pack and expose it
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya import github.com/tooploox/oya-fixtures/pack3-and-a-half --expose"
+  Then the command succeeds
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack3-and-a-half: v1.1.0
+    Expose: pack3AndAHalf
+    Import:
+      pack3AndAHalf: github.com/tooploox/oya-fixtures/pack3-and-a-half
+
+    """
+
+@current
+Scenario: Try to expose two packs
+  Given file ./Oyafile containing
+    """
+    Project: project
+    """
+  When I run "oya import github.com/tooploox/oya-fixtures/pack1 --expose"
+  And I run "oya import github.com/tooploox/oya-fixtures/pack2 --expose"
+  Then the command fails with error matching
+  """
+  .*already exposed.*
+  """
+  And file ./Oyafile contains
+    """
+    Project: project
+    Require:
+      github.com/tooploox/oya-fixtures/pack1: v1.1.1
+    Expose: pack1
+    Import:
+      pack1: github.com/tooploox/oya-fixtures/pack1
+
+    """
