@@ -66,5 +66,34 @@ Scenario: Never overwrite existing an task when exposing tasks
 
   """
 
+@current
+Scenario: Show task as exposed when listing tasks
+  Given file ./Oyafile containing
+    """
+    Project: main
+    """
+  And file ./project1/Oyafile containing
+    """
+    Values:
+      foo: project1
 
-# TODO: Show as aliases when listing tasks.
+    echo: |
+      echo "project1"
+    """
+  And file ./project2/Oyafile containing
+    """
+    Import:
+      p: /project1
+
+    Expose: p
+    """
+  And I'm in the ./project2 dir
+  When I run "oya tasks"
+  Then the command succeeds
+  And the command outputs
+  """
+  # in ./Oyafile
+  oya run echo   # (p.echo)
+  oya run p.echo
+
+  """

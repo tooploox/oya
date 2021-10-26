@@ -64,10 +64,14 @@
 ** DONE Flag for go import
 ** DONE Multiple packages?
 Not for now.
-** TODO Better handling by oya tasks
-*** TODO Show global tasks first
-*** TODO Group aliased tasks
-*** TODO Show global tasks pointing to exposed tasks
+** DONE Better handling by oya tasks
+*** DONE Show global tasks first
+*** DONE Group aliased tasks
+*** DONE Show global tasks pointing to exposed tasks
+Use Meta.OriginalTaskName
+**** DONE Add to .feature
+**** DONE Add to tasks_test.go
+
 ** TODO Transient exposure (package exposing another package)
 * TODO Vendoring is only partially implemented
 ** TODO Simplify oya get/vendor (based on Import statements) TBD

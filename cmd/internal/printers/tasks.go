@@ -68,9 +68,17 @@ func (p *TaskList) taskPrinter() func(io.Writer, task.Name, task.Meta) {
 	docOffset := maxTaskWidth(p.tasks)
 	return func(w io.Writer, taskName task.Name, meta task.Meta) {
 		fmt.Fprintf(w, "oya run %s", taskName)
-		if len(meta.Doc) > 0 {
+		exposed := meta.IsTaskExposed(taskName)
+		if len(meta.Doc) > 0 || exposed {
 			padding := strings.Repeat(" ", docOffset-len(taskName))
-			fmt.Fprintf(w, "%s # %s", padding, meta.Doc)
+			fmt.Fprintf(w, "%s #", padding)
+			if len(meta.Doc) > 0 {
+				fmt.Fprintf(w, " %s", meta.Doc)
+			}
+
+			if exposed {
+				fmt.Fprintf(w, " (%s)", string(meta.OriginalTaskName))
+			}
 		}
 		fmt.Fprintln(w)
 	}

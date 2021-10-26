@@ -27,7 +27,8 @@ func (tt Table) AddTask(name Name, task Task) {
 
 func (tt Table) AddDoc(taskName Name, s string) {
 	tt.meta[taskName] = Meta{
-		Doc: s,
+		Doc:              s,
+		OriginalTaskName: taskName,
 	}
 }
 
@@ -46,7 +47,9 @@ func (tt Table) Expose(alias types.Alias) {
 			globalName := name.Unaliased()
 			_, ok := tt.LookupTask(globalName)
 			if !ok {
-				tt.addTaskWithMeta(globalName, task, tt.meta[name])
+				meta := tt.meta[name]
+				meta.OriginalTaskName = name
+				tt.addTaskWithMeta(globalName, task, meta)
 			}
 		}
 	}
@@ -57,6 +60,7 @@ func (tt Table) addTaskWithMeta(name Name, task Task, meta Meta) {
 	tt.meta[name] = meta
 }
 
+// ForEach invokes the callback for each task.
 func (tt Table) ForEach(f func(taskName Name, task Task, meta Meta) error) error {
 	for taskName, task := range tt.tasks {
 		meta := tt.meta[taskName]
@@ -67,13 +71,14 @@ func (tt Table) ForEach(f func(taskName Name, task Task, meta Meta) error) error
 	return nil
 }
 
+// ForEachSorted invokes the callback for each task, the tasks sorted alphabetically.
 func (tt Table) ForEachSorted(f func(taskName Name, task Task, meta Meta) error) error {
 	taskNames := make([]Name, 0, len(tt.tasks))
 	for taskName := range tt.tasks {
 		taskNames = append(taskNames, taskName)
 	}
-
 	Sort(taskNames)
+
 	for _, taskName := range taskNames {
 		task := tt.tasks[taskName]
 		meta := tt.meta[taskName]

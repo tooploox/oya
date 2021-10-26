@@ -134,7 +134,20 @@ func TestTaskList(t *testing.T) {
 				"",
 			},
 		},
-		// NEXT: Exposed
+		{
+			desc:    "exposed tasks",
+			workDir: "/project/",
+			tasks: []taskDef{
+				{task.Name("y"), task.Meta{Doc: "a description", OriginalTaskName: task.Name("y").Aliased("somepack")}, "/project/Oyafile"},
+				{task.Name("z"), task.Meta{OriginalTaskName: task.Name("z").Aliased("somepack")}, "/project/Oyafile"},
+			},
+			expectedOutput: []string{
+				"# in ./Oyafile",
+				"oya run y # a description (somepack.y)",
+				"oya run z # (somepack.z)",
+				"",
+			},
+		},
 	}
 
 	for _, tc := range testCases {
