@@ -65,6 +65,9 @@
 ** DONE Multiple packages?
 Not for now.
 ** TODO Better handling by oya tasks
+*** TODO Show global tasks first
+*** TODO Group aliased tasks
+*** TODO Show global tasks pointing to exposed tasks
 ** TODO Transient exposure (package exposing another package)
 * TODO Vendoring is only partially implemented
 ** TODO Simplify oya get/vendor (based on Import statements) TBD

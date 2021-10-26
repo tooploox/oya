@@ -15,7 +15,7 @@ Scenario: Single Oyafile
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build\s+
+  oya run build
 
   """
 
@@ -32,7 +32,7 @@ Scenario: Show only user-defined
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build\s+
+  oya run build
 
   """
 
@@ -53,10 +53,11 @@ Scenario: Subdirectories are not recursed by default
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build\s+
+  oya run build
 
   """
 
+@current
 Scenario: Subdirectories can be recursed
   Given file ./Oyafile containing
     """
@@ -64,7 +65,12 @@ Scenario: Subdirectories can be recursed
     build: |
       echo "Done"
     """
-  And file ./subdir1/Oyafile containing
+  And file ./subdir/Oyafile containing
+    """
+    build: |
+      echo "Done"
+    """
+  And file ./another_subdir/Oyafile containing
     """
     build: |
       echo "Done"
@@ -74,10 +80,13 @@ Scenario: Subdirectories can be recursed
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build\s+
+  oya run build
 
-  # in ./subdir1/Oyafile
-  oya run build\s+
+  # in ./subdir/Oyafile
+  oya run build
+
+  # in ./another_subdir/Oyafile
+  oya run build
 
   """
 
@@ -96,7 +105,7 @@ Scenario: Docstring prints
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build  # Build it.*
+  oya run build # Build it.*
 
   """
 
@@ -124,11 +133,11 @@ Scenario: Doc strings are properly aligned
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run build    # Build it.*
-  oya run testAll  # Run all tests.*
+  oya run build   # Build it.*
+  oya run testAll # Run all tests.*
 
   # in ./subdir1/Oyafile
-  oya run foo  # Do foo
+  oya run foo     # Do foo
 
   """
 
@@ -157,7 +166,7 @@ Scenario: Parent dir tasks are not listed
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run foo  # Do foo
+  oya run foo # Do foo
 
   """
 
@@ -185,7 +194,7 @@ Scenario: Imported packs tasks are listed
   And the command outputs text matching
   """
   # in ./Oyafile
-  oya run foo.packTask\s+
-  oya run test\s+
+  oya run test
+  oya run foo.packTask
 
   """

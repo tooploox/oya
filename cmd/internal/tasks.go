@@ -1,11 +1,10 @@
 package internal
 
 import (
-	"fmt"
 	"io"
-	"path/filepath"
 	"text/tabwriter"
 
+	"github.com/tooploox/oya/cmd/internal/printers"
 	"github.com/tooploox/oya/pkg/project"
 	"github.com/tooploox/oya/pkg/task"
 )
@@ -28,32 +27,12 @@ func Tasks(workDir string, recurse, changeset bool, stdout, stderr io.Writer) er
 		return err
 	}
 
-	first := true
-
+	printer := printers.NewTaskList(workDir)
 	err = p.ForEachTask(workDir, recurse, changeset, false, // No built-ins.
 		func(i int, oyafilePath string, taskName task.Name, task task.Task, meta task.Meta) error {
-			if i == 0 {
-				relPath, err := filepath.Rel(workDir, oyafilePath)
-				if err != nil {
-					return err
-				}
-				if !first {
-					fmt.Fprintln(w)
-				} else {
-					first = false
-				}
-
-				fmt.Fprintf(w, "# in ./%s\n", relPath)
-			}
-
-			if len(meta.Doc) > 0 {
-				fmt.Fprintf(w, "oya run %s\t# %s\n", taskName, meta.Doc)
-			} else {
-				fmt.Fprintf(w, "oya run %s\t\n", taskName)
-			}
-
-			return nil
+			return printer.AddTask(taskName, meta, oyafilePath)
 		})
+	printer.Print(w)
 	w.Flush()
 	return err
 }
