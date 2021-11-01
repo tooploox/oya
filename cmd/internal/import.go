@@ -10,7 +10,7 @@ import (
 	"github.com/tooploox/oya/pkg/raw"
 )
 
-func Import(workDir, uri, alias string, stdout, stderr io.Writer) error {
+func Import(workDir, uri, alias string, exposeTasks bool, stdout, stderr io.Writer) error {
 	if alias == "" {
 		uriArr := strings.Split(uri, "/")
 		alias = strcase.ToLowerCamel(uriArr[len(uriArr)-1])
@@ -34,6 +34,16 @@ func Import(workDir, uri, alias string, stdout, stderr io.Writer) error {
 	}
 
 	if err := raw.AddImport(alias, uri); err != nil {
+		return err
+	}
+
+	if exposeTasks {
+		if err := raw.Expose(alias); err != nil {
+			return err
+		}
+	}
+
+	if err := raw.ApplyChanges(); err != nil {
 		return err
 	}
 

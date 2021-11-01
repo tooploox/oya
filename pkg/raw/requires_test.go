@@ -26,6 +26,8 @@ func TestOyafile_AddRequire_NoRequire(t *testing.T) {
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
+
 	expectedContent := `Project: AddRequire
 Require:
   github.com/tooploox/foo: v1.0.0
@@ -48,6 +50,8 @@ func TestOyafile_AddRequire_EmptyRequire(t *testing.T) {
 	pack := tu.MustMakeMockPack("github.com/tooploox/foo", "v1.0.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
+
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
 
 	expectedContent := `Project: AddRequire_EmptyRequire
 
@@ -72,6 +76,8 @@ func TestOyafile_AddRequire_ExistingRequire(t *testing.T) {
 	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.1.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
+
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
 
 	expectedContent := `Project: AddRequire_ExistingRequire
 
@@ -98,6 +104,8 @@ func TestOyafile_AddRequire_SameVersion(t *testing.T) {
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
+
 	expectedContent := `Project: AddRequire_ExistingRequire
 
 Require:
@@ -122,6 +130,8 @@ func TestOyafile_AddRequire_DifferentVersion(t *testing.T) {
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
 
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
+
 	expectedContent := `Project: AddRequire_ExistingRequire
 
 Require:
@@ -145,6 +155,8 @@ func TestOyafile_AddRequire_MoreKeys(t *testing.T) {
 	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.1.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
+
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
 
 	expectedContent := `Project: AddRequire_MoreKeys
 Require:
@@ -171,6 +183,8 @@ func TestOyafile_AddRequire_DifferentVersionMoreKeys(t *testing.T) {
 	pack := tu.MustMakeMockPack("github.com/tooploox/bar", "v1.5.0")
 	err = raw.AddRequire(pack)
 	tu.AssertNoErr(t, err, "Error adding require")
+
+	tu.AssertNoErr(t, raw.ApplyChanges(), "Error applying changes")
 
 	expectedContent := `Project: AddRequire_ExistingMoreKeys
 

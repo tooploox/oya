@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.18.0+incompatible
+	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/c-bata/go-prompt v0.2.4-0.20200321140817-d043be076398
 	github.com/cucumber/godog v0.12.2

@@ -27,16 +27,19 @@ type PackReference struct {
 type PackReplacements map[types.ImportPath]string
 
 type Oyafile struct {
-	Dir      string
-	Path     string
-	RootDir  string
-	Shell    string
-	Imports  map[types.Alias]types.ImportPath
-	Tasks    task.Table
-	Values   template.Scope
-	Project  string   // Project is set for root Oyafile.
-	Ignore   []string // Ignore contains directory exclusion rules.
-	Requires []PackReference
+	Dir     string
+	Path    string
+	RootDir string
+	Shell   string
+	Imports map[types.Alias]types.ImportPath
+	Tasks   task.Table
+	// ExposedAliases contains a list of imported packs' aliases that will
+	// be exposed to global scope.
+	ExposedAliases []types.Alias
+	Values         template.Scope
+	Project        string   // Project is set for root Oyafile.
+	Ignore         []string // Ignore contains directory exclusion rules.
+	Requires       []PackReference
 	// Replacements map packs to local paths relative to project root directory for development based on the Replace: directive.
 	Replacements PackReplacements
 	IsBuilt      bool

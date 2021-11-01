@@ -19,10 +19,14 @@ func (p *Project) Require(pack pack.Pack) error {
 		return ErrNoOyafile{Path: p.RootDir}
 	}
 
-	err = raw.AddRequire(pack)
-	if err != nil {
+	if err := raw.AddRequire(pack); err != nil {
 		return err
 	}
+
+	if err := raw.ApplyChanges(); err != nil {
+		return err
+	}
+
 	p.invalidateOyafileCache(p.RootDir)
 
 	p.dependencies = nil // Force reload.

@@ -10,6 +10,15 @@ import (
 	"strings"
 )
 
+// ApplyChanges flushes in-memory Oyafile contents to disk.
+func (raw *Oyafile) ApplyChanges() error {
+	info, err := os.Stat(raw.Path)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(raw.Path, raw.oyafileContents, info.Mode())
+}
+
 // flatMap maps each line of Oyafile to possibly multiple lines flattening the result. Does not write to the file.
 func (raw *Oyafile) flatMap(f func(line string) []string) error {
 	scanner := bufio.NewScanner(bytes.NewReader(raw.oyafileContents))
@@ -150,15 +159,6 @@ func writeLines(lines []string, output *bytes.Buffer) error {
 // (?m) directive may be used to match file line by line
 func (raw *Oyafile) matches(rx *regexp.Regexp) bool {
 	return rx.MatchString(string(raw.oyafileContents))
-}
-
-// write flushes in-memory Oyafile contents to disk.
-func (raw *Oyafile) write() error {
-	info, err := os.Stat(raw.Path)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(raw.Path, raw.oyafileContents, info.Mode())
 }
 
 func indent(lines []string, level int) []string {

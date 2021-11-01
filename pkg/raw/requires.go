@@ -30,10 +30,7 @@ var defaultIndent = 2
 
 // AddRequire adds a Require: entry for the pack.
 func (raw *Oyafile) AddRequire(pack Pack) error {
-	if err := raw.addRequire(pack); err != nil {
-		return err
-	}
-	return raw.write()
+	return raw.addRequire(pack)
 }
 
 // addRequire adds a Require: entry for a pack using the following algorithm:

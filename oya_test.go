@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/andreyvit/diff"
 	"github.com/cucumber/godog"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -281,7 +282,8 @@ func (c *SuiteContext) theCommandFailsWithErrorMatching(errMsg *gherkin.DocStrin
 func (c *SuiteContext) theCommandOutputs(expected *gherkin.DocString) error {
 	actual := c.stdout.String()
 	if actual != expected.Content {
-		return fmt.Errorf("unexpected %v; expected: %q", actual, expected.Content)
+		return fmt.Errorf("unexpected %v; expected: %v; diff: %v",
+			actual, expected.Content, diff.LineDiff(actual, expected.Content))
 	}
 	return nil
 }
@@ -290,7 +292,7 @@ func (c *SuiteContext) theCommandOutputsTextMatching(expected *gherkin.DocString
 	actual := c.stdout.String()
 	rx := regexp.MustCompile(expected.Content)
 	if !rx.MatchString(actual) {
-		return fmt.Errorf("unexpected %v; expected to match: %q", actual, expected.Content)
+		return fmt.Errorf("unexpected %v; expected to match: %v", actual, expected.Content)
 	}
 	return nil
 }

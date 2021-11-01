@@ -20,11 +20,16 @@ var importCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return internal.Import(cwd, args[0], alias, cmd.OutOrStdout(), cmd.OutOrStderr())
+		expose, err := cmd.Flags().GetBool("expose")
+		if err != nil {
+			return err
+		}
+		return internal.Import(cwd, args[0], alias, expose, cmd.OutOrStdout(), cmd.OutOrStderr())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(importCmd)
 	importCmd.Flags().StringP("alias", "a", "", "Import pack under alias name")
+	importCmd.Flags().BoolP("expose", "e", false, "Expose imported tasks")
 }

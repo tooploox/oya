@@ -59,6 +59,20 @@
   - State "CANCELLED"  from "TODO"       [2019-01-25 Fri 10:34] \\
     It's enough to have "install" task by convention in packs and then oya tasks will show it.
   :END:
+* DONE Experiment: exposing tasks
+** DONE PoC
+** DONE Flag for go import
+** DONE Multiple packages?
+Not for now.
+** DONE Better handling by oya tasks
+*** DONE Show global tasks first
+*** DONE Group aliased tasks
+*** DONE Show global tasks pointing to exposed tasks
+Use Meta.OriginalTaskName
+**** DONE Add to .feature
+**** DONE Add to tasks_test.go
+
+** DONE Transient exposure (package exposing another package)
 * TODO Vendoring is only partially implemented
 ** TODO Simplify oya get/vendor (based on Import statements) TBD
 **** Just use Import

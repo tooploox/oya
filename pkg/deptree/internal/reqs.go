@@ -134,16 +134,22 @@ func (r *Reqs) remoteReqs(p pack.Pack) ([]pack.Pack, error) {
 	return l.Reqs(p.Version())
 }
 
+// TODO(bilus): The same logic is in resolvePackReferences in packs.go
 func toPacks(references []oyafile.PackReference) ([]pack.Pack, error) {
 	packs := make([]pack.Pack, len(references))
 	for i, reference := range references {
-		repo, err := repo.Open(reference.ImportPath)
+		l, err := repo.Open(reference.ImportPath)
 		if err != nil {
 			return nil, err
 		}
-		if packs[i], err = repo.Version(reference.Version); err != nil {
+		pack, err := l.Version(reference.Version)
+		if err != nil {
 			return nil, err
 		}
+		if len(reference.ReplacementPath) > 0 {
+			pack = pack.LocalReplacement(reference.ReplacementPath)
+		}
+		packs[i] = pack
 	}
 	return packs, nil
 }
