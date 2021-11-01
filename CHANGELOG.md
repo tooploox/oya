@@ -7,6 +7,8 @@
 - Ensure non-zero exit code from a command in Oya tasks, including sub-commands,
   propagates to the shell invoking `oya run`, even without `set -e`.
 
+- Fix `Replace` directive having no effect when used in imported packs.
+
 ### Added
 
 - REPL, helping build scripts interactively with access to values in .oya files

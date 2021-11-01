@@ -55,3 +55,41 @@ Scenario: With local require oya doesn't attempt to lookup requirements remotely
     """
   When I run "oya run foo.version"
   Then the command succeeds
+
+Scenario: Replace directive works in packs
+  Given file ./Oyafile containing
+    """
+    Project: project
+
+    Require:
+      github.com/tooploox/does-not-exist: v1.0.0
+
+    Replace:
+      github.com/tooploox/does-not-exist: /tmp/pack1
+
+    Import:
+      foo: github.com/tooploox/does-not-exist
+    """
+  And file /tmp/pack1/Oyafile containing
+    """
+    Project: pack1
+
+    Require:
+      github.com/tooploox/does-not-exist2: v1.0.0
+
+    Replace:
+      github.com/tooploox/does-not-exist2: /tmp/pack2
+
+    Import:
+      foo: github.com/tooploox/does-not-exist2
+
+    version: echo 1.0.0
+    """
+  And file /tmp/pack2/Oyafile containing
+    """
+    Project: pack2
+
+    version: echo 1.0.0
+    """
+  When I run "oya run foo.version"
+  Then the command succeeds
