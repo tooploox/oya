@@ -139,7 +139,6 @@ Scenario: Import a pack with alias from a parameter
 
     """
 
-@current
 Scenario: Import a pack and expose it
   Given file ./Oyafile containing
     """
@@ -158,7 +157,6 @@ Scenario: Import a pack and expose it
 
     """
 
-@current
 Scenario: Try to expose two packs
   Given file ./Oyafile containing
     """

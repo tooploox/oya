@@ -57,7 +57,6 @@ Scenario: Subdirectories are not recursed by default
 
   """
 
-@current
 Scenario: Subdirectories can be recursed
   Given file ./Oyafile containing
     """
