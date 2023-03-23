@@ -53,13 +53,15 @@ build-dist: |
   set -e
   go get -u github.com/mitchellh/gox
 
-  # # Windows compilation is seperated because it failes when bulding two arch parallel.
-  gox -os="linux darwin" -arch="amd64 386" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
-  gox -os="windows" -arch="amd64" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
-  gox -os="windows" -arch="386" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
+  gox -os="linux darwin" -arch="386 amd64 arm64" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
+  # gox -os="linux darwin" -arch="arm64" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
+  # gox -os="windows" -arch="amd64" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
+  # gox -os="windows" -arch="386" -output="dist/oya_${GITHUB_REF_NAME}_{{.OS}}_{{.Arch}}" -ldflags="-X main.buildVersion=${GITHUB_REF_NAME}"
 
   find ./dist -type f ! -name "*.exe" -exec gzip {} \;
   find ./dist -type f -name "*.exe" -execdir zip {}.zip {} \;
   find ./dist -type f -name "*.exe" -exec rm {} \;
 
-  sha256sum dist/oya_*_{darwin,linux,windows}_* | tee dist/oya_SHA256SUMS
+  ls -la ./dist
+
+  # sha256sum dist/oya_*_{darwin,linux,windows}_* | tee dist/oya_SHA256SUMS

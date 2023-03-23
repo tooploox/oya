@@ -3,7 +3,7 @@ run-name: Oya build triggered by ${{ github.actor }}
 on:
   push:
     branches:
-      - "*"
+      - "test_"
     tags-ignore:
       - "v*.*.*"
 
