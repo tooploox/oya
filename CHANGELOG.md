@@ -1,7 +1,7 @@
 # Oya Changelog
 
 
-## v0.0.20 (Upcoming)
+## v0.0.20 (Released)
 
 ### Added
 
@@ -19,6 +19,9 @@
     whoami: |
        echo ${Oya[Import.Alias]}
     ```
+    
+- Added build for Apple Silicon processors `arm64`.
+
 
 ### Changed
 
