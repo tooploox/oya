@@ -1,0 +1,49 @@
+name: release
+run-name: Oya release triggered by ${{ github.actor }}
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: magnetikonline/action-golang-cache@v4
+        with:
+          go-version-file: go.mod
+      - run: go run oya.go run build-dist
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build-release
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: oya_*
+          fail_on_unmatched_files: true
+
+
+  # TODO: If there is a time and need (and way/os to testit) we can try to migrate to GHActions
+  # build-installer:
+  #   docker:
+  #     - image: scottyhardy/docker-wine:latest
+  #   steps:
+  #     - checkout
+  #     - run: apt-get update && apt-get install -y wget curl zip osslsigncode
+  #     - run: wget https://github.com/mozilla/sops/releases/download/3.3.1/sops_3.3.1_amd64.deb
+  #     - run: dpkg -i sops_3.3.1_amd64.deb
+  #     - run: curl https://oya.sh/get | bash
+  #     - run: oya run -r fetchBinary
+  #     - run: oya run -r buildInstaller
+  #     - run: oya run -r signInstaller
+  #     - run: oya run -r releaseInstaller
