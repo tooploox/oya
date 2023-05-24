@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 OYA_URL="https://github.com/tooploox/oya"
-OYA_TAGS_URL="https://api.github.com/repos/tooploox/oya/tags"
+OYA_LATEST_RELEASE_URL="https://api.github.com/repos/tooploox/oya/releases/latest"
+INSTALL_DIR="/usr/local/bin"
 verifySHA=true
 
 check_sops() {
@@ -53,6 +54,8 @@ get_arch() {
         arch='386'
     elif [[ "$archstr" == 'x86_64' || "$archstr" == 'AMD64' ]]; then
          arch='amd64'
+    elif [[ "$archstr" == 'arm64' ]]; then
+         arch='arm64'
     else
         echo "Sorry Oya doesn't support ${archstr} architecture yet! :("
         exit 1
@@ -60,17 +63,15 @@ get_arch() {
 }
 
 find_latest() {
-    version="$(fetch_versions | tail -n 1)"
+    version="$(fetch_latest_release_tag)"
     if [[ -n ${version} ]];then
         echo "${version}"
         return 0
     fi
 }
 
-fetch_versions() {
-    curl -s $OYA_TAGS_URL |
-        \awk -v RS=',' -v FS='"' '$2=="name"{print $4}' |
-        sort -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n -k 5,5n 
+fetch_latest_release_tag() {
+    curl -s ${OYA_LATEST_RELEASE_URL} | awk -v RS=',' -v FS='"' '$2=="tag_name"{print $4}'
 }
 
 install_version() {
@@ -89,16 +90,15 @@ get_and_check() {
     _tmp_dir=`mktemp -d`
     _archive="oya.gz"
     _fileName="oya"
-    _bin_dir="/usr/local/bin"
     _args=""
     get_package "$_url" "$_tmp_dir" "$_archive" || return $?
     verify_sha "$_sum_url" "$_tmp_dir" "$_archive" || return $?
     gunzip ${_tmp_dir}/${_archive} || return $?
     chmod +x ${_tmp_dir}/${_fileName} || return $?
-    if [ ! -w "$_bin_dir" ]; then
+    if [ ! -w "$INSTALL_DIR" ]; then
         _args="sudo "
     fi
-    ${_args}mv ${_tmp_dir}/${_fileName} ${_bin_dir}
+    ${_args}mv ${_tmp_dir}/${_fileName} ${INSTALL_DIR}
 }
 
 get_package() {
